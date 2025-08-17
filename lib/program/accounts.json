@@ -1,0 +1,26 @@
+{
+    "stg": {
+        "global": {
+            "creator": "3vuPuhCn9c7wMkwi3pB9N6d4CtWnHUT4goaKascro4Pq",
+            "program": "MFerSc4KKyyXRmqGnNZ9dFGrGDG9aGRuZEE1Ftz7prS",
+            "protocol": "4scg1GNWc3qj9jiKcbPobQB1peGwWLDknYU3c1cvMp68"
+        },
+        "vaults": {
+            "one": {
+                "id": 0,
+                "pubkey": "6ixm38VWUGLsabmz7Az2uCzoyJgJHEETjgFdNQDbxrJ6",
+                "deposit_token_symbol": "USDC",
+                "deposit_token_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "deposit_token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                "deposit_token_pyth_oracle": "Dpw1EAVrSB1ibxiDQyTAW6Zip3J4Btk2x4SgApQCeFbX",
+                "share_token_mint": "BQ8VUoFcCuFxsubCdeXBQxA7wyngFNUZPV7CEJ189kNr",
+                "share_token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+                "vault_authority": "Gm6b9oiPBwFZyDMYWdEVj5KWRNrXdMXarCa2Xox11LC9",
+                "vault_fee_authority": "BHgVsRmBqs44vNkfQEEfa8oQrzwsAJ5ejs5F1ndMGu95",
+                "kamino_manager": "AaJoJXMQb6YEbXn4SR9sNKsb2x9GbPL5nuExegMwS3Bn",
+                "kamino_authority": "7K3iuuHZ7EHjXpmunvZqXuVqUQA3ycrNWHUYhYM6Dv2w"
+            }
+        }
+
+    }
+}
