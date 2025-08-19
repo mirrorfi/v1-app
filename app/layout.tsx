@@ -34,7 +34,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <AppWalletProvider>
-          
           <body
             className={`h-[80vh] antialiased ${satoshi.variable} ${univaNova.variable}`}
           >

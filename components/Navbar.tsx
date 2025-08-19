@@ -65,7 +65,7 @@ export function Navbar() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link href="/strategy-dashboard" legacyBehavior passHref>
+                <Link href="/" legacyBehavior passHref>
                   <NavigationMenuLink
                     className={`text-sm font-medium ${
                       pathname === "/strategy-dashboard"
@@ -73,7 +73,7 @@ export function Navbar() {
                         : "text-foreground"
                     }  hover:text-primary`}
                   >
-                    Strategy Dashboard
+                    Mirror Vaults
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -82,10 +82,10 @@ export function Navbar() {
               <div className="border-l border-[#3f4152] h-4 mx-4" />
 
               <NavigationMenuItem>
-                <Link href="/create-strategy" legacyBehavior passHref>
+                <Link href="/create" legacyBehavior passHref>
                   <NavigationMenuLink
                     className={`text-sm font-medium ${
-                      pathname === "/create-strategy"
+                      pathname === "/create"
                         ? "text-primary"
                         : "text-foreground"
                     } hover:text-primary`}

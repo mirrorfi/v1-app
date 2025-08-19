@@ -1,7 +1,8 @@
 "use client";
-
+import { Navbar } from '@/components/Navbar';
 import dynamic from 'next/dynamic'; 
-import { Navbar } from "@/components/Navbar";
+import { useEffect, useState } from "react";
+import { StrategyModal } from '@/components/StrategyModal';
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -9,9 +10,41 @@ const WalletMultiButtonDynamic = dynamic(
 );
  
 export default function Home() {
+  const [modalOpen, setModalOpen] = useState(true);
+  let closeModal = () => {
+    setModalOpen(false);
+  };
+
   return (
-     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background/95 to-blue-950/20 text-foreground">
-        <Navbar />
-     </div>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background/95 to-blue-950/20 text-foreground">
+      <Navbar />
+      {/*<StrategyDashboardHeader
+          strategies={strategies}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
+
+        {viewMode === "grid" ? (
+          <StrategyGridView
+            strategies={strategies}
+            categoryFilter={categoryFilter}
+            onStrategyClick={handleStrategyClick}
+          />
+        ) : (
+          <StrategyListView
+            strategies={strategies}
+            categoryFilter={categoryFilter}
+            sortDirection={sortDirection}
+            setSortDirection={setSortDirection}
+            onStrategyClick={handleStrategyClick}
+          />
+        )}*/}
+      <StrategyModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+      />
+    </div>
   );
 }
