@@ -36,9 +36,9 @@ export function InteractiveFlow({
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
-          panOnDrag={true}
-          zoomOnScroll={true}
-          zoomOnPinch={true}
+          panOnDrag={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
           zoomOnDoubleClick={false}
           proOptions={{ hideAttribution: true }}
         />

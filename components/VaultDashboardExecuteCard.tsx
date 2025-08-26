@@ -8,9 +8,9 @@ export function VaultDashboardExecuteCard() {
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
 
   // Mock data - replace with real data
-  const tokenBalance = 2.45 // Available SOL balance
-  const tokenPrice = 100 // SOL price in USD
-  const apy = 8.82
+  const tokenBalance = 0.21 // Available SOL balance
+  const tokenPrice = 180 // SOL price in USD
+  const apy = 6.8
 
   const handleAmountChange = (value: string) => {
     // Only allow numbers and decimal point
@@ -45,19 +45,18 @@ export function VaultDashboardExecuteCard() {
     <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg hover:bg-blue-900/30 transition-all duration-200">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-lg">Sanctum's INF LST</CardTitle>
+          <CardTitle className="text-white text-lg">Kamino Lending Strategy</CardTitle>
         </div>
         <div className="text-green-400 font-medium">APY: {apy}%</div>
       </CardHeader>
 
       <CardContent className="space-y-4 pb-6">
         <div className="text-sm text-gray-300 leading-relaxed">
-          Stake your LST to INF created by Sanctum. You can earn APY from a basket of multiple LSTs and collect fees
-          from LST Swaps
+          USDC yield strategy comibining USDC Lending to Kamino Main Market for secure yield + future yield strategy 
         </div>
 
         <div className="inline-flex items-center px-2 py-1 bg-blue-600/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-          LST
+          Lending
         </div>
 
         <div className="space-y-3 mt-6">
