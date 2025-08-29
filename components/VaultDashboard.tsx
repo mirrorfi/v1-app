@@ -4,14 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useEffect, useState } from "react"
+import { getVaultBalances } from "@/lib/api/vault"
+import { PublicKey, Keypair } from "@solana/web3.js"
 
 import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
 import { VaultDashboardChart } from "@/components/VaultDashboardChart";
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
+import { set } from "@coral-xyz/anchor/dist/cjs/utils/features"
 
 interface StrategyDashboardProps {
+  vault: string;
   strategy: {
     name: string
     icon?: string
@@ -21,12 +26,30 @@ interface StrategyDashboardProps {
   onTabChange?: (tab: string) => void
 }
 
-export function VaultDashboard({ strategy, activeTab = "vault-stats", onTabChange }: StrategyDashboardProps) {
+export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onTabChange }: StrategyDashboardProps) {
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
     { id: "your-position", label: "Your Position" },
     { id: "overview", label: "Overview" },
   ]
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [vaultBalances, setVaultBalances] = useState<any>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    async function loadVault(){
+      try{
+        const vaultKey = Keypair.generate().publicKey;
+        const balances = await getVaultBalances(vaultKey);
+        setVaultBalances(balances);
+      } catch (error) {
+        console.error("Error fetching vault balances:", error);
+      } 
+      setIsLoading(false);
+    }
+    loadVault();
+  }, [vault]);
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6">
@@ -76,7 +99,7 @@ export function VaultDashboard({ strategy, activeTab = "vault-stats", onTabChang
             <div className="lg:col-span-2 space-y-4">
               <VaultDashboardFlow />
               <VaultDashboardChart />
-              <VaultDashboardBalances />
+              <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
           </div>
           )}
           {activeTab == "your-position" && (

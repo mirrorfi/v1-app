@@ -6,12 +6,13 @@ import {
     getReserveExchangeRate,
     getCumulativeBorrowRate,
     calculateSupplyAPR,
+    calculateBorrowAPR
 } from '../accounts';
 import { fetchJupiterPrices } from '../../jupiter';
 import BigNumber from 'bignumber.js';
 import { SYSTEM_PROGRAM_ID } from '@/lib/constants';
 import { sfToValue } from '../math';
-import { Obligation, Reserve } from '@kamino-finance/klend-sdk';
+import { Reserve, BigFractionBytes } from '@kamino-finance/klend-sdk';
 
 interface ObligationNAV {
     obligation: string;
@@ -92,6 +93,7 @@ export async function getKaminoBalances(connection: Connection, obligationAddres
             const tokenMint = reserves[reserveMint].liquidity.mintPubkey.toString();
             const tokenPriceUSD = tokenPrices[tokenMint].usdPrice;
             const token24Change = tokenPrices[tokenMint].priceChange24h;
+            const reserveBorrowAPR = calculateBorrowAPR(reserves[reserveMint]);
             const reserveCumulativeBorrowRate = getCumulativeBorrowRate(
                 reserves[reserveMint].liquidity.cumulativeBorrowRateBsf
             );
@@ -113,12 +115,11 @@ export async function getKaminoBalances(connection: Connection, obligationAddres
                 tokenPrice          : tokenPriceUSD,
                 tokenPriceChange24h : token24Change,
                 value               : borrowValueUsd.toNumber(),
-                yield               : 0
+                yield               : reserveBorrowAPR
             });
             obligationNAV.totalNAV -= borrowValueUsd.toNumber();
         });
         obligationBalances.push(obligationNAV);
-        console.log(obligationNAV);
     });
 
     return obligationBalances;
