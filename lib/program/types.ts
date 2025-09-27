@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/mirrorfi_vault.json`.
  */
 export type MirrorfiVault = {
-  "address": "MFerSc4KKyyXRmqGnNZ9dFGrGDG9aGRuZEE1Ftz7prS",
+  "address": "MFiKi9h7NgFHXcuBSunkTDZL7ssNynUtVC1JhtKgkk8",
   "metadata": {
     "name": "mirrorfiVault",
     "version": "0.1.0",
@@ -14,124 +14,28 @@ export type MirrorfiVault = {
   },
   "instructions": [
     {
-      "name": "kaminoInitObligation",
-      "docs": [
-        "This function initializes a new obligation in the Kamino lending protocol"
-      ],
+      "name": "mappingInitialize",
       "discriminator": [
-        253,
-        177,
-        160,
-        225,
-        70,
-        156,
-        217,
-        109
-      ],
-      "accounts": [
-        {
-          "name": "obligationOwner",
-          "docs": [
-            "The signer of the obligation (user's wallet)"
-          ],
-          "signer": true
-        },
-        {
-          "name": "feePayer",
-          "docs": [
-            "The account that will pay the transaction fee"
-          ],
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "obligation",
-          "writable": true
-        },
-        {
-          "name": "lendingMarket"
-        },
-        {
-          "name": "seed1Account"
-        },
-        {
-          "name": "seed2Account"
-        },
-        {
-          "name": "ownerUserMetadata"
-        },
-        {
-          "name": "kaminoProgram",
-          "address": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD"
-        },
-        {
-          "name": "rent",
-          "docs": [
-            "Required by Kamino's init_obligation function"
-          ],
-          "address": "SysvarRent111111111111111111111111111111111"
-        },
-        {
-          "name": "systemProgram",
-          "docs": [
-            "Required by Kamino's init_obligation function"
-          ],
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "kaminoInitObligationArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "mferDeposit",
-      "discriminator": [
-        166,
-        81,
-        101,
-        252,
-        132,
-        97,
-        207,
-        185
+        135,
+        75,
+        142,
+        17,
+        13,
+        75,
+        11,
+        33
       ],
       "accounts": [
         {
           "name": "owner",
-          "docs": [
-            "The user who is depositing tokens"
-          ],
           "writable": true,
-          "signer": true,
-          "relations": [
-            "mfer"
-          ]
+          "signer": true
         },
         {
-          "name": "mfer",
-          "docs": [
-            "The user account"
-          ],
-          "writable": true
+          "name": "protocol"
         },
         {
-          "name": "protocol",
-          "docs": [
-            "The protocol account"
-          ],
-          "relations": [
-            "mfer"
-          ]
-        },
-        {
-          "name": "mferAuthority",
+          "name": "mapping",
           "writable": true,
           "pda": {
             "seeds": [
@@ -139,261 +43,53 @@ export type MirrorfiVault = {
                 "kind": "const",
                 "value": [
                   109,
-                  102,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114,
-                  95,
                   97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
+                  112,
+                  112,
                   105,
-                  116,
-                  121
+                  110,
+                  103
                 ]
               },
               {
                 "kind": "account",
-                "path": "mfer"
+                "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "ownerAta",
-          "docs": [
-            "The owner's token account for this mint"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "owner"
-              },
-              {
-                "kind": "account",
-                "path": "tokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "tokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "mferAuthorityAta",
-          "docs": [
-            "The token account for the user_authority PDA"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "mferAuthority"
-              },
-              {
-                "kind": "account",
-                "path": "tokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "tokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "tokenMint",
-          "docs": [
-            "The token mint to deposit"
-          ]
-        },
-        {
-          "name": "tokenProgram",
-          "docs": [
-            "The token program to use (supports token-2022)"
-          ],
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "mint"
         },
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
         {
-          "name": "args",
+          "name": "oracleTypes",
           "type": {
-            "defined": {
-              "name": "mFerDepositArgs"
+            "vec": {
+              "defined": {
+                "name": "oracleType"
+              }
             }
           }
         }
       ]
     },
     {
-      "name": "mferFreeze",
+      "name": "mappingRefresh",
       "discriminator": [
-        43,
-        88,
-        104,
+        75,
+        1,
+        169,
+        229,
         164,
-        194,
-        4,
-        235,
-        207
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "docs": [
-            "The protocol admin that can freeze users"
-          ],
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
-        },
-        {
-          "name": "user"
-        },
-        {
-          "name": "protocol",
-          "docs": [
-            "The protocol this user belongs to"
-          ]
-        },
-        {
-          "name": "mfer",
-          "docs": [
-            "The user account to freeze"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "protocol"
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              }
-            ]
-          }
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "mferInitialize",
-      "discriminator": [
-        252,
-        144,
-        214,
-        128,
-        181,
-        199,
-        217,
-        86
+        62,
+        180,
+        144
       ],
       "accounts": [
         {
@@ -402,23 +98,58 @@ export type MirrorfiVault = {
           "signer": true
         },
         {
+          "name": "mapping",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "mappingUpdate",
+      "discriminator": [
+        241,
+        99,
+        68,
+        33,
+        87,
+        169,
+        97,
+        115
+      ],
+      "accounts": [
+        {
           "name": "owner",
-          "docs": [
-            "The owner of this user account"
-          ],
+          "writable": true,
           "signer": true
         },
         {
-          "name": "protocol",
-          "docs": [
-            "The protocol this user belongs to"
-          ]
+          "name": "protocol"
         },
         {
-          "name": "mfer",
-          "docs": [
-            "The user account to initialize"
-          ],
+          "name": "mapping",
           "writable": true,
           "pda": {
             "seeds": [
@@ -426,346 +157,37 @@ export type MirrorfiVault = {
                 "kind": "const",
                 "value": [
                   109,
-                  102,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
                 ]
               },
               {
                 "kind": "account",
-                "path": "protocol"
-              },
-              {
-                "kind": "account",
-                "path": "owner"
+                "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "mferAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mfer"
-              }
-            ]
-          }
+          "name": "mint"
         },
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "mferUnfreeze",
-      "discriminator": [
-        54,
-        180,
-        66,
-        248,
-        205,
-        2,
-        91,
-        232
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "docs": [
-            "The protocol admin that can unfreeze users"
-          ],
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
-        },
-        {
-          "name": "user"
-        },
-        {
-          "name": "protocol",
-          "docs": [
-            "The protocol this user belongs to"
-          ]
-        },
-        {
-          "name": "mfer",
-          "docs": [
-            "The user account to unfreeze"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "protocol"
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              }
-            ]
-          }
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "mferWithdraw",
-      "discriminator": [
-        165,
-        39,
-        23,
-        175,
-        48,
-        84,
-        239,
-        148
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "docs": [
-            "The user who is withdrawing tokens"
-          ],
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "mfer"
-          ]
-        },
-        {
-          "name": "mfer",
-          "writable": true
-        },
-        {
-          "name": "protocol",
-          "relations": [
-            "mfer"
-          ]
-        },
-        {
-          "name": "mferAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mfer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "ownerAta",
-          "docs": [
-            "The owner's token account for this mint"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "owner"
-              },
-              {
-                "kind": "account",
-                "path": "tokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "tokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "mferAuthorityAta",
-          "docs": [
-            "The token account for the mfer_authority PDA"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "mferAuthority"
-              },
-              {
-                "kind": "account",
-                "path": "tokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "tokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "tokenMint",
-          "docs": [
-            "The token mint to withdraw"
-          ]
-        },
-        {
-          "name": "tokenProgram",
-          "docs": [
-            "The token program to use (supports token-2022)"
-          ],
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
         {
-          "name": "args",
+          "name": "oracleTypes",
           "type": {
-            "defined": {
-              "name": "mFerWithdrawArgs"
+            "vec": {
+              "defined": {
+                "name": "oracleType"
+              }
             }
           }
         }
@@ -788,7 +210,7 @@ export type MirrorfiVault = {
       ],
       "accounts": [
         {
-          "name": "owner",
+          "name": "admin",
           "writable": true,
           "signer": true,
           "relations": [
@@ -798,7 +220,7 @@ export type MirrorfiVault = {
         {
           "name": "protocol",
           "docs": [
-            "Only protocol owner can initialize an oracle"
+            "The protocol account this oracle belongs to"
           ]
         },
         {
@@ -809,9 +231,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   111,
                   114,
                   97,
@@ -836,20 +255,17 @@ export type MirrorfiVault = {
           }
         },
         {
-          "name": "pythOracle"
-        },
-        {
           "name": "tokenMint",
           "docs": [
             "Mint address of the token this oracle is for"
           ]
         },
         {
-          "name": "tokenProgram"
+          "name": "pythOracle"
         },
         {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
           "name": "systemProgram",
@@ -861,38 +277,11 @@ export type MirrorfiVault = {
           "name": "args",
           "type": {
             "defined": {
-              "name": "initOracleArgs"
+              "name": "oracleInitializeArgs"
             }
           }
         }
       ]
-    },
-    {
-      "name": "protocolFreeze",
-      "discriminator": [
-        71,
-        190,
-        129,
-        59,
-        200,
-        188,
-        151,
-        91
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
-        },
-        {
-          "name": "protocol",
-          "writable": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "protocolInitialize",
@@ -908,7 +297,7 @@ export type MirrorfiVault = {
       ],
       "accounts": [
         {
-          "name": "creator",
+          "name": "admin",
           "writable": true,
           "signer": true
         },
@@ -920,9 +309,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   112,
                   114,
                   111,
@@ -932,92 +318,26 @@ export type MirrorfiVault = {
                   111,
                   108
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "creator"
-              },
-              {
-                "kind": "arg",
-                "path": "args.id"
               }
             ]
           }
         },
         {
-          "name": "protocolAuthority",
+          "name": "treasury",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
-                  112,
-                  114,
-                  111,
                   116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  95,
+                  114,
+                  101,
                   97,
+                  115,
                   117,
-                  116,
-                  104,
-                  111,
                   114,
-                  105,
-                  116,
                   121
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "protocol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "protocolFeeAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  112,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  95,
-                  102,
-                  101,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "protocol"
               }
             ]
           }
@@ -1032,35 +352,111 @@ export type MirrorfiVault = {
           "name": "args",
           "type": {
             "defined": {
-              "name": "initProtocolArgs"
+              "name": "protocolInitializeArgs"
             }
           }
         }
       ]
     },
     {
-      "name": "protocolUnfreeze",
+      "name": "protocolTreasuryWithdraw",
       "discriminator": [
-        149,
-        246,
-        107,
-        155,
-        245,
-        31,
-        98,
-        99
+        27,
+        28,
+        4,
+        24,
+        69,
+        67,
+        35,
+        176
       ],
       "accounts": [
         {
-          "name": "owner",
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
+          "name": "admin",
+          "writable": true,
+          "signer": true
         },
         {
-          "name": "protocol",
+          "name": "protocol"
+        },
+        {
+          "name": "treasury",
           "writable": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "adminAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "admin"
+              },
+              {
+                "kind": "account",
+                "path": "tokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "treasuryAta",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": []
@@ -1079,12 +475,8 @@ export type MirrorfiVault = {
       ],
       "accounts": [
         {
-          "name": "owner",
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
+          "name": "admin",
+          "signer": true
         },
         {
           "name": "protocol",
@@ -1129,9 +521,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   119,
                   115,
                   111,
@@ -1427,6 +816,26 @@ export type MirrorfiVault = {
           ]
         },
         {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "vault"
         },
         {
@@ -1468,52 +877,7 @@ export type MirrorfiVault = {
           ]
         },
         {
-          "name": "vaultFeeAuthority",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  102,
-                  101,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              }
-            ]
-          },
-          "relations": [
-            "vault"
-          ]
-        },
-        {
           "name": "vaultAuthorityAta",
-          "docs": [
-            "Vault token account holding the deposit tokens"
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -1603,16 +967,103 @@ export type MirrorfiVault = {
           }
         },
         {
-          "name": "vaultFeeAuthorityAta",
-          "docs": [
-            "Fee recipient token account controlled by the vault fee authority"
-          ],
+          "name": "treasuryAta",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vaultFeeAuthority"
+                "path": "treasury"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "managerAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "manager"
               },
               {
                 "kind": "const",
@@ -1716,16 +1167,7 @@ export type MirrorfiVault = {
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "collectFeeArgs"
-            }
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "vaultDeposit",
@@ -1752,8 +1194,67 @@ export type MirrorfiVault = {
           ]
         },
         {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "vault",
           "writable": true
+        },
+        {
+          "name": "vaultDepositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  102,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
         },
         {
           "name": "vaultAuthority",
@@ -1788,6 +1289,86 @@ export type MirrorfiVault = {
                 "path": "vault"
               }
             ]
+          }
+        },
+        {
+          "name": "mapping",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenMint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasuryAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
           }
         },
         {
@@ -1857,41 +1438,8 @@ export type MirrorfiVault = {
                 "path": "user"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "depositTokenProgram"
               },
               {
                 "kind": "account",
@@ -1938,13 +1486,13 @@ export type MirrorfiVault = {
           }
         },
         {
-          "name": "userShareAta",
+          "name": "depositorShareAta",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user"
+                "path": "vaultDepositor"
               },
               {
                 "kind": "account",
@@ -2011,7 +1559,8 @@ export type MirrorfiVault = {
           "name": "depositTokenProgram"
         },
         {
-          "name": "shareTokenProgram"
+          "name": "shareTokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
@@ -2047,7 +1596,7 @@ export type MirrorfiVault = {
       ],
       "accounts": [
         {
-          "name": "owner",
+          "name": "admin",
           "writable": true,
           "signer": true,
           "relations": [
@@ -2090,6 +1639,26 @@ export type MirrorfiVault = {
           "docs": [
             "The protocol account this vault belongs to"
           ]
+        },
+        {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "vault",
@@ -2155,44 +1724,6 @@ export type MirrorfiVault = {
           }
         },
         {
-          "name": "vaultFeeAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  102,
-                  101,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              }
-            ]
-          }
-        },
-        {
           "name": "spotManager",
           "writable": true,
           "pda": {
@@ -2200,13 +1731,10 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   115,
                   112,
                   111,
-                  114,
+                  116,
                   95,
                   109,
                   97,
@@ -2232,63 +1760,6 @@ export type MirrorfiVault = {
               {
                 "kind": "account",
                 "path": "vaultAuthority"
-              },
-              {
-                "kind": "account",
-                "path": "depositTokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "depositTokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "vaultFeeAuthorityAta",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vaultFeeAuthority"
               },
               {
                 "kind": "account",
@@ -2387,7 +1858,8 @@ export type MirrorfiVault = {
           "name": "depositTokenProgram"
         },
         {
-          "name": "shareTokenProgram"
+          "name": "shareTokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "systemProgram",
@@ -2403,7 +1875,7 @@ export type MirrorfiVault = {
           "name": "args",
           "type": {
             "defined": {
-              "name": "initVaultArgs"
+              "name": "vaultInitializeArgs"
             }
           }
         }
@@ -2470,9 +1942,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -2512,9 +1981,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   107,
                   97,
                   109,
@@ -2630,13 +2096,10 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   115,
                   112,
                   111,
-                  114,
+                  116,
                   95,
                   109,
                   97,
@@ -2662,9 +2125,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -2888,9 +2348,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -3101,9 +2558,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -3421,9 +2875,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -3463,9 +2914,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   107,
                   97,
                   109,
@@ -3590,9 +3038,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -3840,9 +3285,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -4115,7 +3557,36 @@ export type MirrorfiVault = {
           ]
         },
         {
-          "name": "vault"
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "spotManager",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  116,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
         },
         {
           "name": "vaultAuthority",
@@ -4151,114 +3622,6 @@ export type MirrorfiVault = {
               }
             ]
           }
-        },
-        {
-          "name": "vaultAuthorityAta",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vaultAuthority"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "depositTokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "depositTokenPythOracle"
-        },
-        {
-          "name": "depositTokenMint"
-        },
-        {
-          "name": "depositTokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": []
@@ -4287,9 +3650,6 @@ export type MirrorfiVault = {
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   107,
                   97,
                   109,
@@ -4350,7 +3710,7 @@ export type MirrorfiVault = {
       ],
       "accounts": [
         {
-          "name": "owner",
+          "name": "admin",
           "writable": true,
           "signer": true,
           "relations": [
@@ -4395,8 +3755,67 @@ export type MirrorfiVault = {
           ]
         },
         {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "vault",
           "writable": true
+        },
+        {
+          "name": "vaultDepositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  102,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
         },
         {
           "name": "vaultAuthority",
@@ -4434,6 +3853,29 @@ export type MirrorfiVault = {
           }
         },
         {
+          "name": "mapping",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenMint"
+              }
+            ]
+          }
+        },
+        {
           "name": "vaultAuthorityAta",
           "writable": true,
           "pda": {
@@ -4441,6 +3883,63 @@ export type MirrorfiVault = {
               {
                 "kind": "account",
                 "path": "vaultAuthority"
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "depositTokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "treasuryAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
               },
               {
                 "kind": "account",
@@ -4548,13 +4047,13 @@ export type MirrorfiVault = {
           }
         },
         {
-          "name": "userShareAta",
+          "name": "depositorShareAta",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user"
+                "path": "vaultDepositor"
               },
               {
                 "kind": "account",
@@ -4621,7 +4120,8 @@ export type MirrorfiVault = {
           "name": "depositTokenProgram"
         },
         {
-          "name": "shareTokenProgram"
+          "name": "shareTokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
@@ -4659,16 +4159,16 @@ export type MirrorfiVault = {
       ]
     },
     {
-      "name": "mFer",
+      "name": "mapping",
       "discriminator": [
-        114,
-        82,
-        108,
-        224,
-        178,
-        222,
-        183,
-        237
+        18,
+        206,
+        25,
+        210,
+        237,
+        88,
+        255,
+        93
       ]
     },
     {
@@ -4682,19 +4182,6 @@ export type MirrorfiVault = {
         179,
         229,
         244
-      ]
-    },
-    {
-      "name": "priceUpdateV2",
-      "discriminator": [
-        34,
-        241,
-        35,
-        99,
-        157,
-        126,
-        244,
-        205
       ]
     },
     {
@@ -4734,6 +4221,19 @@ export type MirrorfiVault = {
         152,
         117,
         119
+      ]
+    },
+    {
+      "name": "vaultDepositor",
+      "discriminator": [
+        87,
+        109,
+        182,
+        106,
+        87,
+        96,
+        63,
+        211
       ]
     }
   ],
@@ -4776,7 +4276,7 @@ export type MirrorfiVault = {
     {
       "code": 6007,
       "name": "invalidAccountDiscriminator",
-      "msg": "Invalid AccountDiscriminator"
+      "msg": "Invalid Account Discriminator"
     },
     {
       "code": 6008,
@@ -4790,269 +4290,277 @@ export type MirrorfiVault = {
     },
     {
       "code": 6010,
+      "name": "invalidOracleTypeLength",
+      "msg": "Oracle type length must be greater than 0"
+    },
+    {
+      "code": 6011,
+      "name": "oracleStale",
+      "msg": "Oracle stale"
+    },
+    {
+      "code": 6012,
+      "name": "oracleConfDeviated",
+      "msg": "Oracle confidence exceeded max allowed deviation from price"
+    },
+    {
+      "code": 6013,
+      "name": "invalidPrice",
+      "msg": "Price is not finite"
+    },
+    {
+      "code": 6014,
+      "name": "noValidPrice",
+      "msg": "No valid price found"
+    },
+    {
+      "code": 6015,
+      "name": "invalidPythAccount",
+      "msg": "Account passed is not owned by Pyth program"
+    },
+    {
+      "code": 6016,
+      "name": "invalidAddress",
+      "msg": "Address cannot be default public key"
+    },
+    {
+      "code": 6017,
       "name": "accountInvalid",
       "msg": "Account Invalid"
     },
     {
-      "code": 6011,
+      "code": 6018,
       "name": "accountNotInitialized",
       "msg": "Account not initialized"
     },
     {
-      "code": 6012,
+      "code": 6019,
       "name": "accountVersionUnallowed",
       "msg": "Account version unallowed"
     },
     {
-      "code": 6013,
+      "code": 6020,
+      "name": "insufficientRemainingAccounts",
+      "msg": "Insufficient remaining accounts"
+    },
+    {
+      "code": 6021,
       "name": "protocolNotSupported",
       "msg": "Activity on the protocol is not supported"
     },
     {
-      "code": 6014,
+      "code": 6022,
       "name": "protocolNotActivated",
       "msg": "Vault activity on the protocol not activated"
     },
     {
-      "code": 6015,
+      "code": 6023,
       "name": "spotPositionSlotAlreadyActive",
       "msg": "Spot position slot already active"
     },
     {
-      "code": 6016,
+      "code": 6024,
       "name": "spotPositionSlotNotActive",
       "msg": "Spot position slot not active"
     },
     {
-      "code": 6017,
+      "code": 6025,
       "name": "invalidSpotPositionSlot",
       "msg": "Invalid spot position slot"
     },
     {
-      "code": 6018,
+      "code": 6026,
       "name": "spotPositionNotFound",
       "msg": "Spot position not found"
     },
     {
-      "code": 6019,
+      "code": 6027,
       "name": "maxSpotPositionReached",
       "msg": "Max spot position reached"
     },
     {
-      "code": 6020,
+      "code": 6028,
       "name": "spotPositionMismatch",
       "msg": "Spot position mismatch"
     },
     {
-      "code": 6021,
+      "code": 6029,
       "name": "spotPositionNotEmpty",
       "msg": "Spot position not empty"
     },
     {
-      "code": 6022,
+      "code": 6030,
       "name": "obligationSlotAlreadyActive",
       "msg": "obligation slot already active"
     },
     {
-      "code": 6023,
+      "code": 6031,
       "name": "obligationSlotNotActive",
       "msg": "obligation slot not active"
     },
     {
-      "code": 6024,
+      "code": 6032,
       "name": "invalidObligationSlot",
       "msg": "invalid obligation slot"
     },
     {
-      "code": 6025,
+      "code": 6033,
       "name": "obligationNotFound",
       "msg": "obligation not found"
     },
     {
-      "code": 6026,
+      "code": 6034,
       "name": "maxObligationReached",
       "msg": "max obligation reached"
     },
     {
-      "code": 6027,
+      "code": 6035,
       "name": "obligationMismatch",
       "msg": "obligation mismatch"
     },
     {
-      "code": 6028,
+      "code": 6036,
       "name": "zeroAmountNotAllowed",
       "msg": "zero amount not allowed"
     },
     {
-      "code": 6029,
+      "code": 6037,
       "name": "insufficientLiquidity",
       "msg": "vault liquidity insufficient for withdrawal"
     },
     {
-      "code": 6030,
+      "code": 6038,
       "name": "insufficientSolToWrap",
       "msg": "Insufficient SOL to wrap"
     },
     {
-      "code": 6031,
+      "code": 6039,
       "name": "insufficientWSolToUnwrap",
       "msg": "Insufficient WSOL to unwrap"
     },
     {
-      "code": 6032,
+      "code": 6040,
       "name": "protocolFrozen",
       "msg": "Protocol is frozen"
     },
     {
-      "code": 6033,
+      "code": 6041,
+      "name": "invalidTreasury",
+      "msg": "Treasury account provided is invalid"
+    },
+    {
+      "code": 6042,
       "name": "mFerFrozen",
       "msg": "MirrorFi User is frozen"
     },
     {
-      "code": 6034,
+      "code": 6043,
       "name": "vaultFrozen",
       "msg": "Vault is frozen"
     },
     {
-      "code": 6035,
+      "code": 6044,
       "name": "navNotRefreshed",
       "msg": "Vault NAV has not been refreshed"
     },
     {
-      "code": 6036,
+      "code": 6045,
+      "name": "kaminoNotRefreshed",
+      "msg": "Kamino has not been refreshed"
+    },
+    {
+      "code": 6046,
       "name": "obligationNotRefreshed",
       "msg": "Obligation has not been refreshed"
     },
     {
-      "code": 6037,
+      "code": 6047,
       "name": "insufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6038,
+      "code": 6048,
+      "name": "insufficientShares",
+      "msg": "Insufficient shares for withdrawal"
+    },
+    {
+      "code": 6049,
       "name": "invalidAuthority",
       "msg": "Invalid authority"
     },
     {
-      "code": 6039,
+      "code": 6050,
       "name": "invalidTokenAccount",
       "msg": "Invalid token account"
     },
     {
-      "code": 6040,
+      "code": 6051,
       "name": "invalidDestinationAccount",
       "msg": "Invalid destination account"
     },
     {
-      "code": 6041,
+      "code": 6052,
       "name": "operationNotAllowed",
       "msg": "Operation not allowed"
     },
     {
-      "code": 6042,
+      "code": 6053,
       "name": "zeroWithdrawalUnallowed",
       "msg": "Zero Withdrawal is not allowed"
     },
     {
-      "code": 6043,
+      "code": 6054,
       "name": "zeroDepositUnallowed",
       "msg": "Zero Deposit is not allowed"
     },
     {
-      "code": 6044,
+      "code": 6055,
       "name": "depositTooSmall",
       "msg": "Deposit amount is too small"
     },
     {
-      "code": 6045,
+      "code": 6056,
       "name": "depositTooLarge",
       "msg": "Deposit amount is too large"
     },
     {
-      "code": 6046,
+      "code": 6057,
       "name": "withdrawalTooSmall",
       "msg": "Withdrawal amount is too small"
     },
     {
-      "code": 6047,
+      "code": 6058,
       "name": "withdrawalTooLarge",
       "msg": "Withdrawal amount is too large"
+    },
+    {
+      "code": 6059,
+      "name": "invalidMappingMint",
+      "msg": "Mint provided does not match the mapping mint"
+    },
+    {
+      "code": 6060,
+      "name": "mappingStale",
+      "msg": "Mapping needs to be refreshed"
+    },
+    {
+      "code": 6061,
+      "name": "invalidMappingAccount",
+      "msg": "Mapping account cannot be deserialized"
+    },
+    {
+      "code": 6062,
+      "name": "noMatchingMintInPosition",
+      "msg": "Mapping mint not found in spot position"
     }
   ],
   "types": [
     {
-      "name": "collectFeeArgs",
+      "name": "bitmask",
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "initOracleArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "initProtocolArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          },
-          {
-            "name": "protocolFeeRate",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "initVaultArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          },
-          {
-            "name": "name",
-            "type": "bytes"
-          },
-          {
-            "name": "managerFeeRate",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "kaminoInitObligationArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tag",
-            "type": "u8"
-          },
-          {
-            "name": "id",
-            "type": "u8"
-          }
+          "u8"
         ]
       }
     },
@@ -5194,126 +4702,42 @@ export type MirrorfiVault = {
       }
     },
     {
-      "name": "mFer",
-      "serialization": "bytemuckunsafe",
-      "repr": {
-        "kind": "c"
-      },
+      "name": "mapping",
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "protocol",
-            "docs": [
-              "Protocol associated with the user"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "owner",
-            "docs": [
-              "Address of the user owner"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "mferAuthority",
-            "docs": [
-              "User Authority (PDA)"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "referrer",
-            "docs": [
-              "Referrer"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "createdAt",
-            "docs": [
-              "Timestamp when the user was created"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "updatedAt",
-            "docs": [
-              "Timestamp when the user was updated"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "padding1",
-            "docs": [
-              "Padding for future use"
-            ],
-            "type": {
-              "array": [
-                "u64",
-                16
-              ]
-            }
-          },
-          {
-            "name": "isInitialized",
-            "docs": [
-              "Is the vault initialized"
-            ],
-            "type": "bool"
-          },
-          {
-            "name": "freeze",
-            "type": "bool"
-          },
-          {
-            "name": "version",
-            "docs": [
-              "Version of the vault"
-            ],
-            "type": "u8"
-          },
           {
             "name": "bump",
             "type": "u8"
           },
           {
-            "name": "align0",
-            "type": {
-              "array": [
-                "u8",
-                4
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "mFerDepositArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "mFerWithdrawArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
+            "name": "lastRefreshedSlot",
             "type": "u64"
           },
           {
-            "name": "withdrawAll",
-            "type": "bool"
+            "name": "price",
+            "docs": [
+              "Price is only stored in f64 and never calculated directly due to lack of floating Rust type support"
+            ],
+            "type": "f64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "oracleTypes",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "oracleType"
+                }
+              }
+            }
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
           }
         ]
       }
@@ -5398,109 +4822,30 @@ export type MirrorfiVault = {
       }
     },
     {
-      "name": "priceFeedMessage",
-      "repr": {
-        "kind": "c"
-      },
+      "name": "oracleInitializeArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "feedId",
-            "docs": [
-              "`FeedId` but avoid the type alias because of compatibility issues with Anchor's `idl-build` feature."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "price",
-            "type": "i64"
-          },
-          {
-            "name": "conf",
-            "type": "u64"
-          },
-          {
-            "name": "exponent",
-            "type": "i32"
-          },
-          {
-            "name": "publishTime",
-            "docs": [
-              "The timestamp of this price update in seconds"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "prevPublishTime",
-            "docs": [
-              "The timestamp of the previous price update. This field is intended to allow users to",
-              "identify the single unique price update for any moment in time:",
-              "for any time t, the unique update is the one such that prev_publish_time < t <= publish_time.",
-              "",
-              "Note that there may not be such an update while we are migrating to the new message-sending logic,",
-              "as some price updates on pythnet may not be sent to other chains (because the message-sending",
-              "logic may not have triggered). We can solve this problem by making the message-sending mandatory",
-              "(which we can do once publishers have migrated over).",
-              "",
-              "Additionally, this field may be equal to publish_time if the message is sent on a slot where",
-              "where the aggregation was unsuccesful. This problem will go away once all publishers have",
-              "migrated over to a recent version of pyth-agent."
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "emaPrice",
-            "type": "i64"
-          },
-          {
-            "name": "emaConf",
+            "name": "id",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "priceUpdateV2",
-      "docs": [
-        "A price update account. This account is used by the Pyth Receiver program to store a verified price update from a Pyth price feed.",
-        "It contains:",
-        "- `write_authority`: The write authority for this account. This authority can close this account to reclaim rent or update the account to contain a different price update.",
-        "- `verification_level`: The [`VerificationLevel`] of this price update. This represents how many Wormhole guardian signatures have been verified for this price update.",
-        "- `price_message`: The actual price update.",
-        "- `posted_slot`: The slot at which this price update was posted."
-      ],
+      "name": "oracleType",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "writeAuthority",
-            "type": "pubkey"
-          },
-          {
-            "name": "verificationLevel",
-            "type": {
-              "defined": {
-                "name": "verificationLevel"
+            "name": "pyth",
+            "fields": [
+              {
+                "name": "priceUpdateV2",
+                "type": "pubkey"
               }
-            }
-          },
-          {
-            "name": "priceMessage",
-            "type": {
-              "defined": {
-                "name": "priceFeedMessage"
-              }
-            }
-          },
-          {
-            "name": "postedSlot",
-            "type": "u64"
+            ]
           }
         ]
       }
@@ -5515,102 +4860,126 @@ export type MirrorfiVault = {
         "kind": "struct",
         "fields": [
           {
-            "name": "isInitialized",
-            "type": "bool"
-          },
-          {
-            "name": "freeze",
-            "type": "bool"
-          },
-          {
-            "name": "version",
-            "type": "u8"
+            "name": "stateFlags",
+            "docs": [
+              "Bitfield for various platform-level state."
+            ],
+            "type": {
+              "defined": {
+                "name": "bitmask"
+              }
+            }
           },
           {
             "name": "bump",
+            "docs": [
+              "Bump used for PDA derivation."
+            ],
             "type": "u8"
           },
           {
-            "name": "isKamino",
-            "type": "bool"
-          },
-          {
-            "name": "isMeteora",
-            "type": "bool"
-          },
-          {
-            "name": "isOrca",
-            "type": "bool"
-          },
-          {
-            "name": "isDrift",
-            "type": "bool"
-          },
-          {
-            "name": "reservedProtocols",
+            "name": "treasuryBump",
             "docs": [
-              "Reserved space for future protocol integrations"
+              "Bump used for PDA derivation."
             ],
+            "type": "u8"
+          },
+          {
+            "name": "align0",
             "type": {
               "array": [
-                "bool",
-                12
+                "u8",
+                5
               ]
             }
           },
           {
-            "name": "creator",
+            "name": "platformFeeBps",
             "docs": [
-              "Address of protocol's creator"
+              "Fee taken from vault profits, in basis points."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "platformCommissionFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformDepositFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformWithdrawalFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "docs": [
+              "Authority of protocol."
             ],
             "type": "pubkey"
           },
           {
-            "name": "owner",
+            "name": "protocolsIntegrated",
             "docs": [
-              "Update authority of protocol state"
+              "Number of protocols integrated, supports up to 255."
             ],
-            "type": "pubkey"
+            "type": "u8"
           },
           {
-            "name": "createdAt",
-            "docs": [
-              "Creation timestamp of protocol"
-            ],
-            "type": "i64"
+            "name": "align1",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
-            "name": "updatedAt",
+            "name": "activeIntegrations",
             "docs": [
-              "Last updated timestamp of the protocol"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "protocolFeeAuthority",
-            "docs": [
-              "Fee Authority of the protocol"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "protocolFeeRate",
-            "docs": [
-              "The Fee Rate of the protocol, 1000 = 1% (decimal = 3)"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "padding",
-            "docs": [
-              "Extra Space"
+              "Bitfield for protocol integrations that are active.",
+              "Each bit represents a protocol integration, where 1 is active and 0 is inactive."
             ],
             "type": {
               "array": [
                 "u64",
-                64
+                4
               ]
             }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "protocolInitializeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "platformFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformCommissionFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformDepositFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformWithdrawalFeeBps",
+            "type": "u16"
           }
         ]
       }
@@ -5621,24 +4990,64 @@ export type MirrorfiVault = {
         "kind": "struct",
         "fields": [
           {
-            "name": "protocolFeeRate",
-            "type": "u64"
+            "name": "platformFeeBps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "isKamino",
-            "type": "bool"
+            "name": "platformCommissionFeeBps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "isMeteora",
-            "type": "bool"
+            "name": "platformDepositFeeBps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "isOrca",
-            "type": "bool"
+            "name": "platformWithdrawalFeeBps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "isDrift",
-            "type": "bool"
+            "name": "admin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "isFrozen",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enableKamino",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enableMeteora",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enableOrca",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enableDrift",
+            "type": {
+              "option": "bool"
+            }
           }
         ]
       }
@@ -5753,10 +5162,6 @@ export type MirrorfiVault = {
             "type": "pubkey"
           },
           {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
             "name": "lastNav",
             "type": "u64"
           },
@@ -5785,7 +5190,7 @@ export type MirrorfiVault = {
             "type": "bool"
           },
           {
-            "name": "freeze",
+            "name": "isFrozen",
             "type": "bool"
           },
           {
@@ -5808,33 +5213,24 @@ export type MirrorfiVault = {
             "type": "bool"
           },
           {
-            "name": "isOrca",
-            "type": "bool"
-          },
-          {
-            "name": "isDrift",
-            "type": "bool"
-          },
-          {
             "name": "reservedProtocols",
             "type": {
               "array": [
                 "u8",
-                15
+                16
               ]
             }
           },
           {
-            "name": "name",
+            "name": "depositTokenDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "lookupTable",
             "docs": [
-              "Name of the vault (32 bytes)"
+              "Vault Look Up Table"
             ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
+            "type": "pubkey"
           },
           {
             "name": "pubkey",
@@ -5861,20 +5257,6 @@ export type MirrorfiVault = {
             "name": "vaultAuthority",
             "docs": [
               "Vault authority (PDA)"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "vaultFeeAuthority",
-            "docs": [
-              "Vault fee authority"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "protocolFeeAuthority",
-            "docs": [
-              "Protocol fee authority"
             ],
             "type": "pubkey"
           },
@@ -5907,9 +5289,16 @@ export type MirrorfiVault = {
             "type": "i64"
           },
           {
-            "name": "lastNavUpdateAt",
+            "name": "lastGavUpdateAt",
             "docs": [
               "Timestamp of last NAV update"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "lastResolveAt",
+            "docs": [
+              "Timestamp of last Resolve"
             ],
             "type": "i64"
           },
@@ -5921,72 +5310,65 @@ export type MirrorfiVault = {
             "type": "u64"
           },
           {
-            "name": "lastNav",
+            "name": "lastGavUsd",
             "docs": [
-              "Last calculated Net Asset Value"
+              "Last calculated Gross Asset Value (in USD & Deposit Token)"
             ],
             "type": "u64"
           },
           {
-            "name": "totalDepositAmount",
+            "name": "lastGavToken",
+            "type": "u64"
+          },
+          {
+            "name": "lastTotalProfitUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lastTotalProfitToken",
+            "type": "u64"
+          },
+          {
+            "name": "totalDeposit",
             "docs": [
               "Total amount deposited into the vault"
             ],
             "type": "u64"
           },
           {
-            "name": "totalWithdrawAmount",
+            "name": "totalWithdrawal",
             "docs": [
               "Total amount withdrawn from the vault"
             ],
             "type": "u64"
           },
           {
-            "name": "totalDepositCount",
+            "name": "totalClaimedFee",
+            "type": "u64"
+          },
+          {
+            "name": "totalClaimedProtocolFee",
+            "type": "u64"
+          },
+          {
+            "name": "freshCapital",
             "docs": [
-              "Total number of deposit transactions"
+              "(NOT USED YET) Vault Capital Tracking"
             ],
             "type": "u64"
           },
           {
-            "name": "totalWithdrawCount",
-            "docs": [
-              "Total number of withdraw transactions"
-            ],
+            "name": "requestCapital",
             "type": "u64"
           },
           {
-            "name": "totalYield",
-            "docs": [
-              "Total yield generated"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "totalManagerFee",
-            "docs": [
-              "Total fees paid to the manager"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "totalProtocolFee",
-            "docs": [
-              "Total fees paid to the protocol"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "avgIndex",
-            "docs": [
-              "Average Share Index Price"
-            ],
+            "name": "withdrawableCapital",
             "type": "u64"
           },
           {
             "name": "delegatee1",
             "docs": [
-              "Authorized account to manage the vault"
+              "(NOT USED YET) Authorized account to manage the vault"
             ],
             "type": "pubkey"
           },
@@ -6010,7 +5392,7 @@ export type MirrorfiVault = {
             "type": {
               "array": [
                 "u64",
-                192
+                61
               ]
             }
           }
@@ -6024,6 +5406,97 @@ export type MirrorfiVault = {
         "fields": [
           {
             "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "vaultDepositor",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "align",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "totalShares",
+            "docs": [
+              "Total shares currently held"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "totalCost",
+            "docs": [
+              "Total cost basis for current shares (in token units)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "realizedPnl",
+            "docs": [
+              "Realized profit/loss from past sells (in token units)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "vaultInitializeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "lookupTable",
+            "type": "pubkey"
+          },
+          {
+            "name": "managerFeeRate",
             "type": "u64"
           }
         ]
@@ -6173,39 +5646,6 @@ export type MirrorfiVault = {
           {
             "name": "withdrawAll",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "verificationLevel",
-      "docs": [
-        "Pyth price updates are bridged to all blockchains via Wormhole.",
-        "Using the price updates on another chain requires verifying the signatures of the Wormhole guardians.",
-        "The usual process is to check the signatures for two thirds of the total number of guardians, but this can be cumbersome on Solana because of the transaction size limits,",
-        "so we also allow for partial verification.",
-        "",
-        "This enum represents how much a price update has been verified:",
-        "- If `Full`, we have verified the signatures for two thirds of the current guardians.",
-        "- If `Partial`, only `num_signatures` guardian signatures have been checked.",
-        "",
-        "# Warning",
-        "Using partially verified price updates is dangerous, as it lowers the threshold of guardians that need to collude to produce a malicious price update."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "partial",
-            "fields": [
-              {
-                "name": "numSignatures",
-                "type": "u8"
-              }
-            ]
-          },
-          {
-            "name": "full"
           }
         ]
       }

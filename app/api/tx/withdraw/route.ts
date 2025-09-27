@@ -9,7 +9,6 @@ import { getRefreshNavIxs } from "@/lib/utils/mirrorfi";
 
 export async function POST(req: NextRequest) {
     const data = await req.json();
-    console.log("Received deposit request:", data);
     
     if(!process.env.PRIVATE_SOLANA_RPC_URL) {
         return new Response(JSON.stringify({ error: "Solana PRC Not Provided" }), { status: 500 });
@@ -20,14 +19,11 @@ export async function POST(req: NextRequest) {
     if(!data.vault) {
         return new Response(JSON.stringify({ error: "Vault not found" }), { status: 500 });
     }
-    if(!data.depositAmount) {
-        return new Response(JSON.stringify({ error: "Deposit amount not found" }), { status: 500 });
+    if(!data.withdrawAmount) {
+        return new Response(JSON.stringify({ error: "Withdraw amount not found" }), { status: 500 });
     }
 
-    console.log("Request Checking Passed, proceeding...");
-
     try{
-        console.log("Establishing connection to Solana...");
         const connection = new Connection(process.env.PRIVATE_SOLANA_RPC_URL);
 
         const userPublicKey = new PublicKey(data.user);
@@ -39,18 +35,12 @@ export async function POST(req: NextRequest) {
         const provider = new AnchorProvider(connection, userWallet, { commitment: "confirmed" });
         const program = new Program(IDL as MirrorfiVault, provider);
 
-        // const vault = await program.account.vault.fetch(new PublicKey(data.vault));
-        // if(!vault){
-        //     throw new Error("Vault not found");
-        // }
-        // const depositTokenMint = vault.depositTokenMint;
-        // const depositTokenProgram = TOKEN_PROGRAM_ID;
-        // const shareTokenProgram = TOKEN_PROGRAM_2022_ID;
+        const withdrawAll = data.withdrawAll === true;
 
-        console.log("Preparing transaction instructions...");
         const refresh_nav_ixs = await getRefreshNavIxs(program as unknown as Program<MirrorfiVault>, new PublicKey(data.vault));
-        const vault_deposit_ix = await program.methods.vaultDeposit({
-            amount: new BN(data.depositAmount),
+        const vault_withdraw_ix = await program.methods.vaultWithdraw({
+            amount: new BN(data.withdrawAmount),
+            withdrawAll: withdrawAll,
         }).accounts({
             vault: data.vault,
             depositTokenProgram: TOKEN_PROGRAM_ID,
@@ -64,7 +54,7 @@ export async function POST(req: NextRequest) {
                 microLamports: 0,
             }),
             ...refresh_nav_ixs,
-            vault_deposit_ix,
+            vault_withdraw_ix,
         ];
         const encodedTx = await createEncodedTransaction(provider, instructions);
         let res = {

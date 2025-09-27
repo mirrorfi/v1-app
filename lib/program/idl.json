@@ -8,6 +8,186 @@
   },
   "instructions": [
     {
+      "name": "mapping_initialize",
+      "discriminator": [
+        135,
+        75,
+        142,
+        17,
+        13,
+        75,
+        11,
+        33
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "protocol"
+        },
+        {
+          "name": "mapping",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "oracle_types",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "OracleType"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "mapping_refresh",
+      "discriminator": [
+        75,
+        1,
+        169,
+        229,
+        164,
+        62,
+        180,
+        144
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mapping",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "mapping_update",
+      "discriminator": [
+        241,
+        99,
+        68,
+        33,
+        87,
+        169,
+        97,
+        115
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "protocol"
+        },
+        {
+          "name": "mapping",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "oracle_types",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "OracleType"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "oracle_initialize",
       "docs": [
         "This function initializes an oracle for token price data"
@@ -24,7 +204,7 @@
       ],
       "accounts": [
         {
-          "name": "owner",
+          "name": "admin",
           "writable": true,
           "signer": true,
           "relations": [
@@ -34,7 +214,7 @@
         {
           "name": "protocol",
           "docs": [
-            "Only protocol owner can initialize an oracle"
+            "The protocol account this oracle belongs to"
           ]
         },
         {
@@ -45,9 +225,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   111,
                   114,
                   97,
@@ -72,20 +249,17 @@
           }
         },
         {
-          "name": "pyth_oracle"
-        },
-        {
           "name": "token_mint",
           "docs": [
             "Mint address of the token this oracle is for"
           ]
         },
         {
-          "name": "token_program"
+          "name": "pyth_oracle"
         },
         {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
           "name": "system_program",
@@ -97,38 +271,11 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "InitOracleArgs"
+              "name": "OracleInitializeArgs"
             }
           }
         }
       ]
-    },
-    {
-      "name": "protocol_freeze",
-      "discriminator": [
-        71,
-        190,
-        129,
-        59,
-        200,
-        188,
-        151,
-        91
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
-        },
-        {
-          "name": "protocol",
-          "writable": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "protocol_initialize",
@@ -144,7 +291,7 @@
       ],
       "accounts": [
         {
-          "name": "creator",
+          "name": "admin",
           "writable": true,
           "signer": true
         },
@@ -156,9 +303,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   112,
                   114,
                   111,
@@ -168,92 +312,26 @@
                   111,
                   108
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "creator"
-              },
-              {
-                "kind": "arg",
-                "path": "args.id"
               }
             ]
           }
         },
         {
-          "name": "protocol_authority",
+          "name": "treasury",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
-                  112,
-                  114,
-                  111,
                   116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  95,
+                  114,
+                  101,
                   97,
+                  115,
                   117,
-                  116,
-                  104,
-                  111,
                   114,
-                  105,
-                  116,
                   121
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "protocol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "protocol_fee_authority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  112,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  95,
-                  102,
-                  101,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "protocol"
               }
             ]
           }
@@ -268,35 +346,111 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "InitProtocolArgs"
+              "name": "ProtocolInitializeArgs"
             }
           }
         }
       ]
     },
     {
-      "name": "protocol_unfreeze",
+      "name": "protocol_treasury_withdraw",
       "discriminator": [
-        149,
-        246,
-        107,
-        155,
-        245,
-        31,
-        98,
-        99
+        27,
+        28,
+        4,
+        24,
+        69,
+        67,
+        35,
+        176
       ],
       "accounts": [
         {
-          "name": "owner",
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
+          "name": "admin",
+          "writable": true,
+          "signer": true
         },
         {
-          "name": "protocol",
+          "name": "protocol"
+        },
+        {
+          "name": "treasury",
           "writable": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "admin_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "admin"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "treasury_ata",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": []
@@ -315,12 +469,8 @@
       ],
       "accounts": [
         {
-          "name": "owner",
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "protocol"
-          ]
+          "name": "admin",
+          "signer": true
         },
         {
           "name": "protocol",
@@ -365,9 +515,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   119,
                   115,
                   111,
@@ -663,6 +810,26 @@
           ]
         },
         {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "vault"
         },
         {
@@ -704,52 +871,7 @@
           ]
         },
         {
-          "name": "vault_fee_authority",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  102,
-                  101,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              }
-            ]
-          },
-          "relations": [
-            "vault"
-          ]
-        },
-        {
           "name": "vault_authority_ata",
-          "docs": [
-            "Vault token account holding the deposit tokens"
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -839,16 +961,103 @@
           }
         },
         {
-          "name": "vault_fee_authority_ata",
-          "docs": [
-            "Fee recipient token account controlled by the vault fee authority"
-          ],
+          "name": "treasury_ata",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_fee_authority"
+                "path": "treasury"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "manager_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "manager"
               },
               {
                 "kind": "const",
@@ -952,16 +1161,7 @@
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "CollectFeeArgs"
-            }
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "vault_deposit",
@@ -988,8 +1188,67 @@
           ]
         },
         {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "vault",
           "writable": true
+        },
+        {
+          "name": "vault_depositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  102,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
         },
         {
           "name": "vault_authority",
@@ -1024,6 +1283,86 @@
                 "path": "vault"
               }
             ]
+          }
+        },
+        {
+          "name": "mapping",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
           }
         },
         {
@@ -1093,41 +1432,8 @@
                 "path": "user"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "deposit_token_program"
               },
               {
                 "kind": "account",
@@ -1174,13 +1480,13 @@
           }
         },
         {
-          "name": "user_share_ata",
+          "name": "depositor_share_ata",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user"
+                "path": "vault_depositor"
               },
               {
                 "kind": "account",
@@ -1247,7 +1553,8 @@
           "name": "deposit_token_program"
         },
         {
-          "name": "share_token_program"
+          "name": "share_token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associated_token_program",
@@ -1283,7 +1590,7 @@
       ],
       "accounts": [
         {
-          "name": "owner",
+          "name": "admin",
           "writable": true,
           "signer": true,
           "relations": [
@@ -1326,6 +1633,26 @@
           "docs": [
             "The protocol account this vault belongs to"
           ]
+        },
+        {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "vault",
@@ -1391,44 +1718,6 @@
           }
         },
         {
-          "name": "vault_fee_authority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  102,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  102,
-                  101,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              }
-            ]
-          }
-        },
-        {
           "name": "spot_manager",
           "writable": true,
           "pda": {
@@ -1436,9 +1725,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   115,
                   112,
                   111,
@@ -1468,63 +1754,6 @@
               {
                 "kind": "account",
                 "path": "vault_authority"
-              },
-              {
-                "kind": "account",
-                "path": "deposit_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "deposit_token_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "vault_fee_authority_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vault_fee_authority"
               },
               {
                 "kind": "account",
@@ -1623,7 +1852,8 @@
           "name": "deposit_token_program"
         },
         {
-          "name": "share_token_program"
+          "name": "share_token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "system_program",
@@ -1639,7 +1869,7 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "InitVaultArgs"
+              "name": "VaultInitializeArgs"
             }
           }
         }
@@ -1706,9 +1936,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -1748,9 +1975,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   107,
                   97,
                   109,
@@ -1866,9 +2090,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   115,
                   112,
                   111,
@@ -1898,9 +2119,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -2124,9 +2342,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -2337,9 +2552,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -2657,9 +2869,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -2699,9 +2908,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   107,
                   97,
                   109,
@@ -2826,9 +3032,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -3076,9 +3279,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   118,
                   97,
                   117,
@@ -3351,7 +3551,36 @@
           ]
         },
         {
-          "name": "vault"
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "spot_manager",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  116,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
         },
         {
           "name": "vault_authority",
@@ -3387,114 +3616,6 @@
               }
             ]
           }
-        },
-        {
-          "name": "vault_authority_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vault_authority"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "deposit_token_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "deposit_token_pyth_oracle"
-        },
-        {
-          "name": "deposit_token_mint"
-        },
-        {
-          "name": "deposit_token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": []
@@ -3523,9 +3644,6 @@
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  102,
-                  95,
                   107,
                   97,
                   109,
@@ -3586,7 +3704,7 @@
       ],
       "accounts": [
         {
-          "name": "owner",
+          "name": "admin",
           "writable": true,
           "signer": true,
           "relations": [
@@ -3631,8 +3749,67 @@
           ]
         },
         {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "vault",
           "writable": true
+        },
+        {
+          "name": "vault_depositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  102,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
         },
         {
           "name": "vault_authority",
@@ -3670,6 +3847,29 @@
           }
         },
         {
+          "name": "mapping",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_mint"
+              }
+            ]
+          }
+        },
+        {
           "name": "vault_authority_ata",
           "writable": true,
           "pda": {
@@ -3677,6 +3877,63 @@
               {
                 "kind": "account",
                 "path": "vault_authority"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "treasury_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
               },
               {
                 "kind": "account",
@@ -3784,13 +4041,13 @@
           }
         },
         {
-          "name": "user_share_ata",
+          "name": "depositor_share_ata",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user"
+                "path": "vault_depositor"
               },
               {
                 "kind": "account",
@@ -3857,7 +4114,8 @@
           "name": "deposit_token_program"
         },
         {
-          "name": "share_token_program"
+          "name": "share_token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associated_token_program",
@@ -3895,6 +4153,19 @@
       ]
     },
     {
+      "name": "Mapping",
+      "discriminator": [
+        18,
+        206,
+        25,
+        210,
+        237,
+        88,
+        255,
+        93
+      ]
+    },
+    {
       "name": "Oracle",
       "discriminator": [
         139,
@@ -3905,19 +4176,6 @@
         179,
         229,
         244
-      ]
-    },
-    {
-      "name": "PriceUpdateV2",
-      "discriminator": [
-        34,
-        241,
-        35,
-        99,
-        157,
-        126,
-        244,
-        205
       ]
     },
     {
@@ -3957,6 +4215,19 @@
         152,
         117,
         119
+      ]
+    },
+    {
+      "name": "VaultDepositor",
+      "discriminator": [
+        87,
+        109,
+        182,
+        106,
+        87,
+        96,
+        63,
+        211
       ]
     }
   ],
@@ -3999,7 +4270,7 @@
     {
       "code": 6007,
       "name": "InvalidAccountDiscriminator",
-      "msg": "Invalid AccountDiscriminator"
+      "msg": "Invalid Account Discriminator"
     },
     {
       "code": 6008,
@@ -4013,253 +4284,277 @@
     },
     {
       "code": 6010,
+      "name": "InvalidOracleTypeLength",
+      "msg": "Oracle type length must be greater than 0"
+    },
+    {
+      "code": 6011,
+      "name": "OracleStale",
+      "msg": "Oracle stale"
+    },
+    {
+      "code": 6012,
+      "name": "OracleConfDeviated",
+      "msg": "Oracle confidence exceeded max allowed deviation from price"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidPrice",
+      "msg": "Price is not finite"
+    },
+    {
+      "code": 6014,
+      "name": "NoValidPrice",
+      "msg": "No valid price found"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidPythAccount",
+      "msg": "Account passed is not owned by Pyth program"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidAddress",
+      "msg": "Address cannot be default public key"
+    },
+    {
+      "code": 6017,
       "name": "AccountInvalid",
       "msg": "Account Invalid"
     },
     {
-      "code": 6011,
+      "code": 6018,
       "name": "AccountNotInitialized",
       "msg": "Account not initialized"
     },
     {
-      "code": 6012,
+      "code": 6019,
       "name": "AccountVersionUnallowed",
       "msg": "Account version unallowed"
     },
     {
-      "code": 6013,
+      "code": 6020,
+      "name": "InsufficientRemainingAccounts",
+      "msg": "Insufficient remaining accounts"
+    },
+    {
+      "code": 6021,
       "name": "ProtocolNotSupported",
       "msg": "Activity on the protocol is not supported"
     },
     {
-      "code": 6014,
+      "code": 6022,
       "name": "ProtocolNotActivated",
       "msg": "Vault activity on the protocol not activated"
     },
     {
-      "code": 6015,
+      "code": 6023,
       "name": "SpotPositionSlotAlreadyActive",
       "msg": "Spot position slot already active"
     },
     {
-      "code": 6016,
+      "code": 6024,
       "name": "SpotPositionSlotNotActive",
       "msg": "Spot position slot not active"
     },
     {
-      "code": 6017,
+      "code": 6025,
       "name": "InvalidSpotPositionSlot",
       "msg": "Invalid spot position slot"
     },
     {
-      "code": 6018,
+      "code": 6026,
       "name": "SpotPositionNotFound",
       "msg": "Spot position not found"
     },
     {
-      "code": 6019,
+      "code": 6027,
       "name": "MaxSpotPositionReached",
       "msg": "Max spot position reached"
     },
     {
-      "code": 6020,
+      "code": 6028,
       "name": "SpotPositionMismatch",
       "msg": "Spot position mismatch"
     },
     {
-      "code": 6021,
+      "code": 6029,
       "name": "SpotPositionNotEmpty",
       "msg": "Spot position not empty"
     },
     {
-      "code": 6022,
+      "code": 6030,
       "name": "ObligationSlotAlreadyActive",
       "msg": "obligation slot already active"
     },
     {
-      "code": 6023,
+      "code": 6031,
       "name": "ObligationSlotNotActive",
       "msg": "obligation slot not active"
     },
     {
-      "code": 6024,
+      "code": 6032,
       "name": "InvalidObligationSlot",
       "msg": "invalid obligation slot"
     },
     {
-      "code": 6025,
+      "code": 6033,
       "name": "ObligationNotFound",
       "msg": "obligation not found"
     },
     {
-      "code": 6026,
+      "code": 6034,
       "name": "MaxObligationReached",
       "msg": "max obligation reached"
     },
     {
-      "code": 6027,
+      "code": 6035,
       "name": "ObligationMismatch",
       "msg": "obligation mismatch"
     },
     {
-      "code": 6028,
+      "code": 6036,
       "name": "ZeroAmountNotAllowed",
       "msg": "zero amount not allowed"
     },
     {
-      "code": 6029,
+      "code": 6037,
       "name": "InsufficientLiquidity",
       "msg": "vault liquidity insufficient for withdrawal"
     },
     {
-      "code": 6030,
+      "code": 6038,
       "name": "InsufficientSolToWrap",
       "msg": "Insufficient SOL to wrap"
     },
     {
-      "code": 6031,
+      "code": 6039,
       "name": "InsufficientWSolToUnwrap",
       "msg": "Insufficient WSOL to unwrap"
     },
     {
-      "code": 6032,
+      "code": 6040,
       "name": "ProtocolFrozen",
       "msg": "Protocol is frozen"
     },
     {
-      "code": 6033,
+      "code": 6041,
+      "name": "InvalidTreasury",
+      "msg": "Treasury account provided is invalid"
+    },
+    {
+      "code": 6042,
       "name": "MFerFrozen",
       "msg": "MirrorFi User is frozen"
     },
     {
-      "code": 6034,
+      "code": 6043,
       "name": "VaultFrozen",
       "msg": "Vault is frozen"
     },
     {
-      "code": 6035,
+      "code": 6044,
       "name": "NAVNotRefreshed",
       "msg": "Vault NAV has not been refreshed"
     },
     {
-      "code": 6036,
+      "code": 6045,
+      "name": "KaminoNotRefreshed",
+      "msg": "Kamino has not been refreshed"
+    },
+    {
+      "code": 6046,
       "name": "ObligationNotRefreshed",
       "msg": "Obligation has not been refreshed"
     },
     {
-      "code": 6037,
+      "code": 6047,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6038,
+      "code": 6048,
+      "name": "InsufficientShares",
+      "msg": "Insufficient shares for withdrawal"
+    },
+    {
+      "code": 6049,
       "name": "InvalidAuthority",
       "msg": "Invalid authority"
     },
     {
-      "code": 6039,
+      "code": 6050,
       "name": "InvalidTokenAccount",
       "msg": "Invalid token account"
     },
     {
-      "code": 6040,
+      "code": 6051,
       "name": "InvalidDestinationAccount",
       "msg": "Invalid destination account"
     },
     {
-      "code": 6041,
+      "code": 6052,
       "name": "OperationNotAllowed",
       "msg": "Operation not allowed"
     },
     {
-      "code": 6042,
+      "code": 6053,
       "name": "ZeroWithdrawalUnallowed",
       "msg": "Zero Withdrawal is not allowed"
     },
     {
-      "code": 6043,
+      "code": 6054,
       "name": "ZeroDepositUnallowed",
       "msg": "Zero Deposit is not allowed"
     },
     {
-      "code": 6044,
+      "code": 6055,
       "name": "DepositTooSmall",
       "msg": "Deposit amount is too small"
     },
     {
-      "code": 6045,
+      "code": 6056,
       "name": "DepositTooLarge",
       "msg": "Deposit amount is too large"
     },
     {
-      "code": 6046,
+      "code": 6057,
       "name": "WithdrawalTooSmall",
       "msg": "Withdrawal amount is too small"
     },
     {
-      "code": 6047,
+      "code": 6058,
       "name": "WithdrawalTooLarge",
       "msg": "Withdrawal amount is too large"
+    },
+    {
+      "code": 6059,
+      "name": "InvalidMappingMint",
+      "msg": "Mint provided does not match the mapping mint"
+    },
+    {
+      "code": 6060,
+      "name": "MappingStale",
+      "msg": "Mapping needs to be refreshed"
+    },
+    {
+      "code": 6061,
+      "name": "InvalidMappingAccount",
+      "msg": "Mapping account cannot be deserialized"
+    },
+    {
+      "code": 6062,
+      "name": "NoMatchingMintInPosition",
+      "msg": "Mapping mint not found in spot position"
     }
   ],
   "types": [
     {
-      "name": "CollectFeeArgs",
+      "name": "Bitmask",
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitOracleArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitProtocolArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          },
-          {
-            "name": "protocol_fee_rate",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitVaultArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          },
-          {
-            "name": "name",
-            "type": "bytes"
-          },
-          {
-            "name": "manager_fee_rate",
-            "type": "u64"
-          }
+          "u8"
         ]
       }
     },
@@ -4401,6 +4696,47 @@
       }
     },
     {
+      "name": "Mapping",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "last_refreshed_slot",
+            "type": "u64"
+          },
+          {
+            "name": "price",
+            "docs": [
+              "Price is only stored in f64 and never calculated directly due to lack of floating Rust type support"
+            ],
+            "type": "f64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "oracle_types",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "OracleType"
+                }
+              }
+            }
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "Oracle",
       "serialization": "bytemuckunsafe",
       "repr": {
@@ -4480,109 +4816,30 @@
       }
     },
     {
-      "name": "PriceFeedMessage",
-      "repr": {
-        "kind": "c"
-      },
+      "name": "OracleInitializeArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "feed_id",
-            "docs": [
-              "`FeedId` but avoid the type alias because of compatibility issues with Anchor's `idl-build` feature."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "price",
-            "type": "i64"
-          },
-          {
-            "name": "conf",
-            "type": "u64"
-          },
-          {
-            "name": "exponent",
-            "type": "i32"
-          },
-          {
-            "name": "publish_time",
-            "docs": [
-              "The timestamp of this price update in seconds"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "prev_publish_time",
-            "docs": [
-              "The timestamp of the previous price update. This field is intended to allow users to",
-              "identify the single unique price update for any moment in time:",
-              "for any time t, the unique update is the one such that prev_publish_time < t <= publish_time.",
-              "",
-              "Note that there may not be such an update while we are migrating to the new message-sending logic,",
-              "as some price updates on pythnet may not be sent to other chains (because the message-sending",
-              "logic may not have triggered). We can solve this problem by making the message-sending mandatory",
-              "(which we can do once publishers have migrated over).",
-              "",
-              "Additionally, this field may be equal to publish_time if the message is sent on a slot where",
-              "where the aggregation was unsuccesful. This problem will go away once all publishers have",
-              "migrated over to a recent version of pyth-agent."
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "ema_price",
-            "type": "i64"
-          },
-          {
-            "name": "ema_conf",
+            "name": "id",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "PriceUpdateV2",
-      "docs": [
-        "A price update account. This account is used by the Pyth Receiver program to store a verified price update from a Pyth price feed.",
-        "It contains:",
-        "- `write_authority`: The write authority for this account. This authority can close this account to reclaim rent or update the account to contain a different price update.",
-        "- `verification_level`: The [`VerificationLevel`] of this price update. This represents how many Wormhole guardian signatures have been verified for this price update.",
-        "- `price_message`: The actual price update.",
-        "- `posted_slot`: The slot at which this price update was posted."
-      ],
+      "name": "OracleType",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "write_authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "verification_level",
-            "type": {
-              "defined": {
-                "name": "VerificationLevel"
+            "name": "Pyth",
+            "fields": [
+              {
+                "name": "price_update_v2",
+                "type": "pubkey"
               }
-            }
-          },
-          {
-            "name": "price_message",
-            "type": {
-              "defined": {
-                "name": "PriceFeedMessage"
-              }
-            }
-          },
-          {
-            "name": "posted_slot",
-            "type": "u64"
+            ]
           }
         ]
       }
@@ -4597,102 +4854,126 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "is_initialized",
-            "type": "bool"
-          },
-          {
-            "name": "freeze",
-            "type": "bool"
-          },
-          {
-            "name": "version",
-            "type": "u8"
+            "name": "state_flags",
+            "docs": [
+              "Bitfield for various platform-level state."
+            ],
+            "type": {
+              "defined": {
+                "name": "Bitmask"
+              }
+            }
           },
           {
             "name": "bump",
+            "docs": [
+              "Bump used for PDA derivation."
+            ],
             "type": "u8"
           },
           {
-            "name": "is_kamino",
-            "type": "bool"
-          },
-          {
-            "name": "is_meteora",
-            "type": "bool"
-          },
-          {
-            "name": "is_orca",
-            "type": "bool"
-          },
-          {
-            "name": "is_drift",
-            "type": "bool"
-          },
-          {
-            "name": "reserved_protocols",
+            "name": "treasury_bump",
             "docs": [
-              "Reserved space for future protocol integrations"
+              "Bump used for PDA derivation."
             ],
+            "type": "u8"
+          },
+          {
+            "name": "align0",
             "type": {
               "array": [
-                "bool",
-                12
+                "u8",
+                5
               ]
             }
           },
           {
-            "name": "creator",
+            "name": "platform_fee_bps",
             "docs": [
-              "Address of protocol's creator"
+              "Fee taken from vault profits, in basis points."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "platform_commission_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "platform_deposit_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "platform_withdrawal_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "docs": [
+              "Authority of protocol."
             ],
             "type": "pubkey"
           },
           {
-            "name": "owner",
+            "name": "protocols_integrated",
             "docs": [
-              "Update authority of protocol state"
+              "Number of protocols integrated, supports up to 255."
             ],
-            "type": "pubkey"
+            "type": "u8"
           },
           {
-            "name": "created_at",
-            "docs": [
-              "Creation timestamp of protocol"
-            ],
-            "type": "i64"
+            "name": "align1",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
-            "name": "updated_at",
+            "name": "active_integrations",
             "docs": [
-              "Last updated timestamp of the protocol"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "protocol_fee_authority",
-            "docs": [
-              "Fee Authority of the protocol"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "protocol_fee_rate",
-            "docs": [
-              "The Fee Rate of the protocol, 1000 = 1% (decimal = 3)"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "padding",
-            "docs": [
-              "Extra Space"
+              "Bitfield for protocol integrations that are active.",
+              "Each bit represents a protocol integration, where 1 is active and 0 is inactive."
             ],
             "type": {
               "array": [
                 "u64",
-                64
+                4
               ]
             }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProtocolInitializeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "platform_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "platform_commission_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "platform_deposit_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "platform_withdrawal_fee_bps",
+            "type": "u16"
           }
         ]
       }
@@ -4703,24 +4984,64 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "protocol_fee_rate",
-            "type": "u64"
+            "name": "platform_fee_bps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "is_kamino",
-            "type": "bool"
+            "name": "platform_commission_fee_bps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "is_meteora",
-            "type": "bool"
+            "name": "platform_deposit_fee_bps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "is_orca",
-            "type": "bool"
+            "name": "platform_withdrawal_fee_bps",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            "name": "is_drift",
-            "type": "bool"
+            "name": "admin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "is_frozen",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enable_kamino",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enable_meteora",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enable_orca",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "enable_drift",
+            "type": {
+              "option": "bool"
+            }
           }
         ]
       }
@@ -4835,10 +5156,6 @@
             "type": "pubkey"
           },
           {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
             "name": "last_nav",
             "type": "u64"
           },
@@ -4867,7 +5184,7 @@
             "type": "bool"
           },
           {
-            "name": "freeze",
+            "name": "is_frozen",
             "type": "bool"
           },
           {
@@ -4890,33 +5207,24 @@
             "type": "bool"
           },
           {
-            "name": "is_orca",
-            "type": "bool"
-          },
-          {
-            "name": "is_drift",
-            "type": "bool"
-          },
-          {
             "name": "reserved_protocols",
             "type": {
               "array": [
                 "u8",
-                15
+                16
               ]
             }
           },
           {
-            "name": "name",
+            "name": "deposit_token_decimals",
+            "type": "u8"
+          },
+          {
+            "name": "lookup_table",
             "docs": [
-              "Name of the vault (32 bytes)"
+              "Vault Look Up Table"
             ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
+            "type": "pubkey"
           },
           {
             "name": "pubkey",
@@ -4943,20 +5251,6 @@
             "name": "vault_authority",
             "docs": [
               "Vault authority (PDA)"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "vault_fee_authority",
-            "docs": [
-              "Vault fee authority"
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "protocol_fee_authority",
-            "docs": [
-              "Protocol fee authority"
             ],
             "type": "pubkey"
           },
@@ -4989,9 +5283,16 @@
             "type": "i64"
           },
           {
-            "name": "last_nav_update_at",
+            "name": "last_gav_update_at",
             "docs": [
               "Timestamp of last NAV update"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "last_resolve_at",
+            "docs": [
+              "Timestamp of last Resolve"
             ],
             "type": "i64"
           },
@@ -5003,72 +5304,65 @@
             "type": "u64"
           },
           {
-            "name": "last_nav",
+            "name": "last_gav_usd",
             "docs": [
-              "Last calculated Net Asset Value"
+              "Last calculated Gross Asset Value (in USD & Deposit Token)"
             ],
             "type": "u64"
           },
           {
-            "name": "total_deposit_amount",
+            "name": "last_gav_token",
+            "type": "u64"
+          },
+          {
+            "name": "last_total_profit_usd",
+            "type": "u64"
+          },
+          {
+            "name": "last_total_profit_token",
+            "type": "u64"
+          },
+          {
+            "name": "total_deposit",
             "docs": [
               "Total amount deposited into the vault"
             ],
             "type": "u64"
           },
           {
-            "name": "total_withdraw_amount",
+            "name": "total_withdrawal",
             "docs": [
               "Total amount withdrawn from the vault"
             ],
             "type": "u64"
           },
           {
-            "name": "total_deposit_count",
+            "name": "total_claimed_fee",
+            "type": "u64"
+          },
+          {
+            "name": "total_claimed_protocol_fee",
+            "type": "u64"
+          },
+          {
+            "name": "fresh_capital",
             "docs": [
-              "Total number of deposit transactions"
+              "(NOT USED YET) Vault Capital Tracking"
             ],
             "type": "u64"
           },
           {
-            "name": "total_withdraw_count",
-            "docs": [
-              "Total number of withdraw transactions"
-            ],
+            "name": "request_capital",
             "type": "u64"
           },
           {
-            "name": "total_yield",
-            "docs": [
-              "Total yield generated"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "total_manager_fee",
-            "docs": [
-              "Total fees paid to the manager"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "total_protocol_fee",
-            "docs": [
-              "Total fees paid to the protocol"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "avg_index",
-            "docs": [
-              "Average Share Index Price"
-            ],
+            "name": "withdrawable_capital",
             "type": "u64"
           },
           {
             "name": "delegatee_1",
             "docs": [
-              "Authorized account to manage the vault"
+              "(NOT USED YET) Authorized account to manage the vault"
             ],
             "type": "pubkey"
           },
@@ -5092,7 +5386,7 @@
             "type": {
               "array": [
                 "u64",
-                192
+                61
               ]
             }
           }
@@ -5106,6 +5400,97 @@
         "fields": [
           {
             "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultDepositor",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "is_initialized",
+            "type": "bool"
+          },
+          {
+            "name": "align",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "total_shares",
+            "docs": [
+              "Total shares currently held"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_cost",
+            "docs": [
+              "Total cost basis for current shares (in token units)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "realized_pnl",
+            "docs": [
+              "Realized profit/loss from past sells (in token units)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultInitializeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "lookup_table",
+            "type": "pubkey"
+          },
+          {
+            "name": "manager_fee_rate",
             "type": "u64"
           }
         ]
@@ -5255,39 +5640,6 @@
           {
             "name": "withdraw_all",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "VerificationLevel",
-      "docs": [
-        "Pyth price updates are bridged to all blockchains via Wormhole.",
-        "Using the price updates on another chain requires verifying the signatures of the Wormhole guardians.",
-        "The usual process is to check the signatures for two thirds of the total number of guardians, but this can be cumbersome on Solana because of the transaction size limits,",
-        "so we also allow for partial verification.",
-        "",
-        "This enum represents how much a price update has been verified:",
-        "- If `Full`, we have verified the signatures for two thirds of the current guardians.",
-        "- If `Partial`, only `num_signatures` guardian signatures have been checked.",
-        "",
-        "# Warning",
-        "Using partially verified price updates is dangerous, as it lowers the threshold of guardians that need to collude to produce a malicious price update."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Partial",
-            "fields": [
-              {
-                "name": "num_signatures",
-                "type": "u8"
-              }
-            ]
-          },
-          {
-            "name": "Full"
           }
         ]
       }
