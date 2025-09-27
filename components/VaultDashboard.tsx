@@ -109,7 +109,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
           )}
           {activeTab == "overview" && (
             <div className="lg:col-span-2 space-y-4">
-              <VaultDashboardBalances />
+              <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
             </div>
           )}
 
