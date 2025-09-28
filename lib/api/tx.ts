@@ -29,7 +29,7 @@ export async function getVaultInitializeTx(vaultData: VaultData) {
     return data;
 }
 
-export async function getVaultDepositTx(user: PublicKey, vault: PublicKey, depositAmount: number) {
+export async function getVaultDepositTx(user: PublicKey, vault: PublicKey, depositAmount: number, depositTokenProgram: PublicKey) {
     const res = await fetch("/api/tx/deposit", {
         method: "POST",
         headers: {
@@ -39,6 +39,7 @@ export async function getVaultDepositTx(user: PublicKey, vault: PublicKey, depos
             user: user.toString(),
             vault: vault.toString(),
             depositAmount,
+            depositTokenProgram: depositTokenProgram.toString(),
         }),
     });
     const data = await res.json();
@@ -46,7 +47,7 @@ export async function getVaultDepositTx(user: PublicKey, vault: PublicKey, depos
     return data;
 }
 
-export async function getVaultWithdrawTx(user: PublicKey, vault: PublicKey, depositAmount: number) {
+export async function getVaultWithdrawTx(user: PublicKey, vault: PublicKey, withdrawAmount: number, withdrawAll: boolean, withdrawTokenProgram: PublicKey) {
     const res = await fetch("/api/tx/withdraw", {
         method: "POST",
         headers: {
@@ -55,7 +56,9 @@ export async function getVaultWithdrawTx(user: PublicKey, vault: PublicKey, depo
         body: JSON.stringify({
             user: user.toString(),
             vault: vault.toString(),
-            depositAmount,
+            withdrawAmount,
+            withdrawAll,
+            withdrawTokenProgram: withdrawTokenProgram.toString(),
         }),
     });
     const data = await res.json();

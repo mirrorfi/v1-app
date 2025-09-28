@@ -4,7 +4,6 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import IDL from "@/lib/program/idl.json";
 import { MirrorfiVault } from "@/lib/program/types";
 import { createEncodedTransaction } from "@/lib/solana";
-import { TOKEN_PROGRAM_2022_ID, TOKEN_PROGRAM_ID } from "@/lib/program/constants";
 import { getRefreshNavIxs } from "@/lib/utils/mirrorfi";
 
 export async function POST(req: NextRequest) {
@@ -21,6 +20,9 @@ export async function POST(req: NextRequest) {
     }
     if(!data.withdrawAmount) {
         return new Response(JSON.stringify({ error: "Withdraw amount not found" }), { status: 500 });
+    }
+    if(!data.withdrawTokenProgram) {
+        return new Response(JSON.stringify({ error: "Withdraw token program not found" }), { status: 500 });
     }
 
     try{
@@ -43,7 +45,7 @@ export async function POST(req: NextRequest) {
             withdrawAll: withdrawAll,
         }).accounts({
             vault: data.vault,
-            depositTokenProgram: TOKEN_PROGRAM_ID,
+            depositTokenProgram: data.withdrawTokenProgram,
         }).instruction();
         
         const instructions = [

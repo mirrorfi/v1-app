@@ -1,14 +1,51 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { getVaultDepositTx, getVaultWithdrawTx } from "@/lib/api"
+import { useWallet } from "@solana/wallet-adapter-react"
+import { PublicKey, VersionedTransaction } from "@solana/web3.js"
+import { TOKEN_INFO, TokenInfo } from "@/lib/utils/tokens"
+import * as bs58 from "bs58"
+import { getConnection } from "@/lib/solana"
+import { getAssociatedTokenAddressSync } from "@solana/spl-token"
 
-export function VaultDashboardExecuteCard() {
+const connection = getConnection();
+
+export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, tokenMint: string}) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
 
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
+
+  const [tokenBalance, setTokenBalance] = useState<number>(0);
+
+  const { publicKey, signTransaction } = useWallet()
+
+  // Load Token Information
+  useEffect(() => {
+    const info = TOKEN_INFO[tokenMint]
+    if (info) {
+      setTokenInfo(info)
+    }
+    async function fetchUserBalance() {
+      if (publicKey && tokenInfo) {
+        const userAta = getAssociatedTokenAddressSync(
+          new PublicKey(tokenMint),
+          publicKey,
+          false,
+          tokenInfo.tokenProgram
+        );
+        const accountInfo = await connection.getTokenAccountBalance(userAta);
+        console.log("User ATA:", userAta.toBase58());
+        console.log("User Token Balance:", accountInfo.value.uiAmount);
+        if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
+      }
+    }
+    fetchUserBalance();
+  }, [tokenMint, publicKey])
+
   // Mock data - replace with real data
-  const tokenBalance = 0.21 // Available SOL balance
   const tokenPrice = 180 // SOL price in USD
   const apy = 6.8
 
@@ -30,11 +67,44 @@ export function VaultDashboardExecuteCard() {
   const usdValue = amount ? (Number.parseFloat(amount) * tokenPrice).toFixed(2) : "0"
 
   const handleConfirm = async () => {
+    console.log("Confirming Action")
     if (!amount || Number.parseFloat(amount) <= 0) return
+    if (!publicKey || !signTransaction) {
+      alert("Please connect your wallet")
+      return
+    }
 
     setIsLoading(true)
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const tokenInfo = TOKEN_INFO[tokenMint];
+      let res;
+      if (activeAction === "deposit") {
+        res = await getVaultDepositTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, tokenInfo.tokenProgram);
+      } else {
+        const withdrawAll = false;
+        res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, withdrawAll, tokenInfo.tokenProgram);
+      }
+      console.log("Raw API Response:", res);
+      const encodedTx = res.tx;
+      const instruction  = bs58.default.decode(encodedTx);
+      const versionedTx = VersionedTransaction.deserialize(instruction);
+      console.log("Versioned Transaction:", versionedTx);
+
+      const { value } = await connection.simulateTransaction(versionedTx);
+      console.log("Simulation result:", value);
+
+      // Prompt user to sign and send transaction
+      const signedTx = await signTransaction(versionedTx);
+      console.log("Signed Transaction:", signedTx);
+      const txid = await connection.sendRawTransaction(signedTx.serialize());
+      console.log("Transaction ID:", txid);
+      alert(`Transaction submitted: ${txid}`);
+
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+    } catch (error) {
+      console.error("Error during transaction processing:", error);
+    }
     setIsLoading(false)
 
     // Reset form or show success message
@@ -84,9 +154,9 @@ export function VaultDashboardExecuteCard() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">S</span>
+                  <span className="text-white text-xs font-bold">{tokenInfo?.symbol.charAt(0)}</span>
                 </div>
-                <span className="text-white font-medium">SOL</span>
+                <span className="text-white font-medium">{tokenInfo?.symbol}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -113,7 +183,7 @@ export function VaultDashboardExecuteCard() {
                 type="text"
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
-                placeholder="0 SOL"
+                placeholder={`0 ${tokenInfo?.symbol}`}
                 className="bg-transparent text-white text-lg font-medium outline-none flex-1 placeholder-gray-500"
               />
             </div>

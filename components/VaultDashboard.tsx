@@ -7,13 +7,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
 import { getVaultBalances } from "@/lib/api/vault"
 import { PublicKey, Keypair } from "@solana/web3.js"
+import { getVaultAccountInfo } from "@/lib/utils/mirrorfi/accounts"
 
 import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
 import { VaultDashboardChart } from "@/components/VaultDashboardChart";
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
-import { set } from "@coral-xyz/anchor/dist/cjs/utils/features"
+import { getConnection } from "@/lib/solana"
 
 interface StrategyDashboardProps {
   vault: string;
@@ -26,6 +27,8 @@ interface StrategyDashboardProps {
   onTabChange?: (tab: string) => void
 }
 
+const connection = getConnection();
+
 export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onTabChange }: StrategyDashboardProps) {
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
@@ -35,14 +38,24 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
 
   const [isLoading, setIsLoading] = useState(false);
   const [vaultBalances, setVaultBalances] = useState<any>(null);
+  const [vaultDepositTokenMint, setVaultDepositTokenMint] = useState<string | null>("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+  const [vaultInfo, setVaultInfo] = useState<any>(null);
 
   useEffect(() => {
     setIsLoading(true);
     async function loadVault(){
+      // Try Loading vault key and check if it's valid
+      // try {
+      //   const vaultKey 
+      // }
+
+
       try{
-        const vaultKey = Keypair.generate().publicKey;
+        const vaultKey = new PublicKey('6nffsG76jbbyqersNR8GxR4CdFXk6nKaBR75hn2oWVkN');
         const balances = await getVaultBalances(vaultKey);
         setVaultBalances(balances);
+        const vaultData = await getVaultAccountInfo(connection, vaultKey);
+        setVaultDepositTokenMint(vaultData.deposit_token_mint.toBase58());
       } catch (error) {
         console.error("Error fetching vault balances:", error);
       } 
@@ -115,7 +128,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
 
           {/* Right Column - Execute Position Card */}
           <div className="lg:col-span-1">
-            <VaultDashboardExecuteCard />
+            {vaultDepositTokenMint && <VaultDashboardExecuteCard vault={vault} tokenMint={vaultDepositTokenMint} /> }
           </div>
         </div>
       </div>

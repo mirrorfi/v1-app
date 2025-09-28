@@ -4,7 +4,6 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import IDL from "@/lib/program/idl.json";
 import { MirrorfiVault } from "@/lib/program/types";
 import { createEncodedTransaction } from "@/lib/solana";
-import { TOKEN_PROGRAM_2022_ID, TOKEN_PROGRAM_ID } from "@/lib/program/constants";
 import { getRefreshNavIxs } from "@/lib/utils/mirrorfi";
 
 export async function POST(req: NextRequest) {
@@ -22,6 +21,9 @@ export async function POST(req: NextRequest) {
     }
     if(!data.depositAmount) {
         return new Response(JSON.stringify({ error: "Deposit amount not found" }), { status: 500 });
+    }
+    if(!data.depositTokenProgram) {
+        return new Response(JSON.stringify({ error: "Deposit token program not found" }), { status: 500 });
     }
 
     console.log("Request Checking Passed, proceeding...");
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest) {
             amount: new BN(data.depositAmount),
         }).accounts({
             vault: data.vault,
-            depositTokenProgram: TOKEN_PROGRAM_ID,
+            depositTokenProgram: data.depositTokenProgram,
         }).instruction();
         
         const instructions = [
