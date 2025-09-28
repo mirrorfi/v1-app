@@ -34,9 +34,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
       <AppWalletProvider>
           <body
-            className={`h-[80vh] antialiased ${satoshi.variable} ${univaNova.variable}`}
+            className={`min-h-screen antialiased ${satoshi.variable} ${univaNova.variable}`}
           >
             <ThemeProvider
               attribute="class"

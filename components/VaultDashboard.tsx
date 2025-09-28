@@ -65,16 +65,16 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
   }, [vault]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6">
-      <div className="flex items-start gap-3 mb-3">
-        <Avatar className="h-10 w-10 bg-gradient-to-br from-pink-500 to-rose-400">
-          <AvatarFallback className="text-white font-bold">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
+      <div className="flex items-start gap-3 mb-4">
+        <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
+          <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <h2 className="text-xl font-semibold text-white">{strategy.name}</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-white">{strategy.name}</h2>
           <Badge
             variant={strategy.status === "active" ? "default" : "secondary"}
-            className={`mt-1 ${
+            className={`mt-1 text-xs ${
               strategy.status === "active"
                 ? "bg-green-500/20 text-green-400 border-green-500/30"
                 : "bg-gray-500/20 text-gray-400 border-gray-500/30"
@@ -85,19 +85,19 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
         </div>
       </div>
 
-      {/* Navigation Tabs - Moved below title */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* Navigation Tabs - Mobile responsive */}
+      <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
             variant={activeTab === tab.id ? "default" : "outline"}
             size="sm"
             onClick={() => onTabChange?.(tab.id)}
-            className={
+            className={`whitespace-nowrap text-xs md:text-sm ${
               activeTab === tab.id
                 ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
                 : "bg-transparent border-blue-700/50 text-blue-300 hover:bg-blue-800/30 hover:text-white"
-            }
+            }`}
           >
             {tab.label}
           </Button>
@@ -105,29 +105,29 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
       </div>
 
       <div className="space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-[500px]">
-          {/* Left Column - cards stacked */}
-          {/* TO DO: Change Display based on which tab is opened */}
+        {/* Mobile: Stack all content vertically */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          {/* Main Content */}
           {activeTab == "vault-stats" && (
-            <div className="lg:col-span-2 space-y-4">
+            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
               <VaultDashboardFlow />
               <VaultDashboardChart />
               <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
-          </div>
+            </div>
           )}
           {activeTab == "your-position" && (
-            <div className="lg:col-span-2 space-y-4">
+            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
               <VaultDashboardUserPosition />
             </div>
           )}
           {activeTab == "overview" && (
-            <div className="lg:col-span-2 space-y-4">
+            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
               <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
             </div>
           )}
 
-          {/* Right Column - Execute Position Card */}
-          <div className="lg:col-span-1">
+          {/* Execute Card - Show first on mobile */}
+          <div className="xl:col-span-1 order-1 xl:order-2">
             {vaultDepositTokenMint && <VaultDashboardExecuteCard vault={vault} tokenMint={vaultDepositTokenMint} /> }
           </div>
         </div>

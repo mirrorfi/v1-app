@@ -29,7 +29,6 @@ export function Navbar() {
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
     : "";
 
-  // Get the current pathname
   const pathname = usePathname();
 
   // Determine the title based on the current pathname
@@ -37,31 +36,21 @@ export function Navbar() {
 
   return (
     <div className="border-b border-[#1a1b29] bg-[#0a0b14]">
-      <div className="flex h-20 justify-around items-center px-6">
-        <div className="flex items-center space-x-4">
+      <div className="flex h-16 md:h-20 justify-between items-center px-4 md:px-6">
+        {/* Logo and Title */}
+        <div className="flex items-center space-x-2 md:space-x-4">
           <Image
             src="/SVG/MirrorFi-Logo-Blue.svg"
             alt="MirrorFi Logo"
             width={32}
             height={32}
-            className="h-8 w-auto"
+            className="h-6 w-6 md:h-8 md:w-8"
           />
-          <h1 className="text-xl font-semibold">{title}</h1>
+          <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
         </div>
 
-        <div className="flex h-16 justify-around items-center px-6 opacity-0 cursor-default">
-          <Button
-            variant="outline"
-            className="h-9 gap-2 rounded-md border-[#2a2b39] bg-[#1a1b29] text-cyan-400 hover:bg-[#2a2b39] hover:text-cyan-300"
-          >
-            <User className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              {truncatedAddress || "Connect Wallet"}
-            </span>
-          </Button>
-        </div>
-
-        <div className="mx-auto flex items-center space-x-4">
+        {/* Navigation Menu - Hidden on mobile */}
+        <div className="hidden md:flex items-center space-x-4">
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -114,19 +103,11 @@ export function Navbar() {
           </NavigationMenu>
         </div>
 
-        <div className="flex items-center space-x-4 opacity-0 cursor-default">
-          <Image
-            src="/SVG/MirrorFi-Logo-Blue.svg"
-            alt="MirrorFi Logo"
-            width={32}
-            height={32}
-            className="h-8 w-auto"
-          />
-          <h1 className="text-xl font-semibold">{title}</h1>
-        </div>
-
-        <div className="flex h-16 justify-around items-center">
-          <WalletMultiButtonDynamic />
+        {/* Wallet Button */}
+        <div className="flex items-center">
+          <div className="scale-75 md:scale-100">
+            <WalletMultiButtonDynamic />
+          </div>
         </div>
       </div>
     </div>

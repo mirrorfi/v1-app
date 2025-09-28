@@ -170,17 +170,17 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
             </div>
             
             <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <Image src={`/PNG/usdc-logo.png`} alt="USDC Logo" width={25} height={25} />
                   <span className="text-white font-medium">{tokenInfo?.symbol}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(0.25)}
-                    className="h-6 px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 sm:px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
                   >
                     25%
                   </Button>
@@ -188,7 +188,7 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(0.5)}
-                    className="h-6 px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 sm:px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
                   >
                     50%
                   </Button>
@@ -196,7 +196,7 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(1)}
-                    className="h-6 px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 sm:px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
                   >
                     100%
                   </Button>
