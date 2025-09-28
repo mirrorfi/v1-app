@@ -6,24 +6,30 @@ import { MirrorfiVault } from "@/lib/program/types";
 import { getKaminoBalances } from "@/lib/utils/kamino/nav";
 import { getSpotBalances } from "@/lib/utils/spot";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, res: NextRequest) {
     const { searchParams } = new URL(req.url);
     const vault = searchParams.get("vault");
+
+    // Taken inspiration from jupiter api: allow for multiple vault datas to be fetched in one batch call
+    // If possible, allow comma separated list of vault addresses
+    // Example: ?vaults=addr1,addr2,addr3
+    // Mario if you read this, you reckon this is possible to do from your side?
+    const vaults = searchParams.get("vaults");
     
     if(!process.env.PRIVATE_SOLANA_RPC_URL) {
         return new Response(JSON.stringify({ error: "Solana PRC Not Provided" }), { status: 500 });
     }
 
-    if(!vault) {
-        return new Response(JSON.stringify({ error: "Vault Not Provided" }), { status: 400 });
+    if(!vault && !vaults) {
+        return new Response(JSON.stringify({ error: "Vault(s) Not Provided" }), { status: 400 });
     }
 
-    let vaultAddress
-    try {
-        vaultAddress = new PublicKey(vault);
-    } catch(e) {
-        return new Response(JSON.stringify({ error: "Invalid Vault Address" }), { status: 400 });
-    }
+    // let vaultAddresses = [];
+    // try {
+    //     vaultAddress = new PublicKey(vault);
+    // } catch(e) {
+    //     return new Response(JSON.stringify({ error: "Invalid Vault Address" }), { status: 400 });
+    // }
     
     try{
         const connection = new Connection(process.env.PRIVATE_SOLANA_RPC_URL);
@@ -56,7 +62,12 @@ export async function GET(req: NextRequest) {
 
         return new Response(
             JSON.stringify(balances),
-            { status: 200 }
+            { 
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+            }
         );
     } catch (error: unknown) {
         console.error("API Error:", error instanceof Error ? error.message : "Unknown error occurred");
