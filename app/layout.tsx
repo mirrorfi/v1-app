@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+// import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppWalletProvider } from "@/components/providers/AppWalletProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { Navbar } from "@/components/Navbar";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next"
@@ -43,11 +44,13 @@ export default function RootLayout({
               enableSystem={false}
               disableTransitionOnChange={false}
             >
-              <TooltipProvider>
-                {children}
-                <Analytics />
-                <Toaster richColors />
-              </TooltipProvider>
+              <NotificationProvider>
+                <TooltipProvider>
+                  {children}
+                  <Analytics />
+                  {/* <Toaster richColors /> */}
+                </TooltipProvider>
+              </NotificationProvider>
             </ThemeProvider>
           </body>
       </AppWalletProvider>
