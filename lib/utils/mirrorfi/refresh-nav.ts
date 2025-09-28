@@ -8,8 +8,7 @@ import { Program } from "@coral-xyz/anchor";
 import { MirrorfiVault } from "@/lib/program/types";
 import { getSpotManagerPda, getVaultAuthorityPda } from "./pda";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
-
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_INFO } from "../tokens";
 
 // Temporary Data, only USDC Price Feed Available
 const TEMP_PYTH_PRICES: Record<string, PublicKey> = {
@@ -28,11 +27,15 @@ export const getRefreshNavIxs = async (program: Program<MirrorfiVault>, vault: P
     const remainingAccounts: any = [];
     await Promise.all(spotManager.positions.map(async(position: any, index: number) => {
         if (position.isActive) {
+            const tokenInfo = TOKEN_INFO[position.tokenMint.toString()];
+            if (!tokenInfo) {
+                throw new Error(`Token info not found for mint: ${position.tokenMint.toString()}`);
+            }
             const refresh_ix = await program.methods
                 .mappingRefresh()
                 .accounts({ mint: position.tokenMint})
                 .remainingAccounts([{
-                    pubkey: TEMP_PYTH_PRICES[position.tokenMint.toString()],
+                    pubkey: tokenInfo.pythOracle,
                     isSigner: false,
                     isWritable: false,
                 }]).instruction();
@@ -40,7 +43,7 @@ export const getRefreshNavIxs = async (program: Program<MirrorfiVault>, vault: P
                 [Buffer.from("mapping"), position.tokenMint.toBuffer()],
                 program.programId
             );
-            const vault_ata = await getAssociatedTokenAddressSync(position.tokenMint, vaultAuthorityPda, true, TOKEN_PROGRAM_ID);
+            const vault_ata = await getAssociatedTokenAddressSync(position.tokenMint, vaultAuthorityPda, true, tokenInfo.tokenProgram);
             remainingAccounts.push({
                 pubkey: mapping,
                 isWritable: true,

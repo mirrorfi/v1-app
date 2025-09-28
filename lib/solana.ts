@@ -1,7 +1,15 @@
 
 import { AnchorProvider, Wallet, BN, Program } from "@coral-xyz/anchor";
-import { TransactionInstruction, VersionedTransaction, TransactionMessage } from "@solana/web3.js";
+import { TransactionInstruction, VersionedTransaction, TransactionMessage, Connection } from "@solana/web3.js";
 import bs58 from "bs58";
+
+export function getConnection() {
+  if(!process.env.NEXT_PUBLIC_SOLANA_RPC_URL) {
+      throw new Error("Solana RPC Not Provided");
+  }
+  const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL);
+  return connection;
+}
 
 export async function createTransaction(provider: AnchorProvider, instructions: TransactionInstruction[]): Promise<VersionedTransaction> {
     const recentBlockhash = await provider.connection.getLatestBlockhash();
