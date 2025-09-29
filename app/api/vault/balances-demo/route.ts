@@ -4,19 +4,37 @@ import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import IDL from "@/lib/program/idl.json";
 import { MirrorfiVault } from "@/lib/program/types";
 import { getKaminoBalances } from "@/lib/utils/kamino";
-import { getShareTokenMintPda, getSpotManagerPda, getVaultAuthorityPda } from "@/lib/utils/mirrorfi/pda";
+import { getShareTokenMintPda } from "@/lib/utils/mirrorfi/pda";
 import { getSpotBalances } from "@/lib/utils/spot";
+
+// !!!!!!!!!Note!!!!!!!!!
+// Use this for Demo Data
+// !!!!!!!!!!!!!!!!!!!!!!
 
 export async function GET(req: NextRequest, res: NextRequest) {
     const { searchParams } = new URL(req.url);
     const vault = searchParams.get("vault");
 
+    // Taken inspiration from jupiter api: allow for multiple vault datas to be fetched in one batch call
+    // If possible, allow comma separated list of vault addresses
+    // Example: ?vaults=addr1,addr2,addr3
+    // Mario if you read this, you reckon this is possible to do from your side?
+    const vaults = searchParams.get("vaults");
+    
     if(!process.env.PRIVATE_SOLANA_RPC_URL) {
         return new Response(JSON.stringify({ error: "Solana PRC Not Provided" }), { status: 500 });
     }
-    if(!vault) {
+
+    if(!vault && !vaults) {
         return new Response(JSON.stringify({ error: "Vault(s) Not Provided" }), { status: 400 });
     }
+
+    // let vaultAddresses = [];
+    // try {
+    //     vaultAddress = new PublicKey(vault);
+    // } catch(e) {
+    //     return new Response(JSON.stringify({ error: "Invalid Vault Address" }), { status: 400 });
+    // }
     
     try{
         const connection = new Connection(process.env.PRIVATE_SOLANA_RPC_URL);
@@ -26,33 +44,23 @@ export async function GET(req: NextRequest, res: NextRequest) {
             signAllTransactions: async (transactions: any) => { return transactions; }
         }
         const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
-        const program: Program<MirrorfiVault> = new Program(IDL as MirrorfiVault, provider);
+        const program = new Program(IDL as MirrorfiVault, provider);
 
-        const vaultAuthority = getVaultAuthorityPda(program.programId, new PublicKey(vault));
 
-        // Spot Positions
-        const spotManagerPda = getSpotManagerPda(program.programId, new PublicKey(vault));
-        const spotManager = await program.account.spotManager.fetch(spotManagerPda);
-        console.log("Spot Manager:", spotManager);
-        const spotPositions: PublicKey[] = [];
-        spotManager.positions.forEach((spotPosition) => {
-            if(spotPosition.isActive){
-                console.log("Active Spot Position:", spotPosition);
-                console.log("Token Mint:", spotPosition.tokenMint.toBase58());
-                spotPositions.push(spotPosition.tokenMint);
-            }
-        });
-        console.log("Spot Positions:", spotPositions);
-        console.log("Vault Authority:", vaultAuthority.toBase58());
-
-        // Kamino Positions
-        const kaminoObligations: PublicKey[] = [];
+        // Hardcoded Position Data
+        const vaultAuthority = new PublicKey("H1ZpCkCHJR9HxwLQSGYdCDt7pkqJAuZx5FhLHzWHdiEw");
+        const spotPositions = [
+            new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+            new PublicKey("So11111111111111111111111111111111111111112"),
+            new PublicKey("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB")
+        ];
+        const kaminoObligations = [
+            new PublicKey("Vnaq7vbHuwHHHSTzDYVnMf2WzFPdAzQA1iAa5NtpXNw")
+        ];
 
         // Fetch Vault Position & Balances
         const balances: Record<string, any> = {}
-        console.log("Fetching Spot Balances for:", spotPositions);
         const spotBalances = await getSpotBalances(connection, vaultAuthority, spotPositions);
-        console.log("Fetching Kamino Balances for:", kaminoObligations);
         const kaminoBalances = await getKaminoBalances(connection, kaminoObligations);
         
         console.log("Vault:", vault);
@@ -67,10 +75,8 @@ export async function GET(req: NextRequest, res: NextRequest) {
         balances["spot"] = spotBalances;
         balances["kamino"] = kaminoBalances;
         balances["totalNAV"] = spotBalances.totalNAV + kaminoBalances.totalNAV;
-        balances["depositTokenPrice"] = spotBalances.tokens[0]?.tokenPrice || 0;
         console.log(balances);
         
-        console.log(balances.spot.tokens);
 
         return new Response(
             JSON.stringify(balances),
