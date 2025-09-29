@@ -14,6 +14,11 @@ import { SYSTEM_PROGRAM_ID } from '@/lib/constants';
 import { sfToValue } from '../math';
 import { Reserve, BigFractionBytes } from '@kamino-finance/klend-sdk';
 
+interface KaminoBalances {
+    totalNAV: number;
+    obligations: ObligationNAV[];
+}
+
 interface ObligationNAV {
     obligation: string;
     totalNAV: number;
@@ -30,10 +35,13 @@ interface ObligationBalance {
     yield: number;
 }
 
-export async function getKaminoBalances(connection: Connection, obligationAddresses: PublicKey[]){
+export async function getKaminoBalances(connection: Connection, obligationAddresses: PublicKey[]): Promise<KaminoBalances> {
     const obligations = await getMultipleObligationData(connection, obligationAddresses);
     if(!obligations || obligations.length === 0){
-        return [];
+        return {
+            totalNAV: 0,
+            obligations: []
+        };
     }
 
     const reserveAddresses: PublicKey[] = [];
@@ -122,5 +130,8 @@ export async function getKaminoBalances(connection: Connection, obligationAddres
         obligationBalances.push(obligationNAV);
     });
 
-    return obligationBalances;
+    return {
+        "totalNAV": obligationBalances.reduce((acc, curr) => acc + curr.totalNAV, 0),
+        "obligations":obligationBalances
+    };
 }

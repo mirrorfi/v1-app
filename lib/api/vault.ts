@@ -8,8 +8,12 @@ export async function getVaultBalances(vault: PublicKey) {
     //     },
     //     body: JSON.stringify({}),
     // });
-    const res = await fetch(`/api/vault/balances?vault=${"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"}`);
-    const data = await res.json();
-    console.log(data);
-    return data;
+    try {
+        const res = await fetch(`/api/vault/balances?vault=${vault.toString()}`);
+        const data = await res.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error("Fetch Vault Balances Error:", error);
+    }
 }

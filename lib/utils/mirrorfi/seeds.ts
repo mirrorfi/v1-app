@@ -7,6 +7,7 @@ export const PROTOCOL_FEE_AUTHORITY = "protocol_fee_authority";
 
 // Vault Seeds
 export const VAULT = "mf_vault";
+export const VAULT_DEPOSITOR = "mf_vault_depositor";
 export const VAULT_AUTHORITY = "mf_vault_authority";
 export const VAULT_FEE_AUTHORITY = "mf_vault_fee_authority";
 export const VAULT_SHARE_MINT = "mf_vault_share_mint";

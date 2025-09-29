@@ -1,6 +1,7 @@
 import IDL from "@/lib/program/idl.json";
 import { PublicKey, Connection } from "@solana/web3.js";
-import { VaultAccountLayout } from "./struct";
+import { VaultAccountLayout, VaultDepositorLayout } from "./struct";
+import { getVaultDepositorPda } from "./pda";
 
 export async function getVaultAccountInfo(connection: Connection, vault: PublicKey) {
     console.log("Fetching Vault Account Info for:", vault.toBase58());
@@ -15,3 +16,18 @@ export async function getVaultAccountInfo(connection: Connection, vault: PublicK
     console.log("Decoded Vault Data:", decoded);
     return decoded;
 }
+
+export async function getVaultDepositorAccountInfo(connection: Connection, vault: PublicKey, user: PublicKey) {
+    const vaultDepositor = getVaultDepositorPda(new PublicKey(IDL.address), vault, user);
+    console.log("Fetching Vault Depositor Account Info for:", vaultDepositor.toBase58());
+    const accountInfo = await connection.getAccountInfo(vaultDepositor);
+    console.log("Raw Vault Depositor Account Info:", accountInfo);
+    if (!accountInfo) return null;
+    // Decode Data
+    const data = accountInfo.data;
+    const decoded = VaultDepositorLayout.decode(Uint8Array.from(data));
+    console.log("Decoded Vault Depositor Data:", decoded);
+    return decoded;
+}
+
+// export async function getUser

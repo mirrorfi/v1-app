@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
-import { SPOT_MANAGER, VAULT_AUTHORITY } from './seeds';
+import { SPOT_MANAGER, VAULT_AUTHORITY, VAULT_DEPOSITOR, VAULT_SHARE_MINT } from './seeds';
 
 
 export function getSpotManagerPda(programId: PublicKey, vault: PublicKey) {
@@ -16,4 +16,20 @@ export function getVaultAuthorityPda(programId: PublicKey, vault: PublicKey) {
         programId
     );
     return vaultAuthorityPda;
+}
+
+export function getVaultDepositorPda(programId: PublicKey, vault: PublicKey, user: PublicKey) {
+    const [vaultDepositorPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(VAULT_DEPOSITOR), vault.toBuffer(), user.toBuffer()],
+        programId
+    );
+    return vaultDepositorPda;
+}
+
+export function getShareTokenMintPda(programId: PublicKey, vault: PublicKey) {
+    const [shareTokenMintPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(VAULT_SHARE_MINT), vault.toBuffer()],
+        programId
+    );
+    return shareTokenMintPda;
 }
