@@ -30,8 +30,7 @@ export async function getSpotBalances(connection: Connection, owner: PublicKey, 
     });
     // Fetch Token Prices
     const tokenPrices = await fetchJupiterPrices(mintAddresses.map(mint => mint.toString()));
-    const tokenAtas = mintAddresses.map(mint => getAssociatedTokenAddressSync(mint, owner));
-    // Fetch Token Account Data
+    const tokenAtas = mintAddresses.map(mint => getAssociatedTokenAddressSync(mint, owner, true));
     const accountInfos = await connection.getMultipleAccountsInfo(tokenAtas);
 
     const spotData: SpotData = {
