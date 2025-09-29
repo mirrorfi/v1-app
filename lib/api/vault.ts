@@ -17,3 +17,15 @@ export async function getVaultBalances(vault: PublicKey) {
         console.error("Fetch Vault Balances Error:", error);
     }
 }
+
+export async function getAllVaults() {
+    try {
+        const res = await fetch(`/api/vault/all`);
+        const data = await res.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error("Fetch All Vaults Error:", error);
+        return null;
+    }
+}

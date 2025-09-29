@@ -8,6 +8,8 @@ import { useEffect, useState } from "react"
 import { getVaultBalances } from "@/lib/api/vault"
 import { PublicKey, Keypair } from "@solana/web3.js"
 import { getVaultAccountInfo, getVaultDepositorAccountInfo } from "@/lib/utils/mirrorfi/accounts"
+import { ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
 import { VaultDashboardChart } from "@/components/VaultDashboardChart";
@@ -37,6 +39,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
     { id: "overview", label: "Overview" },
   ]
   const { publicKey } = useWallet();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [reload, setReload] = useState(false);
   const [vaultBalances, setVaultBalances] = useState<any>(null);
@@ -45,6 +48,10 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
   const [vaultDepositorInfo, setVaultDepositorInfo] = useState<any>(null);
   const handleReload = () => {
     setReload(!reload);
+  }
+
+  const handleBackClick = () => {
+    router.push('/');
   }
 
 
@@ -89,6 +96,18 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
 
   return (
     <div className="w-full max-w-7xl mx-auto p-8 md:p-6">
+      {/* Back Button */}
+      <div className="mb-4">
+        <Button
+          variant="ghost"
+          onClick={handleBackClick}
+          className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 h-auto"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+      </div>
+
       <div className="flex items-start gap-3 mb-4">
         <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
           <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>

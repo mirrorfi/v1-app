@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
-import { SPOT_MANAGER, VAULT_AUTHORITY, VAULT_DEPOSITOR, VAULT_SHARE_MINT } from './seeds';
+import { SPOT_MANAGER, KAMINO_MANAGER, VAULT_AUTHORITY, VAULT_DEPOSITOR, VAULT_SHARE_MINT } from './seeds';
 
 
 export function getSpotManagerPda(programId: PublicKey, vault: PublicKey) {
@@ -8,6 +8,14 @@ export function getSpotManagerPda(programId: PublicKey, vault: PublicKey) {
         programId
     );
     return spotManagerPda;
+}
+
+export function getKaminoManagerPda(programId: PublicKey, vault: PublicKey) {
+    const [kaminoManagerPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(KAMINO_MANAGER), vault.toBuffer()],
+        programId
+    );
+    return kaminoManagerPda;
 }
 
 export function getVaultAuthorityPda(programId: PublicKey, vault: PublicKey) {
