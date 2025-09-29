@@ -165,7 +165,7 @@ export function VaultDashboardFlow() {
     }, [strategy.nodes, strategy.edges]);
 
     return (
-        <Card className={`h-[400px] bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
+        <Card className={`h-[300px] sm:h-[400px] bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
         <CardHeader className="pb-2">
             <CardTitle className="text-white flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-blue-400" />
@@ -176,7 +176,7 @@ export function VaultDashboardFlow() {
             <InteractiveFlow
               nodes={updatedNodes}
               edges={strategy.edges}
-              className="absolute inset-6"
+              className="absolute inset-0 rounded-lg"
             />
         </CardContent>
         </Card>

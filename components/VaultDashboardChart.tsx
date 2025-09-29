@@ -5,7 +5,7 @@ import { TrendingUp, DollarSign, BarChart3, ChartNoAxesCombined } from "lucide-r
 
 import { useState } from "react"
 
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Dot } from "recharts"
+import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Dot, ReferenceLine } from "recharts"
 
 // Define types for data selection
 type DataType = "APY History" | "Share Price" | "Vault NAV"
@@ -30,13 +30,13 @@ const mockData: Record<DataType, Record<TimeFrame, Array<ChartDataItem>>> = {
       { date: "20:00", fullDate: "25 Jul 2025", value: 7.15 },
     ],
     "7D": [
-      { date: "19/07", fullDate: "19 Jul 2025", value: 6.2 },
-      { date: "20/07", fullDate: "20 Jul 2025", value: 6.4 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 6.6 },
-      { date: "22/07", fullDate: "22 Jul 2025", value: 6.8 },
-      { date: "23/07", fullDate: "23 Jul 2025", value: 7.0 },
-      { date: "24/07", fullDate: "24 Jul 2025", value: 7.1 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 7.15 },
+      { date: "19/07", fullDate: "19 Jul 2025", value: 0.5 },
+      { date: "20/07", fullDate: "20 Jul 2025", value: -0.2 },
+      { date: "21/07", fullDate: "21 Jul 2025", value: -0.3 },
+      { date: "22/07", fullDate: "22 Jul 2025", value: -1.0 },
+      { date: "23/07", fullDate: "23 Jul 2025", value: -2 },
+      { date: "24/07", fullDate: "24 Jul 2025", value: 0.5 },
+      { date: "25/07", fullDate: "25 Jul 2025", value: 1 },
     ],
     "30D": [
       { date: "26/06", fullDate: "26 Jun 2025", value: 4.8 },
@@ -51,7 +51,7 @@ const mockData: Record<DataType, Record<TimeFrame, Array<ChartDataItem>>> = {
       { date: "22/05", fullDate: "22 May 2025", value: 0.2 },
       { date: "27/05", fullDate: "27 May 2025", value: 0.8 },
       { date: "01/06", fullDate: "01 Jun 2025", value: 1.2 },
-      { date: "06/06", fullDate: "06 Jun 2025", value: 1.4 },
+      { date: "06/06", fullDate: "06 Jun 2025", value: -2 },
       { date: "11/06", fullDate: "11 Jun 2025", value: 1.6 },
       { date: "16/06", fullDate: "16 Jun 2025", value: 1.8 },
       { date: "21/06", fullDate: "21 Jun 2025", value: 2.0 },
@@ -62,7 +62,7 @@ const mockData: Record<DataType, Record<TimeFrame, Array<ChartDataItem>>> = {
       { date: "16/07", fullDate: "16 Jul 2025", value: 4.1 },
       { date: "21/07", fullDate: "21 Jul 2025", value: 5.2 },
       { date: "25/07", fullDate: "25 Jul 2025", value: 7.15 },
-      { date: "17/08", fullDate: "17 Aug 2025", value: 7.2 },
+      { date: "17/08", fullDate: "17 Aug 2025", value: -0.5 },
     ],
   },
   "Share Price": {
@@ -142,17 +142,17 @@ const mockData: Record<DataType, Record<TimeFrame, Array<ChartDataItem>>> = {
       { date: "27/05", fullDate: "27 May 2025", value: 11000 },
       { date: "01/06", fullDate: "01 Jun 2025", value: 12000 },
       { date: "06/06", fullDate: "06 Jun 2025", value: 13000 },
-      { date: "11/06", fullDate: "11 Jun 2025", value: 14000 },
+      { date: "11/06", fullDate: "11 Jun 2025", value: 12000 },
       { date: "16/06", fullDate: "16 Jun 2025", value: 15000 },
-      { date: "21/06", fullDate: "21 Jun 2025", value: 16000 },
+      { date: "21/06", fullDate: "21 Jun 2025", value: 10000 },
       { date: "26/06", fullDate: "26 Jun 2025", value: 17000 },
       { date: "01/07", fullDate: "01 Jul 2025", value: 18000 },
       { date: "06/07", fullDate: "06 Jul 2025", value: 19000 },
       { date: "11/07", fullDate: "11 Jul 2025", value: 20000 },
       { date: "16/07", fullDate: "16 Jul 2025", value: 21000 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 22000 },
+      { date: "21/07", fullDate: "21 Jul 2025", value: 18000 },
       { date: "25/07", fullDate: "25 Jul 2025", value: 22900 },
-      { date: "17/08", fullDate: "17 Aug 2025", value: 23500 },
+      { date: "17/08", fullDate: "17 Aug 2025", value: 20000 },
     ],
   },
 }
@@ -213,6 +213,33 @@ export function VaultDashboardChart() {
   
   // Get the data based on selected data type and timeframe
   const data: ChartDataItem[] = mockData[selectedDataType][selectedTimeframe]
+  
+  // Determine stroke and fill colors based on final value
+  const getChartColors = () => {
+    if (data.length === 0) {
+      return {
+        stroke: "#10b981", 
+        fill: "url(#colorValuePositive)"
+      }
+    }
+    
+    // Get the final (last) value in the dataset
+    const finalValue = data[data.length - 1].value
+    
+    if (finalValue < 0) {
+      return {
+        stroke: "#ef4444",
+        fill: "url(#colorValueNegative)"
+      }
+    }
+    
+    return {
+      stroke: "#10b981", 
+      fill: "url(#colorValuePositive)"
+    }
+  }
+  
+  const chartColors = getChartColors()
 
   // Get appropriate unit formatter based on data type
   const getYAxisFormatter = (dataType: DataType) => {
@@ -228,8 +255,8 @@ export function VaultDashboardChart() {
     }
   }
 
-  // Calculate normalized domain for Y-axis to emphasize fluctuations
-  const calculateYAxisDomain = (data: ChartDataItem[]): [number, number] => {
+  // Calculate Y-axis domain based on data type
+  const calculateYAxisDomain = (data: ChartDataItem[], dataType: DataType): [number, number] => {
     if (!data || data.length === 0) return [0, 0];
     
     // Find min and max values
@@ -237,23 +264,28 @@ export function VaultDashboardChart() {
     const min = Math.min(...values);
     const max = Math.max(...values);
     
-    // If values are very close together (stable), create a normalized range
+    // For Share Price and Vault NAV, start from 0 (not normalized)
+    if (dataType === "Vault NAV") {
+      return [0, max]; // Always start from 0 to show full scale
+    }
+    
+    // For APY History, use normalized range to emphasize fluctuations
     const range = max - min;
     const avgValue = (max + min) / 2;
     
-    if (range < avgValue * 0.05) { // If range is less than 5% of average value
+    if (range < Math.abs(avgValue) * 0.05) { // If range is less than 5% of average value
       // Create a domain that's centered on the average with at least ±2.5% range
-      const buffer = Math.max(avgValue * 0.025, range);
+      const buffer = Math.max(Math.abs(avgValue) * 0.025, range);
       return [min - buffer, max + buffer];
     }
     
     // Add a small buffer on top and bottom for better visualization
     const buffer = range * 0.1;
-    return [min - buffer, max + buffer];
+    return [min, max + buffer];
   }
   
   // Calculate the y-axis domain based on current data
-  const yAxisDomain = calculateYAxisDomain(data);
+  const yAxisDomain = calculateYAxisDomain(data, selectedDataType);
 
 
   // Get appropriate icon based on data type
@@ -295,25 +327,25 @@ export function VaultDashboardChart() {
         </CardTitle>
         
         {/* Data type and timeframe selector row */}
-        <div className="flex flex-wrap justify-between mt-3 gap-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between mt-3 gap-3 sm:gap-2">
           {/* Data type selector */}
-          <div className="flex gap-1">
+          <div className="flex gap-1 overflow-x-auto">
             {(["APY History", "Share Price", "Vault NAV"] as const).map((dataType) => (
               <Button
                 key={dataType}
                 variant={selectedDataType === dataType ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedDataType(dataType)}
-                className={`text-xs ${selectedDataType === dataType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+                className={`text-xs whitespace-nowrap ${selectedDataType === dataType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
               >
-                {getDataTypeIcon(dataType)}
-                <span className="ml-1">{dataType}</span>
+                <span className="hidden sm:inline">{getDataTypeIcon(dataType)}</span>
+                <span className={selectedDataType === dataType ? "ml-1" : ""}>{dataType}</span>
               </Button>
             ))}
           </div>
           
           {/* Timeframe selector */}
-          <div className="flex gap-1">
+          <div className="flex gap-1 justify-center sm:justify-end">
             {(["24H", "7D", "30D", "90D"] as const).map((timeframe) => (
               <Button
                 key={timeframe}
@@ -330,60 +362,114 @@ export function VaultDashboardChart() {
       </CardHeader>
       
       <CardContent className="pb-4">
-        <div className="h-64 w-full relative">
+        <div className="h-48 sm:h-64 w-full relative">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={data}
-              onMouseMove={(e: any) => {
-                if (e && e.activeTooltipIndex !== undefined) {
-                  setActiveIndex(e.activeTooltipIndex)
-                }
-              }}
-              onMouseLeave={() => setActiveIndex(null)}
-            >
-              <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis 
-                dataKey="date" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fill: "#64748b", fontSize: 12 }} 
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#64748b", fontSize: 12 }}
-                tickFormatter={getYAxisFormatter(selectedDataType)}
-                domain={yAxisDomain}
-                allowDataOverflow={false}
-              />
-              <Tooltip
-                content={(props) => <CustomTooltip {...props} dataType={selectedDataType} />}
-                cursor={{
-                  stroke: "#64748b",
-                  strokeWidth: 1,
-                  strokeDasharray: "4 4",
+            {selectedDataType === "APY History" ? (
+              <AreaChart
+                data={data}
+                onMouseMove={(e: any) => {
+                  if (e && e.activeTooltipIndex !== undefined) {
+                    setActiveIndex(e.activeTooltipIndex)
+                  }
                 }}
-              />
-              <Area
-                type="monotone"
-                dataKey="value"
-                stroke="#10b981"
-                strokeWidth={2}
-                fillOpacity={1}
-                fill="url(#colorValue)"
-                activeDot={{
-                  r: 4,
-                  fill: "#10b981",
-                  stroke: "#1e293b",
-                  strokeWidth: 2,
+                onMouseLeave={() => setActiveIndex(null)}
+              >
+                <defs>
+                  <linearGradient id="colorValuePositive" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorValueNegative" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: "#64748b", fontSize: 12 }} 
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                  tickFormatter={getYAxisFormatter(selectedDataType)}
+                  domain={yAxisDomain}
+                  allowDataOverflow={false}
+                  padding={{ bottom: 10 }}
+                />
+                <ReferenceLine y={0} stroke="#64748b" strokeDasharray="2 2" strokeOpacity={0.5} />
+                <Tooltip
+                  content={(props) => <CustomTooltip {...props} dataType={selectedDataType} />}
+                  cursor={{
+                    stroke: "#64748b",
+                    strokeWidth: 1,
+                    strokeDasharray: "4 4",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke={chartColors.stroke}
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill={chartColors.fill}
+                  activeDot={{
+                    r: 4,
+                    fill: chartColors.stroke,
+                    stroke: "#1e293b",
+                    strokeWidth: 2,
+                  }}
+                />
+              </AreaChart>
+            ) : (
+              <LineChart
+                data={data}
+                onMouseMove={(e: any) => {
+                  if (e && e.activeTooltipIndex !== undefined) {
+                    setActiveIndex(e.activeTooltipIndex)
+                  }
                 }}
-              />
-            </AreaChart>
+                onMouseLeave={() => setActiveIndex(null)}
+              >
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: "#64748b", fontSize: 12 }} 
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                  tickFormatter={getYAxisFormatter(selectedDataType)}
+                  domain={yAxisDomain}
+                  allowDataOverflow={false}
+                />
+                <Tooltip
+                  content={(props) => <CustomTooltip {...props} dataType={selectedDataType} />}
+                  cursor={{
+                    stroke: "#64748b",
+                    strokeWidth: 1,
+                    strokeDasharray: "4 4",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke={chartColors.stroke}
+                  strokeWidth={3}
+                  dot={false}
+                  activeDot={{
+                    r: 5,
+                    fill: chartColors.stroke,
+                    stroke: "#1e293b",
+                    strokeWidth: 2,
+                  }}
+                />
+              </LineChart>
+            )}
           </ResponsiveContainer>
         </div>
       </CardContent>

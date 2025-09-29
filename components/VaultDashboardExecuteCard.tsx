@@ -15,7 +15,7 @@ import Image from "next/image"
 
 const connection = getConnection();
 
-export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, tokenMint: string}) {
+export function VaultDashboardExecuteCard({vault, tokenMint, positionBalance, handleReload}: {vault: string, tokenMint: string, positionBalance: number, handleReload: () => void}) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
@@ -66,7 +66,14 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
   }
 
   const handlePercent = (percent: number) => {
-    const computed = tokenBalance * percent
+    let amount = 0;
+    if (activeAction === "deposit") {
+      amount = tokenBalance; // For deposit, use wallet balance
+    } else {
+      amount = positionBalance;
+    }
+    
+    const computed = amount * percent
     setAmount(computed.toString())
   }
 
@@ -88,7 +95,7 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
       if (activeAction === "deposit") {
         res = await getVaultDepositTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, tokenInfo.tokenProgram);
       } else {
-        const withdrawAll = false;
+        const withdrawAll = positionBalance.toString() === amount;
         res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, withdrawAll, tokenInfo.tokenProgram);
       }
       // Convert API Response to VersionedTransaction
@@ -112,7 +119,7 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
         type: "success"
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      handleReload();
     } catch (error) {
       console.error("Error during transaction processing:", error);
       
@@ -170,38 +177,38 @@ export function VaultDashboardExecuteCard({vault, tokenMint}: {vault: string, to
             </div>
             
             <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Image src={`/PNG/usdc-logo.png`} alt="USDC Logo" width={25} height={25} />
                   <span className="text-white font-medium">{tokenInfo?.symbol}</span>
                 </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handlePercent(0.25)}
-                    className="h-6 px-1.5 sm:px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
-                  >
-                    25%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handlePercent(0.5)}
-                    className="h-6 px-1.5 sm:px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
-                  >
-                    50%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handlePercent(1)}
-                    className="h-6 px-1.5 sm:px-2 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
-                  >
-                    100%
-                  </Button>
-                </div>
+                <div className="flex items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePercent(0.25)}
+                  className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                >
+                  25%
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePercent(0.5)}
+                  className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                >
+                  50%
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePercent(1)}
+                  className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                >
+                  100%
+                </Button>
               </div>
+            </div>
 
               <div className="flex items-center justify-between pt-3 relative z-10">
                 <input

@@ -7,11 +7,12 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CoinsIcon, HistoryIcon, AlertCircle } from "lucide-react"
+import { formatNumber } from "@/lib/display"
 
 // Define types for transaction history
 interface Transaction {
@@ -31,10 +32,16 @@ interface UserPosition {
   exists: boolean
 }
 
-export function VaultDashboardUserPosition() {
+export function VaultDashboardUserPosition({vaultDepositor, positionBalance, tokenPrice}: {vaultDepositor: any, positionBalance: number, tokenPrice: number}) {
   // Mock state for user position - in a real implementation, this would be fetched from an API
+  const [positionInfo, setPositionInfo] = useState<any>({
+    shares: 0,
+    value: 0,
+    pnl: 0,
+  });
+  
   const [userPosition, setUserPosition] = useState<UserPosition>({
-    shares: "245.32",
+    shares: positionBalance.toString(),
     totalValue: "$2,453.20",
     apy: "7.15%",
     exists: true,
@@ -63,6 +70,16 @@ export function VaultDashboardUserPosition() {
       }
     ]
   })
+
+  useEffect(() => {
+    if(vaultDepositor && positionBalance) {
+      setPositionInfo({
+        shares: Number(vaultDepositor.total_shares) / 1e8,
+        value: positionBalance,
+        pnl: positionBalance + (Number(vaultDepositor.realized_pnl) - Number(vaultDepositor.total_cost)) / 1e6 * tokenPrice
+      })
+    }
+  }, [vaultDepositor, positionBalance])
 
   // Simulate loading state
   const [isLoading, setIsLoading] = useState(false)
@@ -111,23 +128,23 @@ export function VaultDashboardUserPosition() {
       <CardContent className="space-y-4 pb-4">
         {isLoading ? (
           <LoadingSkeleton />
-        ) : !userPosition.exists ? (
+        ) : !positionInfo.shares || positionInfo.shares == 0 ? (
           <EmptyState />
         ) : (
           <>
             {/* Position Summary */}
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="bg-[#0F1218] p-3 rounded-lg border border-[#2D3748]/30">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
+              <div className="bg-[#0F1218] p-4 sm:p-3 rounded-lg border border-[#2D3748]/30">
                 <div className="text-slate-400 text-xs mb-1">Shares</div>
-                <div className="text-white font-semibold text-xl">{userPosition.shares}</div>
+                <div className="text-white font-semibold text-2xl sm:text-xl">{positionInfo.shares}</div>
               </div>
-              <div className="bg-[#0F1218] p-3 rounded-lg border border-[#2D3748]/30">
+              <div className="bg-[#0F1218] p-4 sm:p-3 rounded-lg border border-[#2D3748]/30">
                 <div className="text-slate-400 text-xs mb-1">Total Value</div>
-                <div className="text-white font-semibold text-xl">{userPosition.totalValue}</div>
+                <div className="text-white font-semibold text-2xl sm:text-xl">{formatNumber(positionInfo.value)}</div>
               </div>
-              <div className="bg-[#0F1218] p-3 rounded-lg border border-[#2D3748]/30">
-                <div className="text-slate-400 text-xs mb-1">Current APY</div>
-                <div className="text-emerald-400 font-semibold text-xl">{userPosition.apy}</div>
+              <div className="bg-[#0F1218] p-4 sm:p-3 rounded-lg border border-[#2D3748]/30">
+                <div className="text-slate-400 text-xs mb-1">Current PnL</div>
+                <div className="text-emerald-400 font-semibold text-2xl sm:text-xl">{positionInfo.pnl.toFixed(2)}</div>
               </div>
             </div>
             
@@ -142,7 +159,7 @@ export function VaultDashboardUserPosition() {
                 {sortedTransactions.map((tx, index) => (
                   <div 
                     key={index}
-                    className="flex items-center justify-between text-sm bg-[#0F1218] rounded p-3 border border-[#2D3748]/30"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between text-sm bg-[#0F1218] rounded p-3 border border-[#2D3748]/30 gap-2"
                   >
                     <div className="flex items-center gap-3">
                       <Badge
@@ -150,13 +167,13 @@ export function VaultDashboardUserPosition() {
                           tx.type === "deposit"
                             ? "bg-green-500/20 text-green-400 border-green-500/30"
                             : "bg-red-500/20 text-red-400 border-red-500/30"
-                        }`}
+                        } text-xs`}
                       >
                         {tx.type === "deposit" ? "Deposit" : "Withdraw"}
                       </Badge>
-                      <span className="text-slate-300">{tx.date}</span>
+                      <span className="text-slate-300 text-xs sm:text-sm">{tx.date}</span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between sm:justify-end gap-4">
                       <div className="text-right">
                         <div className="text-white font-medium">{tx.amount} shares</div>
                         <div className="text-slate-400 text-xs">{tx.value}</div>

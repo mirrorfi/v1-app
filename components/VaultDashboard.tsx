@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
 import { getVaultBalances } from "@/lib/api/vault"
 import { PublicKey, Keypair } from "@solana/web3.js"
-import { getVaultAccountInfo } from "@/lib/utils/mirrorfi/accounts"
+import { getVaultAccountInfo, getVaultDepositorAccountInfo } from "@/lib/utils/mirrorfi/accounts"
 
 import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
 import { VaultDashboardChart } from "@/components/VaultDashboardChart";
@@ -15,6 +15,7 @@ import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
 import { getConnection } from "@/lib/solana"
+import { useWallet } from "@solana/wallet-adapter-react"
 
 interface StrategyDashboardProps {
   vault: string;
@@ -35,11 +36,17 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
     { id: "your-position", label: "Your Position" },
     { id: "overview", label: "Overview" },
   ]
-
+  const { publicKey } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
+  const [reload, setReload] = useState(false);
   const [vaultBalances, setVaultBalances] = useState<any>(null);
+  const [positionBalance, setPositionBalance] = useState<number>(0);
   const [vaultDepositTokenMint, setVaultDepositTokenMint] = useState<string | null>("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-  const [vaultInfo, setVaultInfo] = useState<any>(null);
+  const [vaultDepositorInfo, setVaultDepositorInfo] = useState<any>(null);
+  const handleReload = () => {
+    setReload(!reload);
+  }
+
 
   useEffect(() => {
     setIsLoading(true);
@@ -51,21 +58,37 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
 
 
       try{
-        const vaultKey = new PublicKey('6nffsG76jbbyqersNR8GxR4CdFXk6nKaBR75hn2oWVkN');
+        const vaultKey = new PublicKey(vault);
+        // Process that can be compiled together
+        // Batch 1: Get Balances
         const balances = await getVaultBalances(vaultKey);
         setVaultBalances(balances);
+        // Batch 2: Get Vault Account Info
         const vaultData = await getVaultAccountInfo(connection, vaultKey);
         setVaultDepositTokenMint(vaultData.deposit_token_mint.toBase58());
+        // Batch 3: Get User Position Info
+        if(publicKey){
+          const vaultDepositor = await getVaultDepositorAccountInfo(connection, vaultKey, publicKey);
+          if(vaultDepositor) {
+            setVaultDepositorInfo(vaultDepositor);
+            const positionShareToken = Number(vaultDepositor.total_shares) / 10**8;
+            const ownershipRatio = positionShareToken / balances.shareTokenSupply;
+            const positionBalance = ownershipRatio * balances.totalNAV;
+            setPositionBalance(positionBalance);
+          }
+        }
+        // if()
+        // const vaultDepositor = await getVaultAccountInfo(connection, vaultKey, publicKey);
       } catch (error) {
         console.error("Error fetching vault balances:", error);
       } 
       setIsLoading(false);
     }
     loadVault();
-  }, [vault]);
+  }, [vault, publicKey, reload]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
+    <div className="w-full max-w-7xl mx-auto p-8 md:p-6">
       <div className="flex items-start gap-3 mb-4">
         <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
           <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
@@ -117,7 +140,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
           )}
           {activeTab == "your-position" && (
             <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardUserPosition />
+              <VaultDashboardUserPosition vaultDepositor={vaultDepositorInfo} positionBalance={positionBalance} tokenPrice={vaultBalances?.depositTokenPrice}/>
             </div>
           )}
           {activeTab == "overview" && (
@@ -128,7 +151,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
 
           {/* Execute Card - Show first on mobile */}
           <div className="xl:col-span-1 order-1 xl:order-2">
-            {vaultDepositTokenMint && <VaultDashboardExecuteCard vault={vault} tokenMint={vaultDepositTokenMint} /> }
+            {vaultDepositTokenMint && <VaultDashboardExecuteCard vault={vault} tokenMint={vaultDepositTokenMint} positionBalance={positionBalance} handleReload={handleReload} /> }
           </div>
         </div>
       </div>

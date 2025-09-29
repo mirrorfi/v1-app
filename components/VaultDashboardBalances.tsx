@@ -170,18 +170,18 @@ function TokenItem({ token, type }: TokenItemProps) {
   
   return (
     <div className="flex items-center justify-between text-xs bg-[#0F1218] rounded p-2 border border-[#2D3748]/30">
-      <div className="flex items-center gap-2 w-[50%] min-w-0">
+      <div className="flex items-center gap-2 w-[40%] min-w-0">
         <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${gradientClass} flex items-center justify-center flex-shrink-0`}>
           <span className="text-white text-[10px] font-bold">{logoChar}</span>
         </div>
         <span className="text-gray-300 truncate">{tokenName}</span>
       </div>
       
-      <div className="flex items-center gap-1 w-[20%] justify-start">
+      <div className="flex items-center justify-center w-[25%]">
         <span className="text-white font-medium">{amountDisplay}</span>
       </div>
       
-      <div className="flex flex-col items-end w-[30%]">
+      <div className="flex flex-col items-end w-[35%]">
         <span className="text-white font-medium">${token.value.toFixed(token.value < 0.01 ? 6 : 2)}</span>
         {type === 'spot' && (
           <span className={token.tokenPriceChange24h >= 0 ? "text-green-400 text-[10px]" : "text-red-400 text-[10px]"}>
@@ -410,7 +410,7 @@ export function VaultDashboardBalances({ vaultBalances, isLoading }: VaultDashbo
         // Check if the data has the expected structure
         if (vaultBalances.spot && vaultBalances.kamino) {
           const vaultSpotValue = vaultBalances.spot.totalNAV || 0;
-          const vaultKaminoValue = vaultBalances.kamino.reduce((sum: number, pos: any) => sum + (pos.totalNAV || 0), 0);
+          const vaultKaminoValue = vaultBalances.kamino.totalNAV || 0;
           
           setSpotValue(vaultSpotValue);
           setKaminoValue(vaultKaminoValue);
@@ -466,18 +466,18 @@ export function VaultDashboardBalances({ vaultBalances, isLoading }: VaultDashbo
           /* Data Loaded State */
           <>
             {/* Summary Cards */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-[#0F1218] p-2 rounded-lg border border-[#2D3748]/30">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+              <div className="bg-[#0F1218] p-3 sm:p-2 rounded-lg border border-[#2D3748]/30">
                 <div className="text-slate-400 text-xs">Spot</div>
-                <div className="text-white font-medium">${spotValue.toFixed(2)}</div>
+                <div className="text-white font-medium text-lg sm:text-base">${spotValue.toFixed(2)}</div>
               </div>
-              <div className="bg-[#0F1218] p-2 rounded-lg border border-[#2D3748]/30">
+              <div className="bg-[#0F1218] p-3 sm:p-2 rounded-lg border border-[#2D3748]/30">
                 <div className="text-slate-400 text-xs">Kamino</div>
-                <div className="text-white font-medium">${kaminoValue.toFixed(2)}</div>
+                <div className="text-white font-medium text-lg sm:text-base">${kaminoValue.toFixed(2)}</div>
               </div>
-              <div className="bg-[#0F1218] p-2 rounded-lg border border-[#2D3748]/30">
+              <div className="bg-[#0F1218] p-3 sm:p-2 rounded-lg border border-[#2D3748]/30">
                 <div className="text-slate-400 text-xs">Total</div>
-                <div className="text-emerald-400 font-medium">${totalValue.toFixed(2)}</div>
+                <div className="text-emerald-400 font-medium text-lg sm:text-base">${totalValue.toFixed(2)}</div>
               </div>
             </div>
 
@@ -516,8 +516,8 @@ export function VaultDashboardBalances({ vaultBalances, isLoading }: VaultDashbo
                 totalValue={kaminoValue}
               >
                 <div className="space-y-2">
-                  {balanceData?.kamino?.length > 0 ? (
-                    balanceData.kamino.map((obligation: any, index: number) => (
+                  {balanceData?.kamino?.obligations?.length > 0 ? (
+                    balanceData.kamino.obligations.map((obligation: any, index: number) => (
                       <ObligationSection key={`obligation-${index}`} obligation={obligation} />
                     ))
                   ) : (
