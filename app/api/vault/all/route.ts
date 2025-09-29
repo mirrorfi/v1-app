@@ -7,32 +7,20 @@ import { createEncodedTransaction } from "@/lib/solana";
 import { encodeName } from "@/lib/program/encodeName";
 import accounts from "@/lib/program/accounts.json";
 import { TOKEN_PROGRAM_2022_ID } from "@/lib/program/constants";
+import { getAllVaultAccountInfos } from "@/lib/utils/mirrorfi/accounts";
 
 export async function GET(req: NextRequest) {
     if(!process.env.PRIVATE_SOLANA_RPC_URL) {
         return new Response(JSON.stringify({ error: "Solana PRC Not Provided" }), { status: 500 });
     }
     
-    try{
+    try{ 
+        // Fetch All Vaults
         const connection = new Connection(process.env.PRIVATE_SOLANA_RPC_URL);
-        const wallet = {
-            publicKey: Keypair.generate().publicKey,
-            signTransaction: async (transaction: any) => { return transaction; },
-            signAllTransactions: async (transactions: any) => { return transactions; }
-        }
-        const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
-        const program = new Program(IDL as MirrorfiVault, provider);
-
-        
-        let vaults = await program.account.vault.all();
-        console.log(vaults)
-
-        const res = {
-            message: "hello"
-        }
+        let vaults = await getAllVaultAccountInfos(connection);
 
         return new Response(
-            JSON.stringify(res),
+            JSON.stringify(vaults),
             { status: 200 }
         );
     } catch (error: unknown) {
