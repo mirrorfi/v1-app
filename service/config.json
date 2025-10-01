@@ -1,4 +1,0 @@
-{
-    "FETCH_INTERVAL": 60000,
-    "LOG_FILE_NAME": "vault-indexer.log"
-}
