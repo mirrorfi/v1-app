@@ -3,159 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TrendingUp, DollarSign, BarChart3, ChartNoAxesCombined } from "lucide-react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Dot, ReferenceLine } from "recharts"
+import { getChartData, ChartDataItem } from "@/lib/utils/chartData"
 
 // Define types for data selection
 type DataType = "APY History" | "Share Price" | "Vault NAV"
 type TimeFrame = "24H" | "7D" | "30D" | "90D"
-
-// Define chart data item type
-interface ChartDataItem {
-  date: string;
-  fullDate: string;
-  value: number;
-}
-
-// Mock data for different data types and timeframes
-const mockData: Record<DataType, Record<TimeFrame, Array<ChartDataItem>>> = {
-  "APY History": {
-    "24H": [
-      { date: "00:00", fullDate: "25 Jul 2025", value: 6.8 },
-      { date: "04:00", fullDate: "25 Jul 2025", value: 6.9 },
-      { date: "08:00", fullDate: "25 Jul 2025", value: 7.1 },
-      { date: "12:00", fullDate: "25 Jul 2025", value: 7.0 },
-      { date: "16:00", fullDate: "25 Jul 2025", value: 7.2 },
-      { date: "20:00", fullDate: "25 Jul 2025", value: 7.15 },
-    ],
-    "7D": [
-      { date: "19/07", fullDate: "19 Jul 2025", value: 0.5 },
-      { date: "20/07", fullDate: "20 Jul 2025", value: -0.2 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: -0.3 },
-      { date: "22/07", fullDate: "22 Jul 2025", value: -1.0 },
-      { date: "23/07", fullDate: "23 Jul 2025", value: -2 },
-      { date: "24/07", fullDate: "24 Jul 2025", value: 0.5 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 1 },
-    ],
-    "30D": [
-      { date: "26/06", fullDate: "26 Jun 2025", value: 4.8 },
-      { date: "01/07", fullDate: "01 Jul 2025", value: 5.1 },
-      { date: "06/07", fullDate: "06 Jul 2025", value: 5.4 },
-      { date: "11/07", fullDate: "11 Jul 2025", value: 5.8 },
-      { date: "16/07", fullDate: "16 Jul 2025", value: 6.2 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 6.8 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 7.15 },
-    ],
-    "90D": [
-      { date: "22/05", fullDate: "22 May 2025", value: 0.2 },
-      { date: "27/05", fullDate: "27 May 2025", value: 0.8 },
-      { date: "01/06", fullDate: "01 Jun 2025", value: 1.2 },
-      { date: "06/06", fullDate: "06 Jun 2025", value: -2 },
-      { date: "11/06", fullDate: "11 Jun 2025", value: 1.6 },
-      { date: "16/06", fullDate: "16 Jun 2025", value: 1.8 },
-      { date: "21/06", fullDate: "21 Jun 2025", value: 2.0 },
-      { date: "26/06", fullDate: "26 Jun 2025", value: 2.2 },
-      { date: "01/07", fullDate: "01 Jul 2025", value: 2.4 },
-      { date: "06/07", fullDate: "06 Jul 2025", value: 2.8 },
-      { date: "11/07", fullDate: "11 Jul 2025", value: 3.2 },
-      { date: "16/07", fullDate: "16 Jul 2025", value: 4.1 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 5.2 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 7.15 },
-      { date: "17/08", fullDate: "17 Aug 2025", value: -0.5 },
-    ],
-  },
-  "Share Price": {
-    "24H": [
-      { date: "00:00", fullDate: "25 Jul 2025", value: 1.105 },
-      { date: "04:00", fullDate: "25 Jul 2025", value: 1.107 },
-      { date: "08:00", fullDate: "25 Jul 2025", value: 1.109 },
-      { date: "12:00", fullDate: "25 Jul 2025", value: 1.112 },
-      { date: "16:00", fullDate: "25 Jul 2025", value: 1.115 },
-      { date: "20:00", fullDate: "25 Jul 2025", value: 1.118 },
-    ],
-    "7D": [
-      { date: "19/07", fullDate: "19 Jul 2025", value: 1.090 },
-      { date: "20/07", fullDate: "20 Jul 2025", value: 1.095 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 1.100 },
-      { date: "22/07", fullDate: "22 Jul 2025", value: 1.105 },
-      { date: "23/07", fullDate: "23 Jul 2025", value: 1.109 },
-      { date: "24/07", fullDate: "24 Jul 2025", value: 1.115 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 1.118 },
-    ],
-    "30D": [
-      { date: "26/06", fullDate: "26 Jun 2025", value: 1.040 },
-      { date: "01/07", fullDate: "01 Jul 2025", value: 1.050 },
-      { date: "06/07", fullDate: "06 Jul 2025", value: 1.060 },
-      { date: "11/07", fullDate: "11 Jul 2025", value: 1.070 },
-      { date: "16/07", fullDate: "16 Jul 2025", value: 1.080 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 1.100 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 1.118 },
-    ],
-    "90D": [
-      { date: "22/05", fullDate: "22 May 2025", value: 1.000 },
-      { date: "27/05", fullDate: "27 May 2025", value: 1.010 },
-      { date: "01/06", fullDate: "01 Jun 2025", value: 1.015 },
-      { date: "06/06", fullDate: "06 Jun 2025", value: 1.020 },
-      { date: "11/06", fullDate: "11 Jun 2025", value: 1.025 },
-      { date: "16/06", fullDate: "16 Jun 2025", value: 1.030 },
-      { date: "21/06", fullDate: "21 Jun 2025", value: 1.035 },
-      { date: "26/06", fullDate: "26 Jun 2025", value: 1.040 },
-      { date: "01/07", fullDate: "01 Jul 2025", value: 1.050 },
-      { date: "06/07", fullDate: "06 Jul 2025", value: 1.060 },
-      { date: "11/07", fullDate: "11 Jul 2025", value: 1.070 },
-      { date: "16/07", fullDate: "16 Jul 2025", value: 1.080 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 1.100 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 1.118 },
-      { date: "17/08", fullDate: "17 Aug 2025", value: 1.120 },
-    ],
-  },
-  "Vault NAV": {
-    "24H": [
-      { date: "00:00", fullDate: "25 Jul 2025", value: 22500 },
-      { date: "04:00", fullDate: "25 Jul 2025", value: 22550 },
-      { date: "08:00", fullDate: "25 Jul 2025", value: 22600 },
-      { date: "12:00", fullDate: "25 Jul 2025", value: 22700 },
-      { date: "16:00", fullDate: "25 Jul 2025", value: 22800 },
-      { date: "20:00", fullDate: "25 Jul 2025", value: 22900 },
-    ],
-    "7D": [
-      { date: "19/07", fullDate: "19 Jul 2025", value: 21000 },
-      { date: "20/07", fullDate: "20 Jul 2025", value: 21300 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 21700 },
-      { date: "22/07", fullDate: "22 Jul 2025", value: 22000 },
-      { date: "23/07", fullDate: "23 Jul 2025", value: 22300 },
-      { date: "24/07", fullDate: "24 Jul 2025", value: 22600 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 22900 },
-    ],
-    "30D": [
-      { date: "26/06", fullDate: "26 Jun 2025", value: 18000 },
-      { date: "01/07", fullDate: "01 Jul 2025", value: 18500 },
-      { date: "06/07", fullDate: "06 Jul 2025", value: 19000 },
-      { date: "11/07", fullDate: "11 Jul 2025", value: 19500 },
-      { date: "16/07", fullDate: "16 Jul 2025", value: 20500 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 22000 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 22900 },
-    ],
-    "90D": [
-      { date: "22/05", fullDate: "22 May 2025", value: 10000 },
-      { date: "27/05", fullDate: "27 May 2025", value: 11000 },
-      { date: "01/06", fullDate: "01 Jun 2025", value: 12000 },
-      { date: "06/06", fullDate: "06 Jun 2025", value: 13000 },
-      { date: "11/06", fullDate: "11 Jun 2025", value: 12000 },
-      { date: "16/06", fullDate: "16 Jun 2025", value: 15000 },
-      { date: "21/06", fullDate: "21 Jun 2025", value: 10000 },
-      { date: "26/06", fullDate: "26 Jun 2025", value: 17000 },
-      { date: "01/07", fullDate: "01 Jul 2025", value: 18000 },
-      { date: "06/07", fullDate: "06 Jul 2025", value: 19000 },
-      { date: "11/07", fullDate: "11 Jul 2025", value: 20000 },
-      { date: "16/07", fullDate: "16 Jul 2025", value: 21000 },
-      { date: "21/07", fullDate: "21 Jul 2025", value: 18000 },
-      { date: "25/07", fullDate: "25 Jul 2025", value: 22900 },
-      { date: "17/08", fullDate: "17 Aug 2025", value: 20000 },
-    ],
-  },
-}
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -177,7 +32,13 @@ const CustomTooltip = ({ active, payload, label, dataType }: CustomTooltipProps)
         case "Share Price":
           return `$${value.toFixed(3)}`
         case "Vault NAV":
-          return `$${(value / 1000).toFixed(1)}k`
+          if (value >= 1000000) {
+            return `$${(value / 1000000).toFixed(2)}M`
+          } else if (value >= 1000) {
+            return `$${(value / 1000).toFixed(1)}k`
+          } else {
+            return `$${value.toFixed(0)}`
+          }
         default:
           return `${value}`
       }
@@ -203,16 +64,42 @@ const CustomDot = (props: any) => {
 }
 
 interface VaultDashboardChartProps {
-  // Optional props can be added here
+  vaultAddress?: string;
 }
 
-export function VaultDashboardChart() {
+export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [selectedDataType, setSelectedDataType] = useState<DataType>("APY History")
   const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("90D")
-  
-  // Get the data based on selected data type and timeframe
-  const data: ChartDataItem[] = mockData[selectedDataType][selectedTimeframe]
+  const [data, setData] = useState<ChartDataItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch real data when vault address, data type, or timeframe changes
+  useEffect(() => {
+    if (!vaultAddress) {
+      // Clear data when no vault address is provided
+      setData([])
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const chartData = await getChartData(vaultAddress, selectedDataType, selectedTimeframe);
+        setData(chartData);
+      } catch (err) {
+        console.error('Error fetching chart data:', err);
+        setError('Failed to load chart data');
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [vaultAddress, selectedDataType, selectedTimeframe])
   
   // Determine stroke and fill colors based on final value
   const getChartColors = () => {
@@ -249,7 +136,15 @@ export function VaultDashboardChart() {
       case "Share Price":
         return (value: number) => `$${value.toFixed(3)}`
       case "Vault NAV":
-        return (value: number) => `$${(value / 1000).toFixed(0)}k`
+        return (value: number) => {
+          if (value >= 1000000) {
+            return `$${(value / 1000000).toFixed(1)}M`
+          } else if (value >= 1000) {
+            return `$${(value / 1000).toFixed(0)}k`
+          } else {
+            return `$${value.toFixed(0)}`
+          }
+        }
       default:
         return (value: number) => `${value}`
     }
@@ -322,8 +217,13 @@ export function VaultDashboardChart() {
         <CardTitle className="text-white flex items-center gap-2">
           <ChartNoAxesCombined className="h-5 w-5 text-blue-400"/> 
           Vault Performance
-          {/*getDataTypeIcon(selectedDataType)*/}
-          {/*getChartTitle(selectedDataType)*/}
+          {loading && <span className="text-sm text-blue-400 animate-pulse">Loading...</span>}
+          {error && <span className="text-sm text-red-400">{error}</span>}
+          {vaultAddress && (
+            <span className="text-xs text-slate-400">
+              ({vaultAddress.slice(0, 8)}...)
+            </span>
+          )}
         </CardTitle>
         
         {/* Data type and timeframe selector row */}
@@ -363,8 +263,19 @@ export function VaultDashboardChart() {
       
       <CardContent className="pb-4">
         <div className="h-48 sm:h-64 w-full relative">
-          <ResponsiveContainer width="100%" height="100%">
-            {selectedDataType === "APY History" ? (
+          {data.length === 0 && !loading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="text-slate-400 text-lg mb-2">📊</div>
+                <div className="text-slate-400 text-sm">No data available</div>
+                <div className="text-slate-500 text-xs">
+                  {!vaultAddress ? "Select a vault to view chart data" : "No historical data found for this timeframe"}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              {selectedDataType === "APY History" ? (
               <AreaChart
                 data={data}
                 onMouseMove={(e: any) => {
@@ -470,7 +381,8 @@ export function VaultDashboardChart() {
                 />
               </LineChart>
             )}
-          </ResponsiveContainer>
+            </ResponsiveContainer>
+          )}
         </div>
       </CardContent>
     </Card>

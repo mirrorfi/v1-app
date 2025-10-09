@@ -153,7 +153,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
           {activeTab == "vault-stats" && (
             <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
               <VaultDashboardFlow />
-              <VaultDashboardChart />
+              <VaultDashboardChart vaultAddress={vault} />
               <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
             </div>
           )}
