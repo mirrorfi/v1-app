@@ -49,8 +49,6 @@ export async function GET(req: NextRequest) {
       timestamp: doc.timestamp,
       totalNAV: doc.data?.totalNAV || 0,
       shareTokenSupply: doc.data?.shareTokenSupply || 0,
-      spotNAV: doc.data?.spot?.totalNAV || 0,
-      kaminoNAV: doc.data?.kamino?.totalNAV || 0,
       depositTokenPrice: doc.data?.depositTokenPrice || 0,
     }));
 

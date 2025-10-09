@@ -9,8 +9,6 @@ export interface HistoricalDataPoint {
   timestamp: string;
   totalNAV: number;
   shareTokenSupply: number;
-  spotNAV: number;
-  kaminoNAV: number;
   depositTokenPrice: number;
 }
 
@@ -116,14 +114,6 @@ export const transformHistoricalData = (
   });
 };
 
-// Helper function to calculate days since a reference start date
-const getDaysSinceStart = (currentDate: Date): number => {
-  // You might want to set this to the vault creation date or first data point
-  const startDate = new Date('2025-01-01'); // Placeholder start date
-  const diffTime = Math.abs(currentDate.getTime() - startDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return Math.max(1, diffDays);
-};
 
 // Fetch historical vault data
 export const fetchHistoricalVaultData = async (
