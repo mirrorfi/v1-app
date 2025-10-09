@@ -47,9 +47,9 @@ export async function GET(req: NextRequest) {
     // Transform data for chart consumption
     const chartData = historicalData.map((doc: any) => ({
       timestamp: doc.timestamp,
-      totalNAV: doc.data?.totalNAV || 0,
-      shareTokenSupply: doc.data?.shareTokenSupply || 0,
-      depositTokenPrice: doc.data?.depositTokenPrice || 0,
+      totalNAV: doc.data?.totalNAV || doc.data?.nav || 0,
+      shareTokenSupply: doc.data?.shareTokenSupply || doc.data?.sts || 0,
+      depositTokenPrice: doc.data?.depositTokenPrice || doc.data?.dtp || 0,
     }));
 
     return Response.json({
