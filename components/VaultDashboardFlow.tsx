@@ -9,7 +9,7 @@ const defaultStrategy = {
     "nodes": [
         {
             "data": {
-                "label": "Wallet",
+                "label": "Vault",
                 "description": "Tess",
                 "nodeType": "deposit",
                 "connectionCount": 2
@@ -24,37 +24,37 @@ const defaultStrategy = {
         },
         {
             "data": {
-                "label": "SOL",
-                "description": "Description",
-                "nodeType": "token",
-                "connectionCount": 0
+                "label": "USDC",
+                "description": "Tess",
+                "nodeType": "deposit",
+                "connectionCount": 2
             },
             "position": {
                 "x": 450,
                 "y": 150
             },
-            "id": "2-1747114303252",
+            "id": "2",
             "type": "customNode",
-            "_id": "6822d965bd3c34b2c5adc4ed"
+            "_id": "6822d965bd3c34b2c5adc4ec"
         },
         {
             "data": {
-                "label": "USDC",
+                "label": "Kamino Main Market",
                 "description": "Description",
-                "nodeType": "token",
+                "nodeType": "protocol",
                 "connectionCount": 0
             },
             "position": {
-                "x": 450,
-                "y": -50
+                "x": 850,
+                "y": 150
             },
-            "id": "3-1747114308597",
+            "id": "3",
             "type": "customNode",
-            "_id": "6822d965bd3c34b2c5adc4ee"
+            "_id": "6822d965bd3c34b2c5adc4ef"
         },
         {
             "data": {
-                "label": "Meteora",
+                "label": "Kamino JLP Market",
                 "description": "Description",
                 "nodeType": "protocol",
                 "connectionCount": 0
@@ -63,12 +63,38 @@ const defaultStrategy = {
                 "x": 850,
                 "y": -50
             },
-            "id": "4-1747114314544",
+            "id": "4",
             "type": "customNode",
             "_id": "6822d965bd3c34b2c5adc4ef"
-        }
+        },
     ],
     "edges": [
+        // {
+        //     "style": {
+        //         "strokeDasharray": "5, 5"
+        //     },
+        //     "markerEnd": {
+        //         "type": "arrowclosed"
+        //     },
+        //     "id": "e1-2-1747114303252",
+        //     "source": "1",
+        //     "target": "2-1747114303252",
+        //     "animated": true,
+        //     "_id": "6822d965bd3c34b2c5adc4f0"
+        // },
+        // {
+        //     "style": {
+        //         "strokeDasharray": "5, 5"
+        //     },
+        //     "markerEnd": {
+        //         "type": "arrowclosed"
+        //     },
+        //     "id": "e1-3-1747114308597",
+        //     "source": "1",
+        //     "target": "3-1747114308597",
+        //     "animated": true,
+        //     "_id": "6822d965bd3c34b2c5adc4f1"
+        // },
         {
             "style": {
                 "strokeDasharray": "5, 5"
@@ -76,35 +102,9 @@ const defaultStrategy = {
             "markerEnd": {
                 "type": "arrowclosed"
             },
-            "id": "e1-2-1747114303252",
+            "id": "e1-2",
             "source": "1",
-            "target": "2-1747114303252",
-            "animated": true,
-            "_id": "6822d965bd3c34b2c5adc4f0"
-        },
-        {
-            "style": {
-                "strokeDasharray": "5, 5"
-            },
-            "markerEnd": {
-                "type": "arrowclosed"
-            },
-            "id": "e1-3-1747114308597",
-            "source": "1",
-            "target": "3-1747114308597",
-            "animated": true,
-            "_id": "6822d965bd3c34b2c5adc4f1"
-        },
-        {
-            "style": {
-                "strokeDasharray": "5, 5"
-            },
-            "markerEnd": {
-                "type": "arrowclosed"
-            },
-            "id": "e3-1747114308597-4-1747114314544",
-            "source": "3-1747114308597",
-            "target": "4-1747114314544",
+            "target": "2",
             "animated": true,
             "_id": "6822d965bd3c34b2c5adc4f2"
         },
@@ -115,12 +115,38 @@ const defaultStrategy = {
             "markerEnd": {
                 "type": "arrowclosed"
             },
-            "id": "e2-1747114303252-4-1747114314544",
-            "source": "2-1747114303252",
-            "target": "4-1747114314544",
+            "id": "e2-3",
+            "source": "2",
+            "target": "3",
             "animated": true,
-            "_id": "6822d965bd3c34b2c5adc4f3"
-        }
+            "_id": "6822d965bd3c34b2c5adc4f2"
+        },
+         {
+            "style": {
+                "strokeDasharray": "5, 5"
+            },
+            "markerEnd": {
+                "type": "arrowclosed"
+            },
+            "id": "e2-4",
+            "source": "2",
+            "target": "4",
+            "animated": true,
+            "_id": "6822d965bd3c34b2c5adc4f2"
+        },
+        // {
+        //     "style": {
+        //         "strokeDasharray": "5, 5"
+        //     },
+        //     "markerEnd": {
+        //         "type": "arrowclosed"
+        //     },
+        //     "id": "e2-1747114303252-4-1747114314544",
+        //     "source": "2-1747114303252",
+        //     "target": "4-1747114314544",
+        //     "animated": true,
+        //     "_id": "6822d965bd3c34b2c5adc4f3"
+        // }
     ],
     "name": "SOL-USDC DLMM",
     "user": "BmBq8NeDva9eLgpRJCnHTwHK2qtPBfTQYHXvBYWYp97",
@@ -176,7 +202,7 @@ export function VaultDashboardFlow() {
             <InteractiveFlow
               nodes={updatedNodes}
               edges={strategy.edges}
-              className="absolute inset-0 rounded-lg"
+              className="inset-0 rounded-lg"
             />
         </CardContent>
         </Card>

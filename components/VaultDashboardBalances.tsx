@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { Wallet, ArrowUpCircle, ArrowDownCircle, CircleDollarSign, ChevronDown, ChevronRight, AlertCircle, Ban } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Skeleton } from "@/components/ui/skeleton"
+import { tokenLogos } from "@/constants/nodeOptions"
+import Image from "next/image"
 
 const MOCK_DATA = {
   "spot": {
@@ -132,17 +134,6 @@ const tokenNameMap: Record<string, string> = {
   "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo": "bSOL"
 };
 
-// Token logo mapping for visual display
-const tokenLogoMap: Record<string, string> = {
-  "USDC": "U",
-  "USDT": "T",
-  "SOL": "S",
-  "JUP": "J",
-  "mSOL": "M",
-  "JitoSOL": "J",
-  "bSOL": "B"
-};
-
 // Market name mapping
 const marketNameMap: Record<string, string> = {
   "Vnaq7vbHuwHHHSTzDYVnMf2WzFPdAzQA1iAa5NtpXNw": "Kamino Main Market"
@@ -156,8 +147,7 @@ interface TokenItemProps {
 
 function TokenItem({ token, type }: TokenItemProps) {
   const tokenName = tokenNameMap[token.token] || token.token.slice(0, 4);
-  const logoChar = tokenLogoMap[tokenName] || tokenName[0];
-  
+ 
   const gradientClass = {
     spot: "from-blue-500 to-cyan-500",
     deposit: "from-green-500 to-emerald-500",
@@ -171,9 +161,12 @@ function TokenItem({ token, type }: TokenItemProps) {
   return (
     <div className="flex items-center justify-between text-xs bg-[#0F1218] rounded p-2 border border-[#2D3748]/30">
       <div className="flex items-center gap-2 w-[40%] min-w-0">
-        <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${gradientClass} flex items-center justify-center flex-shrink-0`}>
-          <span className="text-white text-[10px] font-bold">{logoChar}</span>
-        </div>
+        <Image 
+          src={tokenLogos[tokenName]}
+          alt={`${tokenName} logo`}
+          width={20}
+          height={20}
+        />
         <span className="text-gray-300 truncate">{tokenName}</span>
       </div>
       
@@ -183,11 +176,12 @@ function TokenItem({ token, type }: TokenItemProps) {
       
       <div className="flex flex-col items-end w-[35%]">
         <span className="text-white font-medium">${token.value.toFixed(token.value < 0.01 ? 6 : 2)}</span>
-        {type === 'spot' && (
+        {/* No APY for Spot Position
+        type === 'spot' && (
           <span className={token.tokenPriceChange24h >= 0 ? "text-green-400 text-[10px]" : "text-red-400 text-[10px]"}>
             {token.tokenPriceChange24h >= 0 ? "+" : ""}{(token.tokenPriceChange24h * 100).toFixed(2)}%
           </span>
-        )}
+        )*/}
         {type === 'deposit' && (
           <span className="text-emerald-400 text-[10px]">
             APY: {((token.yield || 0) * 100).toFixed(2)}%
@@ -441,7 +435,7 @@ export function VaultDashboardBalances({ vaultBalances, isLoading }: VaultDashbo
 
   return (
     <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg transition-all duration-200">
-      <CardHeader className="pb-2">
+      <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Wallet className="h-5 w-5 text-blue-400" />
           Balance Overview
@@ -465,7 +459,8 @@ export function VaultDashboardBalances({ vaultBalances, isLoading }: VaultDashbo
         ) : (
           /* Data Loaded State */
           <>
-            {/* Summary Cards */}
+            <div className="text-emerald-400 font-medium text-lg sm:text-base">Total NAV: ${totalValue.toFixed(2)}</div>
+            {/* Summary Cards
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
               <div className="bg-[#0F1218] p-3 sm:p-2 rounded-lg border border-[#2D3748]/30">
                 <div className="text-slate-400 text-xs">Spot</div>
@@ -480,13 +475,15 @@ export function VaultDashboardBalances({ vaultBalances, isLoading }: VaultDashbo
                 <div className="text-emerald-400 font-medium text-lg sm:text-base">${totalValue.toFixed(2)}</div>
               </div>
             </div>
+            */}
 
-            {/* Summary Row */}
+            {/* Summary Row
             <div className="flex items-center justify-between text-sm bg-blue-900/30 p-2 rounded-md mb-3">
               <span className="text-white font-semibold">${totalValue.toFixed(2)}</span>
               <span className="text-gray-400">{duration}</span>
               <span className="text-green-400 font-medium">+${totalGain.toFixed(2)}</span>
             </div>
+            */}
 
             {/* Main Categories */}
             <div className="space-y-3">

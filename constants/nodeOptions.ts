@@ -70,6 +70,18 @@ export const tokenLogos: Record<string, string> = {
     "USDS": "https://s2.coinmarketcap.com/static/img/coins/200x200/33039.png",
     "wBTC": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh/logo.png",
     "zBTC": "https://statics.solscan.io/cdn/imgs/s60?ref=68747470733a2f2f7261772e67697468756275736572636f6e74656e742e636f6d2f5a6575734e6574776f726b48512f7a6274632d6d657461646174612f726566732f68656164732f6d61696e2f6c676f6f2d76322e706e67",
+    "JupSOL": "https://static.jup.ag/jupSOL/icon.png",
+    "JitoSOL": "https://storage.googleapis.com/token-metadata/JitoSOL-256.png",
+    "BNSOL": "https://arweave.net/LepI-hea-JrbLMb4L_HpMzaq9k0aHY2-lVSGiBtwvFM?ext=png",
+    "mSOL": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png",
+    "bbSOL": "https://static.bymj.io/web3/staking/bbsol/bbsol2.png",
+    "INF": "https://bafkreiflz2xxkfn33qjch2wj55bvbn33q3s4mmb6bye5pt3mpgy4t2wg4e.ipfs.nftstorage.link/",
+    "vSOL": "https://statics.solscan.io/cdn/imgs/s60?ref=68747470733a2f2f676174657761792e697279732e78797a2f4454427073366177724a576563746942684d7562596b653454426e45396b6b567179435650344d4234697242",
+    "dSOL": "https://drift-public.s3.eu-central-1.amazonaws.com/dSOL.svg",
+    "bSOL": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1/logo.png",
+    "hSOL": "https://raw.githubusercontent.com/igneous-labs/lst-offchain-metadata/master/hSOL/hSOL.png",
+    "bonkSOL": "https://arweave.net/ms-FdIyJ8TxEJOb2SAYhfyrLop7TDrCEjD-I-oIl5u4",
+    "JUP": "https://wsrv.nl/?w=28&h=28&url=https%3A%2F%2Fstatic.jup.ag%2Fjup%2Ficon.png&dpr=2&quality=80"
 }
 
 export const LSTLogos: Record<string, string> = {

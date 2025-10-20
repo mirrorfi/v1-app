@@ -9,6 +9,7 @@ import { Wallet } from "lucide-react"
 import { useState, useEffect } from "react"
 import { allAddresses, LSTLogos, tokenLogos } from "@/constants/nodeOptions"
 //import { getMeteoraPoolAPY } from "@/lib/meteora"
+import { getLogoName } from "@/lib/display/getLogo";
 
 interface InteractiveFlowProps {
   nodes: Node[];
@@ -68,13 +69,13 @@ export function CustomNode({ data, isConnectable }: NodeProps<NodeData>) {
   return (
     <div className={nodeClass}>
       <div className="custom-node-header" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      {data.label != "Wallet" ? (<Image
+      {data.label != "Vault" ? (<Image
         src={
           data.nodeType === "lst"
             ? LSTLogos[data.label]
             : data.nodeType === "token"
             ? tokenLogos[data.label]
-            : `/PNG/${data.label.toLowerCase()}-logo.png`
+            : `/PNG/${getLogoName(data.label)}-logo.png`
         }        alt={`${data.label} logo`}
         width={24}
         height={24}
