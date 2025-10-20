@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import { getVaultBalances } from "@/lib/api/vault"
 import { PublicKey, Keypair } from "@solana/web3.js"
 import { getVaultAccountInfo, getVaultDepositorAccountInfo } from "@/lib/utils/mirrorfi/accounts"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
@@ -41,6 +41,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
   const { publicKey } = useWallet();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(false);
   const [vaultBalances, setVaultBalances] = useState<any>(null);
   const [positionBalance, setPositionBalance] = useState<number>(0);
@@ -54,15 +55,20 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
     router.push('/');
   }
 
-
   useEffect(() => {
     setIsLoading(true);
+    setError(null); // Reset error state
+    
     async function loadVault(){
       // Try Loading vault key and check if it's valid
-      // try {
-      //   const vaultKey 
-      // }
-
+      try {
+        const vaultKey = new PublicKey(vault);
+      } catch(e: any){
+        console.error("Invalid vault address:", e);
+        setError(`Invalid vault address: "${vault}" is not a valid Solana public key.`);
+        setIsLoading(false);
+        return;
+      }
 
       try{
         const vaultKey = new PublicKey(vault);
@@ -84,10 +90,15 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
             setPositionBalance(positionBalance);
           }
         }
-        // if()
-        // const vaultDepositor = await getVaultAccountInfo(connection, vaultKey, publicKey);
-      } catch (error) {
-        console.error("Error fetching vault balances:", error);
+      } catch (error: any) {
+        console.error("Error loading vault:", error);
+        
+        // Handle specific errors
+        if (error.message && error.message.includes('Vault not found')) {
+          setError(`Vault not found: The vault "${vault}" does not exist or is not accessible.`);
+        } else {
+          setError(`Failed to load vault data: ${error.message || 'Unknown error occurred'}`);
+        }
       } 
       setIsLoading(false);
     }
@@ -108,7 +119,45 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
         </Button>
       </div>
 
-      <div className="flex items-start gap-3 mb-4">
+      {/* Error Display */}
+      {error && (
+        <Card className="bg-gradient-to-br from-red-900/20 to-red-800/10 border-red-700/30 backdrop-blur-sm rounded-lg shadow-lg mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-red-500/20 rounded-lg flex-shrink-0">
+                <AlertCircle className="h-6 w-6 text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-red-400 font-semibold text-lg mb-2">Error Loading Vault</h3>
+                <p className="text-red-300 mb-4">{error}</p>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => setReload(!reload)}
+                    variant="outline"
+                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                  <Button
+                    onClick={handleBackClick}
+                    variant="outline"
+                    className="border-slate-500/30 text-slate-400 hover:bg-slate-500/10 hover:border-slate-500/50"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Go Back
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Main Dashboard Content - Only show if no error */}
+      {!error && (
+        <>
+          <div className="flex items-start gap-3 mb-4">
         <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
           <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
         </Avatar>
@@ -174,6 +223,8 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   )
 }

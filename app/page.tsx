@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { TrendingUp, DollarSign, Users, ArrowRight } from "lucide-react";
 import { formatNumber } from "@/lib/display";
 import { useRouter } from "next/navigation";
+import { VaultCard } from "@/components/VaultCard";
 
 interface VaultData {
   pubkey: string;
@@ -54,125 +55,7 @@ export default function Home() {
     router.push(`/vault/${vaultPubkey}`);
   };
 
-  const getVaultName = (vault: VaultData) => {
-    // Generate a name based on vault properties
-    let name = "Vault";
-    if (vault.is_kamino && vault.is_meteora) {
-      name = "Kamino-Meteora Vault";
-    } else if (vault.is_kamino) {
-      name = "Kamino Vault";
-    } else if (vault.is_meteora) {
-      name = "Meteora Vault";
-    }
-    return name;
-  };
 
-  const getVaultStrategy = (vault: VaultData) => {
-    const strategies = [];
-    if (vault.is_kamino) strategies.push("Kamino");
-    if (vault.is_meteora) strategies.push("Meteora");
-    return strategies.length > 0 ? strategies.join(" + ") + " Strategy" : "Multi-Strategy";
-  };
-
-  const getVaultStatus = (vault: VaultData) => {
-    if (vault.is_closed) return { label: "Closed", color: "bg-red-500/20 text-red-400 border-red-500/30" };
-    if (vault.is_frozen) return { label: "Frozen", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" };
-    if (!vault.is_initialized) return { label: "Initializing", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
-    return { label: "Active", color: "bg-green-500/20 text-green-400 border-green-500/30" };
-  };
-
-  const getRiskColor = (risk?: string) => {
-    switch (risk) {
-      case 'Low': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'Medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'High': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default: return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-    }
-  };
-
-  const VaultCard = ({ vault }: { vault: VaultData }) => {
-    const vaultName = getVaultName(vault);
-    const vaultStrategy = getVaultStrategy(vault);
-    const vaultStatus = getVaultStatus(vault);
-    const netDeposits = vault.total_deposit - vault.total_withdrawal;
-
-    return (
-      <Card 
-        className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg hover:bg-blue-900/30 transition-all duration-200 cursor-pointer group"
-        onClick={() => handleVaultClick(vault.pubkey)}
-      >
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 bg-gradient-to-br from-pink-500 to-rose-400">
-                <AvatarFallback className="text-white font-bold">
-                  {vaultName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle className="text-white text-lg group-hover:text-blue-300 transition-colors">
-                  {vaultName}
-                </CardTitle>
-                <p className="text-slate-400 text-sm">
-                  {vaultStrategy}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className={vaultStatus.color}>
-                {vaultStatus.label}
-              </Badge>
-              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-300 transition-colors" />
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-[#0F1218] p-3 rounded-lg border border-[#2D3748]/30">
-              <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="h-4 w-4 text-green-400" />
-                <span className="text-slate-400 text-xs">Net Deposits</span>
-              </div>
-              <div className="text-white font-semibold text-lg">
-                {formatNumber(netDeposits / Math.pow(10, vault.deposit_token_decimals))}
-              </div>
-            </div>
-            
-            <div className="bg-[#0F1218] p-3 rounded-lg border border-[#2D3748]/30">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-4 w-4 text-blue-400" />
-                <span className="text-slate-400 text-xs">Version</span>
-              </div>
-              <div className="text-emerald-400 font-semibold text-lg">
-                v{vault.version}
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Info */}
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-slate-400">
-              <Users className="h-4 w-4" />
-              <span>Decimals: {vault.deposit_token_decimals}</span>
-            </div>
-            <div className="text-slate-400">
-              Fees: {formatNumber(vault.total_claimed_protocol_fee / Math.pow(10, vault.deposit_token_decimals))}
-            </div>
-          </div>
-
-          {/* Vault Address */}
-          <div className="bg-[#0F1218] p-2 rounded border border-[#2D3748]/30">
-            <p className="text-slate-400 text-xs mb-1">Vault Address</p>
-            <p className="text-slate-300 text-xs font-mono break-all">
-              {vault.pubkey}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
 
   const LoadingSkeleton = () => (
     <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg">
@@ -282,7 +165,7 @@ export default function Home() {
             ) : vaults.length > 0 ? (
               // Vault cards
               vaults.map((vault, index) => (
-                <VaultCard key={vault.pubkey || `vault-${index}`} vault={vault} />
+                <VaultCard key={vault.pubkey || `vault-${index}`} vault={vault} onClick={handleVaultClick} />
               ))
             ) : (
               // Empty state
