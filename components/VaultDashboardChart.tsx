@@ -69,8 +69,8 @@ interface VaultDashboardChartProps {
 
 export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [selectedDataType, setSelectedDataType] = useState<DataType>("APY History")
-  const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("90D")
+  const [selectedDataType, setSelectedDataType] = useState<DataType>("Share Price")
+  const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("24H")
   const [data, setData] = useState<ChartDataItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -214,23 +214,11 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   return (
     <Card className={`bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-white flex items-center gap-2">
-          <ChartNoAxesCombined className="h-5 w-5 text-blue-400"/> 
-          Vault Performance
-          {loading && <span className="text-sm text-blue-400 animate-pulse">Loading...</span>}
-          {error && <span className="text-sm text-red-400">{error}</span>}
-          {vaultAddress && (
-            <span className="text-xs text-slate-400">
-              ({vaultAddress.slice(0, 8)}...)
-            </span>
-          )}
-        </CardTitle>
-        
         {/* Data type and timeframe selector row */}
-        <div className="flex flex-col sm:flex-row sm:justify-between mt-3 gap-3 sm:gap-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2">
           {/* Data type selector */}
           <div className="flex gap-1 overflow-x-auto">
-            {(["APY History", "Share Price", "Vault NAV"] as const).map((dataType) => (
+            {(["Share Price", "Vault NAV"] as const).map((dataType) => (
               <Button
                 key={dataType}
                 variant={selectedDataType === dataType ? "default" : "outline"}

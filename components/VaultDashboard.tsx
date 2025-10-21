@@ -36,7 +36,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
     { id: "your-position", label: "Your Position" },
-    { id: "overview", label: "Overview" },
+    //{ id: "overview", label: "Overview" },
   ]
   const { publicKey } = useWallet();
   const router = useRouter();
