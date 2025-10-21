@@ -1,7 +1,7 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { NATIVE_MINT } from "@solana/spl-token";
 
-export const SYSTEM_PROGRAM_ID = new PublicKey("11111111111111111111111111111111");
-export const SYSVAR_RENT_ADDRESS = new PublicKey("SysvarRent111111111111111111111111111111111");
+export const SYSTEM_PROGRAM_ID = SystemProgram.programId;
 export const SYSVAR_INSTRUCTION_ADDRESS = new PublicKey("Sysvar1nstructions1111111111111111111111111");
 export const KAMINO_PROGRAM_ID = new PublicKey("KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD");
 export const KAMINO_FARMS_PROGRAM_ID = new PublicKey("FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr");
@@ -13,12 +13,13 @@ export const KAMINO_MARINADE_MARKET = new PublicKey("GVDUXFwS8uvBG35RjZv6Y8S1AkV
 
 export const KAMINO_FARM_DELEGATEE = new PublicKey("Vnaq7vbHuwHHHSTzDYVnMf2WzFPdAzQA1iAa5NtpXNw");
 
-export const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-export const TOKEN_PROGRAM_2022_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
-
 // Tokens
 export const USDC_TOKEN_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-export const SOL_TOKEN_MINT = new PublicKey("So11111111111111111111111111111111111111112");
+export const SOL_TOKEN_MINT = NATIVE_MINT;
+
+// Pyth PriceUpdateV2
+export const USDC_PRICE_UPDATE_V2 = new PublicKey("Dpw1EAVrSB1ibxiDQyTAW6Zip3J4Btk2x4SgApQCeFbX");
+export const SOL_PRICE_UPDATE_V2 = new PublicKey("7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE");
 
 // TEMP
 export const DEFAULT_KAMINO_REFERER_METADATA = new PublicKey("9wEzLSxpBf41YWG7zM4etDZuc2XUh9gGuUQh5K9SFsVk");
