@@ -16,6 +16,7 @@ import { VaultDashboardChart } from "@/components/VaultDashboardChart";
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
+import { VaultDashboardPNLCard } from "@/components/VaultDashboardPNLCard"
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 
@@ -208,6 +209,12 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
           )}
           {activeTab == "your-position" && (
             <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
+              <VaultDashboardPNLCard 
+                vaultDepositor={vaultDepositorInfo} 
+                positionBalance={positionBalance} 
+                tokenPrice={vaultBalances?.depositTokenPrice}
+                isLoading={isLoading}
+              />
               <VaultDashboardUserPosition vaultDepositor={vaultDepositorInfo} positionBalance={positionBalance} tokenPrice={vaultBalances?.depositTokenPrice}/>
             </div>
           )}
