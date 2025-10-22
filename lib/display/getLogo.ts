@@ -30,6 +30,5 @@ export function getLogoNameByAddress(address: string) {
         "BonK1YhkXEGLZzwtcvRTip3gAL9nCeQD7ppZBLXhtTs": "bonkSOL",
     };
     const logo = addressToNameMap[address] || "unknown";
-    console.log("Name:",    logo, "for address:", address);
     return logo.toLowerCase();
 }
