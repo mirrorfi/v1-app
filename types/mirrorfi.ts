@@ -173,6 +173,42 @@ export type Mirrorfi = {
           "writable": true
         },
         {
+          "name": "vaultDepositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              }
+            ]
+          }
+        },
+        {
           "name": "depositMint"
         },
         {
@@ -190,7 +226,7 @@ export type Mirrorfi = {
             "seeds": [
               {
                 "kind": "account",
-                "path": "depositor"
+                "path": "vaultDepositor"
               },
               {
                 "kind": "account",
@@ -1335,6 +1371,42 @@ export type Mirrorfi = {
           "writable": true
         },
         {
+          "name": "vaultDepositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "withdrawer"
+              }
+            ]
+          }
+        },
+        {
           "name": "depositMint"
         },
         {
@@ -1400,7 +1472,60 @@ export type Mirrorfi = {
         },
         {
           "name": "receiptMintTokenAccount",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vaultDepositor"
+              },
+              {
+                "kind": "account",
+                "path": "receiptMintTokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "receiptMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           "name": "vaultTokenAccount",
@@ -1495,6 +1620,19 @@ export type Mirrorfi = {
         117,
         119
       ]
+    },
+    {
+      "name": "vaultDepositor",
+      "discriminator": [
+        87,
+        109,
+        182,
+        106,
+        87,
+        96,
+        63,
+        211
+      ]
     }
   ],
   "errors": [
@@ -1585,86 +1723,91 @@ export type Mirrorfi = {
     },
     {
       "code": 6017,
+      "name": "invalidVaultDepositor",
+      "msg": "Vault depositor does not match"
+    },
+    {
+      "code": 6018,
       "name": "invalidReceiptMint",
       "msg": "Receipt mint address does not match"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "invalidVaultAuthority",
       "msg": "Vault authority does not match"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "invalidStrategyType",
       "msg": "Strategy type is invalid for this operation"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "vaultDepositCapReached",
       "msg": "Vault deposit cap exceeded"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "vaultNotOperational",
       "msg": "Vault is paused or in reduce-only status"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "vaultNotWithdrawable",
       "msg": "Vault is not in a withdrawable status"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "depositCapReached",
       "msg": "Deposit cap for the vault has been reached"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "insufficientVaultFundsToDeposit",
       "msg": "Insufficient funds in the vault to deposit to strategy"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "zeroNetDeposits",
       "msg": "Vault has zero net deposits, cannot mint or burn shares"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "invalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "strategyTokenAccountNotEmpty",
       "msg": "Strategy token account balance is not zero"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "invalidProtocolProgram",
       "msg": "Protocol program does not match"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "invalidObligation",
       "msg": "Obligation address does not match"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "invalidLendingMarket",
       "msg": "Lending market address does not match"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "invalidDestinationMint",
       "msg": "Destination mint does not match"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "invalidSourceMint",
       "msg": "Source mint does not match strategy destination mint"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "invalidUser",
       "msg": "User address does not match"
     }
@@ -1695,10 +1838,22 @@ export type Mirrorfi = {
             "type": "u64"
           },
           {
-            "name": "platformFeeBps",
+            "name": "platformComissionFeeBps",
             "docs": [
               "Fee taken on profits in basis points"
             ],
+            "type": "u16"
+          },
+          {
+            "name": "platformDepositFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformWithdrawalFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformReferralFeeBps",
             "type": "u16"
           },
           {
@@ -1722,7 +1877,7 @@ export type Mirrorfi = {
             "type": {
               "array": [
                 "u8",
-                3
+                5
               ]
             }
           }
@@ -1735,7 +1890,19 @@ export type Mirrorfi = {
         "kind": "struct",
         "fields": [
           {
-            "name": "platformFeeBps",
+            "name": "platformComissionFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformDepositFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformWithdrawalFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "platformReferralFeeBps",
             "type": "u16"
           },
           {
@@ -1998,7 +2165,25 @@ export type Mirrorfi = {
             }
           },
           {
-            "name": "platformFeeBps",
+            "name": "platformComissionFeeBps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "platformDepositFeeBps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "platformWithdrawalFeeBps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "platformReferralFeeBps",
             "type": {
               "option": "u16"
             }
@@ -2233,6 +2418,65 @@ export type Mirrorfi = {
               "array": [
                 "u8",
                 2
+              ]
+            }
+          },
+          {
+            "name": "padding1",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "vaultDepositor",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "padding0",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
+            "name": "totalShares",
+            "type": "u64"
+          },
+          {
+            "name": "totalCost",
+            "type": "u64"
+          },
+          {
+            "name": "realizedPnl",
+            "type": "i64"
+          },
+          {
+            "name": "padding1",
+            "type": {
+              "array": [
+                "u64",
+                8
               ]
             }
           }
