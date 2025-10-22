@@ -7,7 +7,7 @@ import mirrorfiIdl from '@/idl/mirrorfi.json';
 import { MirrorFiClient } from './utils/mirrorfi-client';
 
 const SERVER_CLUSTER: Cluster = (process.env.SERVER_SOLANA_RPC_CLUSTER ??
-  'devnet') as Cluster;
+  'mainnet-beta') as Cluster;
 export const SERVER_CONNECTION = new Connection(
   process.env.SERVER_SOLANA_RPC_URL ?? clusterApiUrl(SERVER_CLUSTER),
   'confirmed'
