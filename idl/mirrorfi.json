@@ -132,9 +132,6 @@
           "writable": true
         },
         {
-          "name": "protocol_token_account"
-        },
-        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
@@ -1629,8 +1626,8 @@
     },
     {
       "code": 6027,
-      "name": "StrategyTokenAccountNotEmpty",
-      "msg": "Strategy token account balance is not zero"
+      "name": "StrategyHasDepositsDeployed",
+      "msg": "Strategy cannot be closed until all desposits deployed are withdrawn"
     },
     {
       "code": 6028,

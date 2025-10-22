@@ -138,9 +138,6 @@ export type Mirrorfi = {
           "writable": true
         },
         {
-          "name": "protocolTokenAccount"
-        },
-        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
@@ -1635,8 +1632,8 @@ export type Mirrorfi = {
     },
     {
       "code": 6027,
-      "name": "strategyTokenAccountNotEmpty",
-      "msg": "Strategy token account balance is not zero"
+      "name": "strategyHasDepositsDeployed",
+      "msg": "Strategy cannot be closed until all desposits deployed are withdrawn"
     },
     {
       "code": 6028,
