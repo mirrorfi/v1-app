@@ -24,6 +24,7 @@ export const SOL_PRICE_UPDATE_V2 = new PublicKey("7UVimffxr9ow1uXYxsr4LHAcV58mLz
 // TEMP
 export const DEFAULT_KAMINO_REFERER_METADATA = new PublicKey("9wEzLSxpBf41YWG7zM4etDZuc2XUh9gGuUQh5K9SFsVk");
 
+export const DISCRIMINATOR_SIZE = 8;
 
 // export const MAIN_MARKET: Address = address('7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF');
 // export const MAIN_MARKET_LUT: Address = address('284iwGtA9X9aLy3KsyV8uT2pXLARhYbiSi5SiM2g47M2');
