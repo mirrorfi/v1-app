@@ -1,7 +1,7 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { v0TxToBase64 } from "@/lib/utils";
 import { parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
@@ -11,9 +11,16 @@ export async function POST(req: NextRequest) {
   try {
     const { amount, withdrawer, vault } = await req.json();
 
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    if (!amount) {
       return NextResponse.json(
-        { error: 'Invalid deposit amount.' },
+        { error: 'Amount is required.' },
+        { status: 400 }
+      );
+    }
+    
+    if (isNaN(amount) || Number(amount) <= 0) {
+      return NextResponse.json(
+        { error: 'Amount must be a positive number.' },
         { status: 400 }
       );
     }
@@ -76,7 +83,9 @@ export async function POST(req: NextRequest) {
 
     const tx = await buildTx([ix], withdrawerPubkey);
 
-    return bs58.encode(tx.serialize());
+    return NextResponse.json({
+      tx: v0TxToBase64(tx),
+    });
   } catch (err) {
     console.error(err);
 

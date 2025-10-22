@@ -1,8 +1,8 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { v0TxToBase64 } from "@/lib/utils";
 import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiterSwap";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
@@ -12,16 +12,30 @@ export async function POST(req: NextRequest) {
   try {
     const { amount, slippageBps, authority, strategy } = await req.json();
 
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    if (!amount) {
       return NextResponse.json(
-        { error: 'Invalid swap amount.' },
+        { error: 'Amount is required.' },
         { status: 400 }
       );
     }
 
-    if (!slippageBps || isNaN(slippageBps) || Number(slippageBps) < 0) {
+    if (isNaN(amount) || Number(amount) <= 0) {
       return NextResponse.json(
-        { error: 'Invalid slippage bps.' },
+        { error: 'Amount must be a positive number.' },
+        { status: 400 }
+      );
+    }
+
+    if (!slippageBps) {
+      return NextResponse.json(
+        { error: 'Slippage basis points is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (isNaN(slippageBps) || Number(slippageBps) < 0) {
+      return NextResponse.json(
+        { error: 'Slippage basis points must be a non-negative number.' },
         { status: 400 }
       );
     }
@@ -58,8 +72,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const vaultPda = new PublicKey(strategyAcc.vault);
-    const vaultAcc = await mirrorfiClient.fetchProgramAccount(vaultPda.toBase58(), "vault", parseVault);
+    const vault = new PublicKey(strategyAcc.vault);
+    const vaultAcc = await mirrorfiClient.fetchProgramAccount(vault.toBase58(), "vault", parseVault);
 
     if (!vaultAcc) {
       return NextResponse.json(
@@ -77,7 +91,7 @@ export async function POST(req: NextRequest) {
       slippageBps,
       false,
       false,
-      new PublicKey(vaultPda),
+      new PublicKey(vault),
       mirrorfiClient.program.provider.connection,
     );
     const remainingAccounts = extractRemainingAccountsForSwap(
@@ -86,15 +100,15 @@ export async function POST(req: NextRequest) {
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))!.owner;
     const vaultDepositMintTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
-      new PublicKey(vaultPda),
-      !PublicKey.isOnCurve(vaultPda),
+      new PublicKey(vault),
+      !PublicKey.isOnCurve(vault),
       depositMintTokenProgram,
     )
     const targetMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(targetMint))!.owner;
     const vaultTargetMintTokenAccount = getAssociatedTokenAddressSync(
       targetMint,
-      new PublicKey(vaultPda),
-      !PublicKey.isOnCurve(vaultPda),
+      new PublicKey(vault),
+      !PublicKey.isOnCurve(vault),
       targetMintTokenProgram,
     );
     const treasuryPda = mirrorfiClient.treasuryPda;
@@ -116,7 +130,7 @@ export async function POST(req: NextRequest) {
         config: mirrorfiClient.configPda,
         destinationMint: targetMint,
         sourceMint: depositMint,
-        vault: vaultPda,
+        vault,
         strategy,
         tokenProgram: TOKEN_PROGRAM_ID,
         vaultSourceTokenAccount: vaultTargetMintTokenAccount,
@@ -128,7 +142,9 @@ export async function POST(req: NextRequest) {
 
     const tx = await buildTx([ix], new PublicKey(authority));
 
-    return bs58.encode(tx.serialize());
+    return NextResponse.json({
+      tx: v0TxToBase64(tx),
+    });
   } catch (err) {
     console.error(err);
 

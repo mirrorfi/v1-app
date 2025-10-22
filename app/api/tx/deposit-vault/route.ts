@@ -1,7 +1,7 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { v0TxToBase64 } from "@/lib/utils";
 import { parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,9 +10,16 @@ export async function POST(req: NextRequest) {
   try {
     const { amount, depositor, vault } = await req.json();
 
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    if (!amount) {
       return NextResponse.json(
-        { error: 'Invalid deposit amount.' },
+        { error: 'Amount is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (isNaN(amount) || Number(amount) <= 0) {
+      return NextResponse.json(
+        { error: 'Amount must be a positive number.' },
         { status: 400 }
       );
     }
@@ -40,20 +47,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const depositMint = vaultAcc.depositMint;
+    const depositMint = new PublicKey(vaultAcc.depositMint);
     const vaultPubkey = new PublicKey(vault);
     const receiptMint = mirrorfiClient.getReceiptMintPda(vaultPubkey);
-    const depositMintPubkey = new PublicKey(depositMint);
     const depositorPubkey = new PublicKey(depositor);
-    const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMintPubkey))!.owner;
+    const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))!.owner;
     const depositorTokenAccount = getAssociatedTokenAddressSync(
-      depositMintPubkey,
+      depositMint,
       depositorPubkey,
       !PublicKey.isOnCurve(depositorPubkey),
       depositMintTokenProgram,
     );
     const vaultTokenAccount = getAssociatedTokenAddressSync(
-      depositMintPubkey,
+      depositMint,
       vaultPubkey,
       !PublicKey.isOnCurve(vault),
       depositMintTokenProgram,
@@ -75,7 +81,9 @@ export async function POST(req: NextRequest) {
 
     const tx = await buildTx([ix], depositorPubkey);
 
-    return bs58.encode(tx.serialize());
+    return NextResponse.json({
+      tx: v0TxToBase64(tx),
+    })
   } catch (err) {
     console.error(err);
 

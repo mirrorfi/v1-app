@@ -1,4 +1,4 @@
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+import { VersionedTransaction } from "@solana/web3.js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -21,4 +21,8 @@ export function stringToByteArray(str: string, length: number): number[] {
   }
 
   return array;
+}
+
+export function v0TxToBase64(tx: VersionedTransaction): string {
+  return Buffer.from(tx.serialize()).toString("base64");
 }
