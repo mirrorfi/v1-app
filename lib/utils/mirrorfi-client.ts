@@ -2,6 +2,9 @@ import { Mirrorfi } from "@/types/mirrorfi";
 import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
 import { AccountNamespace, BN, IdlAccounts, Program } from "@coral-xyz/anchor";
 import { parseConfig, ParsedProgramAccount, parseVault } from "@/types/accounts";
+import mirrorfiIdl from "@/idl/mirrorfi.json";
+
+const programId = new PublicKey(mirrorfiIdl.address);
 
 export class MirrorFiClient {
   program: Program<Mirrorfi>;
@@ -16,14 +19,14 @@ export class MirrorFiClient {
   private getConfigPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("config")],
-      this.program.programId
+      programId
     )[0];
   }
 
   private getTreasuryPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("treasury")],
-      this.program.programId,
+      programId,
     )[0];
   }
 
@@ -34,14 +37,14 @@ export class MirrorFiClient {
         id.toArrayLike(Buffer, "le", 8),
         authority.toBuffer(),
       ],
-      this.program.programId,
+      programId,
     )[0];
   }
 
   getReceiptMintPda(vault: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("receipt_mint"), vault.toBuffer()],
-      this.program.programId,
+      programId,
     )[0];
   }
 
@@ -52,14 +55,14 @@ export class MirrorFiClient {
         vault.toBuffer(),
         id.toArrayLike(Buffer, "le", 1),
       ],
-      this.program.programId,
+      programId,
     )[0];
   }
 
   getUserPda(authority: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("user"), authority.toBuffer()],
-      this.program.programId,
+      programId,
     )[0];
   }
 
