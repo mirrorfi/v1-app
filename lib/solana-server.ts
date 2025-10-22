@@ -1,6 +1,6 @@
 import { AddressLookupTableAccount, clusterApiUrl, ComputeBudgetProgram, Connection, PublicKey, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { Cluster } from '@solana/web3.js';
-import { getSimulationComputeUnits } from '@solana-developers/helpers';
+// import { getSimulationComputeUnits } from '@solana-developers/helpers';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Mirrorfi } from '@/types/mirrorfi';
 import mirrorfiIdl from '@/idl/mirrorfi.json';
@@ -49,12 +49,13 @@ export async function buildTx(
   payer: PublicKey,
   lookupTables: AddressLookupTableAccount[] = []
 ) {
-  const units = await getSimulationComputeUnits(
-    SERVER_CONNECTION,
-    ixs,
-    payer,
-    lookupTables
-  );
+  // const units = await getSimulationComputeUnits(
+  //   SERVER_CONNECTION,
+  //   ixs,
+  //   payer,
+  //   lookupTables
+  // );
+  const units = 200_000;
 
   if (!units) {
     throw new Error('Unable to get compute limits.');
