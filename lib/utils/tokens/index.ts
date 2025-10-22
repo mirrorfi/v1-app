@@ -1,5 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "../../constants";
+import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { SOL_PRICE_UPDATE_V2, USDC_PRICE_UPDATE_V2, USDC_TOKEN_MINT } from "@/lib/constants";
 
 export interface TokenInfo {
     symbol: string;
@@ -9,15 +10,15 @@ export interface TokenInfo {
 }
 
 export const TOKEN_INFO: Record<string, TokenInfo> = {
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v': {
+    [USDC_TOKEN_MINT.toBase58()]: {
         symbol: 'USDC',
-        pythOracle: new PublicKey('Dpw1EAVrSB1ibxiDQyTAW6Zip3J4Btk2x4SgApQCeFbX'),
+        pythOracle: USDC_PRICE_UPDATE_V2,
         tokenDecimals: 6,
         tokenProgram: TOKEN_PROGRAM_ID,
     },
-    'So11111111111111111111111111111111111111112': {
+    [NATIVE_MINT.toBase58()]: {
         symbol: 'SOL',
-        pythOracle: new PublicKey('7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE'),
+        pythOracle: SOL_PRICE_UPDATE_V2,
         tokenDecimals: 9,
         tokenProgram: TOKEN_PROGRAM_ID,
     },
