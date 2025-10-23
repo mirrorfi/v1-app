@@ -26,10 +26,6 @@ import { TOKEN_INFO } from "@/lib/utils/tokens"
 interface StrategyDashboardProps {
   vault: string;
   vaultData:any;
-  vaultDepositorInfo: any;
-  positionBalance:number;
-  tokenBalance:number;
-  tokenPrice:number;
   isLoading: boolean;
   error: string | null;
   handleReload: () => void;
@@ -40,12 +36,11 @@ interface StrategyDashboardProps {
 const connection = getConnection();
 
 const strategy = {
-  name: "My Super Hyped Strategy",
   icon: "🚀",
   status: "Active" as const,
 }
 
-export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
+export function VaultManagerDashboard({ vault, vaultData, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
   const [activeTab, setActiveTab] = useState("vault-stats")
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
@@ -66,7 +61,7 @@ export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionB
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-8 md:p-6">
+    <div className="w-full max-w-9xl p-8 md:p-6">
       {/* Back Button */}
       <div className="mb-4">
         <Button
@@ -117,87 +112,23 @@ export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionB
       {/* Main Dashboard Content - Only show if no error */}
       {!error && (
         <>
-          <div className="flex items-center gap-3 mb-4">
-        <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
-          <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        {vaultData ? 
-          <div className="flex gap-2">
-            <h2 className="text-lg md:text-xl font-semibold text-white">{vaultData.name}</h2>
-            <Badge
-              variant={strategy.status === "Active" ? "default" : "secondary"}
-              className={`mt-1 text-xs ${
-                strategy.status === "Active"
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-              }`}
-            >
-              {strategy.status}
-            </Badge>
-          </div>
-        : <Skeleton className="h-6 w-32 md:h-8 md:w-48 rounded-md" />}
-      </div>
+        <div className="space-y-4">
+            {/* Mobile: Stack all content vertically */}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+                {/* Main Content */}
+                {activeTab == "vault-stats" && (
+                    <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
+                    <VaultDashboardFlow vaultData={vaultData} depositData={depositData} strategyData={strategiesData} />
+                    {/*<VaultDashboardChart vaultAddress={vault} />*/}
+                    </div>
+                )}
 
-      {/* Navigation Tabs - Mobile responsive */}
-      <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto">
-        {tabs.map((tab) => (
-          <Button
-            key={tab.id}
-            variant={activeTab === tab.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => onTabChange?.(tab.id)}
-            className={`whitespace-nowrap text-xs md:text-sm ${
-              activeTab === tab.id
-                ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
-                : "bg-transparent border-blue-700/50 text-blue-300 hover:bg-blue-800/30 hover:text-white"
-            }`}
-          >
-            {tab.label}
-          </Button>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        {/* Mobile: Stack all content vertically */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          {/* Main Content */}
-          {activeTab == "vault-stats" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardFlow vaultData={vaultData} depositData={depositData} strategyData={strategiesData} />
-              {/*<VaultDashboardChart vaultAddress={vault} />*/}
-              <VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} />
+                {/* Execute Card - Show first on mobile */}
+                <div className="xl:col-span-2 order-1 xl:order-2">
+                    <VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} isManager={true} vaultData={vaultData} />
+                </div>
             </div>
-          )}
-          {activeTab == "your-position" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardPNLCard 
-                vaultDepositor={vaultDepositorInfo} 
-                positionBalance={positionBalance} 
-                tokenPrice={tokenPrice}
-                isLoading={isLoading}
-              />
-              {/*<VaultDashboardUserPosition vaultDepositor={vaultDepositorInfo} positionBalance={positionBalance} tokenPrice={tokenPrice}/> */}
-            </div>
-          )}
-          {activeTab == "overview" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              {/*<VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />*/}
-            </div>
-          )}
-
-          {/* Execute Card - Show first on mobile */}
-          <div className="xl:col-span-1 order-1 xl:order-2">
-            {vaultData ? <VaultDashboardExecuteCard 
-              vault={vault} 
-              vaultData={vaultData} 
-              positionBalance={positionBalance} 
-              handleReload={handleReload} 
-              tokenPrice={tokenPrice} 
-              tokenBalance={tokenBalance} 
-            />: <VaultDashboardExecuteCardSkeleton />}
-          </div>
         </div>
-      </div>
         </>
       )}
     </div>

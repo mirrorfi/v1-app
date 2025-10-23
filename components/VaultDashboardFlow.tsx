@@ -163,6 +163,7 @@ const defaultStrategy = {
 };
 
 interface VaultDashboardFlowProps {
+    vaultData: any;
     depositData: any;
     strategyData: any;
 }
@@ -181,7 +182,7 @@ function getStrategyYCoordinate(numStrategies: number): number[] {
     return coordinates;
 }
 
-export function VaultDashboardFlow({ depositData, strategyData }: VaultDashboardFlowProps) {
+export function VaultDashboardFlow({ vaultData, depositData, strategyData }: VaultDashboardFlowProps) {
     const [strategy, setStrategy] = useState<any>(defaultStrategy);
     const [updatedNodes, setUpdatedNodes] = useState<Node[]>([]);
 
@@ -289,8 +290,11 @@ export function VaultDashboardFlow({ depositData, strategyData }: VaultDashboard
         <CardHeader className="pb-2">
             <CardTitle className="text-white flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-blue-400" />
-            Vault Strategy
+            { vaultData ? vaultData.name : <div className="h-5 w-32 bg-blue-700/30 rounded-md animate-pulse" />}
             </CardTitle>
+            { vaultData ?
+            <div className="text-sm text-blue-300 mt-1">{vaultData.description}</div>
+            : <div className="h-4 w-full md:w-3/4 bg-blue-700/30 rounded-md mt-2 animate-pulse" />}
         </CardHeader>
         <CardContent>
             <InteractiveFlow

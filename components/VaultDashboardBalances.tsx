@@ -4,17 +4,21 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Wallet, ArrowUpCircle, ArrowDownCircle, CircleDollarSign, ChevronDown, ChevronRight, AlertCircle, Ban, Plus, Minus } from "lucide-react"
+import { Wallet, ArrowUpCircle, ArrowDownCircle, CircleDollarSign, ChevronDown, ChevronRight, AlertCircle, Ban, Plus, Minus, TrendingUp, Target, DollarSign } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Skeleton } from "@/components/ui/skeleton"
-import { tokenLogos } from "@/constants/nodeOptions"
-import Image from "next/image"
-import { getStrategyAPY } from "@/lib/apy"
+import { StrategyCard } from "@/components/StrategyCard";
+import { StrategyCardManager } from "@/components/StrategyCardManager";
+import { StrategyCreateModal } from "@/components/StrategyCreateModal";
+import { StrategyJupiterModal } from "@/components/StrategyJupiterModal"
+
 
 interface VaultDashboardBalancesProps {
   depositData: any;
   strategiesData: any[];
   isLoading: boolean;
+  isManager?: boolean;
+  vaultData?: any;
 }
 
 // Skeleton loading components
@@ -72,6 +76,36 @@ function SkeletonCategorySection() {
   );
 }
 
+// KPI Card component
+function KPICard({ title, value, icon: Icon, color = "blue" }: { 
+  title: string; 
+  value: string; 
+  icon: any; 
+  color?: "blue" | "green" | "purple" 
+}) {
+  const colorClasses = {
+    blue: "from-blue-900/20 to-blue-800/10 border-blue-700/30 text-blue-400",
+    green: "from-green-900/20 to-green-800/10 border-green-700/30 text-green-400", 
+    purple: "from-purple-900/20 to-purple-800/10 border-purple-700/30 text-purple-400"
+  };
+
+  return (
+    <Card className={`bg-gradient-to-br ${colorClasses[color].split(' ').slice(0, 2).join(' ')} border ${colorClasses[color].split(' ')[2]} backdrop-blur-sm rounded-lg shadow-lg transition-all duration-200 hover:scale-105`}>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <p className="text-slate-400 text-sm font-medium">{title}</p>
+            <p className="text-white text-2xl font-bold mt-1">{value}</p>
+          </div>
+          <div className={`p-3 rounded-full bg-white/10 ${colorClasses[color].split(' ')[3]}`}>
+            <Icon className="h-6 w-6" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // Error and empty state components
 function ErrorState() {
   return (
@@ -93,110 +127,16 @@ function EmptyState() {
   );
 }
 
-function StrategyCard({strategyData}: {strategyData: any}) {
-
-  const [apy, setAPY] = useState<number>(0);
-
-  useEffect(() => {
-    async function fetchAPY() {
-      const apy = await getStrategyAPY(strategyData);
-      setAPY(apy);
-    }
-    fetchAPY();
-  }, [strategyData]);
-
-
-  // Calculate percentage change (mock data for now)
-  const percentageChange = strategyData.initialCapital ? 
-    ((strategyData.value - strategyData.initialCapital) / strategyData.initialCapital * 100) : 0;
-  const isPositive = percentageChange >= 0;
-  const unrealizedProfit = strategyData.value - (strategyData.initialCapital || 0);
-
-  // Get token icon for background
-  const tokenIcon = strategyData.tokenInfo?.icon || '/PNG/usdc-logo.png';
-
-  
-
-  return (
-    <Card className="relative bg-slate-800/80 border border-slate-600/30 rounded-xl p-6 backdrop-blur-sm hover:bg-slate-800/90 transition-all duration-200 overflow-hidden">
-      {/* Background token image on the left */}
-      <div className="absolute left-0 top-0 w-128 h-full opacity-10 overflow-hidden">
-        <div 
-          className="w-70 h-70 bg-contain bg-no-repeat bg-center transform -translate-x-8 -translate-y-12 rounded-full"
-          style={{
-            backgroundImage: `url(${tokenIcon})`,
-            filter: 'brightness(0.9)'
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 space-y-4">
-        {/* Top row - Strategy name/APY and Value/Change */}
-        <div className="flex items-start justify-between">
-          <div className="flex flex-col">
-            <h3 className="flex text-white font-semibold text-xl items-center gap-2">
-              {strategyData.tokenInfo?.symbol || ''}
-              <div className="text-sm mt-1">
-              {strategyData.strategyType === "deposit" ? "(Main Deposit)" : "(Yield)"}
-              </div>
-            </h3>
-            <p className="text-gray-400 text-base">
-              APY: {apy > 0 ? <span className="text-green-400 font-medium">{apy.toFixed(2)}%</span> : '-'}
-            </p>
-          </div>
-          
-          <div className="flex justify-end items-center gap-2">
-            <span className="text-white font-bold text-2xl">
-              ${strategyData.value.toFixed(2)}
-            </span>
-            <span className={`text-base font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-              ({isPositive ? '+' : ''}{percentageChange.toFixed(1)}%)
-            </span>
-          </div>
-        </div>
-
-        {/* Middle and Bottom rows - Aligned buttons with metrics */}
-        <div className="flex justify-between items-center mt-10">
-          {/* Left side - Action buttons */}
-          <div className="flex gap-3">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="bg-transparent border-slate-500 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 rounded-lg px-4 py-2 font-medium"
-            >
-              Add
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="bg-transparent border-slate-500 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 rounded-lg px-4 py-2 font-medium"
-            >
-              Reduce
-            </Button>
-          </div>
-
-          {/* Right side - Financial metrics */}
-          <div className="flex gap-8 text-base">
-            <span className="text-slate-400">
-              Initial Capital: <span className="text-white font-medium">{strategyData.strategyType === "deposit"? "-" : `$${(strategyData.initialCapital || 0).toFixed(3)}`}</span>
-            </span>
-            <span className="flex text-slate-400">
-              Unrealized Profit: <span className={`font-semibold ${unrealizedProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {strategyData.strategyType === "deposit"? <div className="text-white ml-1">-</div> : `${unrealizedProfit < 0 ? "-" : ""}$${Math.abs(unrealizedProfit).toFixed(5)}`}
-              </span>
-            </span>
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-export function VaultDashboardBalances({ depositData, strategiesData, isLoading }: VaultDashboardBalancesProps) {
+export function VaultDashboardBalances({ depositData, strategiesData, isLoading, isManager=false, vaultData }: VaultDashboardBalancesProps) {
   const [totalValue, setTotalValue] = useState<number>(0);
   const [hasError, setHasError] = useState<boolean>(false);
 
   const isEmpty = depositData && depositData.balance == 0;
+  const [estimatedYield, setEstimatedYield] = useState<number>(0);
+
+  const [isCreateStrategy, setIsCreateStrategy] = useState<boolean>(false);
+  const [isOpenJupiter, setIsOpenJupiter] = useState<string>("");
+  const [openStrategyData, setOpenStrategyData] = useState<any>(null);
 
   useEffect(() => {
     if (depositData && strategiesData) {
@@ -208,8 +148,40 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading 
     }
   }, [depositData, strategiesData]);
 
+  const handleCreateStrategy = (strategyType: string) => {
+    console.log('Creating strategy:', strategyType);
+    if (strategyType === "jupiterYieldToken") {
+      handleOpenJupiter("newYield", null);
+    }
+    else if (strategyType === "jupiterSwap") {
+      handleOpenJupiter("new", null);
+    }
+    // TODO: Implement strategy creation logic
+  };
+
+  const handleOpenCreateModal = () => {
+    setIsCreateStrategy(true);
+  };
+
+  const handleOpenJupiter = (action:string, strategyData:any) => {
+    setIsOpenJupiter(action);
+    setOpenStrategyData(strategyData);
+  };
+  const handleCloseJupiter = () => {setIsOpenJupiter("");}
+
+  const handleCloseCreateStrategy = () => {
+    setIsCreateStrategy(false);
+  };
+
+  const handleOpenStrategy = (data: any) => {
+    console.log('Opening strategy action:', data);
+    if (data.strategyType === "jupiterSwap") {
+      handleOpenJupiter(data.action, data.strategyData);
+    }
+  }
+
   return (
-    <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg transition-all duration-200">
+    <Card className="z--50 bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg transition-all duration-200">
       {/*<CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Wallet className="h-5 w-5 text-blue-400" />
@@ -234,18 +206,80 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading 
         ) : (
           /* Data Loaded State */
           <>
-          <div className="font-medium text-lg mb-4">Total NAV: ${totalValue.toFixed(2)}</div>
+          {/* KPI Cards Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <KPICard 
+              title="Total NAV" 
+              value={`$${totalValue.toFixed(2)}`} 
+              icon={DollarSign} 
+              color="blue" 
+            />
+            <KPICard 
+              title="Total Strategies" 
+              value={strategiesData.length.toString()} 
+              icon={Target} 
+              color="purple" 
+            />
+            <KPICard 
+              title="Estimated Yield" 
+              value={`${estimatedYield.toFixed(2)}%`} 
+              icon={TrendingUp} 
+              color="green" 
+            />
+          </div>
+          
+          {/* Add New Strategy Button - Only for Managers */}
+          {isManager && (
+            <div className="flex justify-end mb-4">
+              <Button 
+                variant="outline" 
+                onClick={handleOpenCreateModal}
+                className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Strategy
+              </Button>
+            </div>
+          )}
+          
+          {/* Strategy Cards */}
           <div className="space-y-4">
             {depositData && (
-              <StrategyCard strategyData={depositData} />
+              <div>
+              {isManager ? 
+                <StrategyCardManager strategyData={depositData} handleOpenStrategy={handleOpenStrategy} />
+               : (
+                <StrategyCard strategyData={depositData} />
+              )}
+              </div>
             )}
             {strategiesData.map((strategy, idx) => (
-              <StrategyCard key={`strategy-${idx}`} strategyData={strategy} />
+              <div key={`strategy-${idx}`}>
+                {isManager ? (
+                  <StrategyCardManager key={`strategy-${idx}`} strategyData={strategy} handleOpenStrategy={handleOpenStrategy} />
+                ) : (
+                  <StrategyCard key={`strategy-${idx}`} strategyData={strategy} />
+                )}
+              </div>
             ))}
           </div>
           </>
         )}
       </CardContent>
+
+      {/* Strategy Create Modal */}
+      <StrategyCreateModal
+        isOpen={isCreateStrategy}
+        onClose={handleCloseCreateStrategy}
+        onCreateStrategy={handleCreateStrategy}
+      />
+      <StrategyJupiterModal
+        isOpen={isOpenJupiter === "add" || isOpenJupiter === "reduce" || isOpenJupiter === "new" || isOpenJupiter === "newYield"}
+        action={isOpenJupiter}
+        onClose={handleCloseJupiter}
+        strategyData={openStrategyData}
+        depositData={depositData} 
+      />
     </Card>
   )
 }

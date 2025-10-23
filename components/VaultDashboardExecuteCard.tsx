@@ -122,22 +122,22 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
           <div className="space-y-3 mt-6">
             {/* Deposit/Withdraw Toggle */}
             <div className="flex rounded-md overflow-hidden">
-              <button
+              <Button
                 onClick={() => setActiveAction("deposit")}
                 className={`flex-1 py-2 text-sm font-medium ${activeAction === "deposit" 
                   ? "bg-blue-600 text-white" 
                   : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
               >
                 Deposit
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveAction("withdraw")}
                 className={`flex-1 py-2 text-sm font-medium ${activeAction === "withdraw" 
                   ? "bg-blue-600 text-white" 
                   : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
               >
                 Withdraw
-              </button>
+              </Button>
             </div>
             
             <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
