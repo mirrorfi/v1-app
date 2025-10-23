@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const { strategyType, authority, destinationMint, vault } = await req.json();
 
-    if (!['JupiterSwap'].includes(strategyType)) {
+    if (strategyType !== 'JupiterSwap') {
       return NextResponse.json(
         { error: 'Invalid strategy type.' },
         { status: 400 }
