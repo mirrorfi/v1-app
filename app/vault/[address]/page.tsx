@@ -75,14 +75,18 @@ export default function VaultPage() {
 
   async function fetchVaultStrategies(vaultKey: PublicKey, vaultData: any) {
     let tokenInfo = TOKEN_INFO[vaultData.depositMint];
+    
+    // 1. Fetch Deposit ATAs and Balances
     let vaultDepositAta = getAssociatedTokenAddressSync(new PublicKey(vaultData.depositMint), vaultKey, true, tokenInfo.tokenProgram);
     let vaultDepositMintBalanceRes = await connection.getTokenAccountBalance(vaultDepositAta);
     let vaultDepositMintBalance = vaultDepositMintBalanceRes.value.uiAmount || 0;
     console.log("TOKEN BALANCE:", vaultDepositMintBalance);
 
+    // 2. Fetch Strategies
     const strategies = await getVaultStrategies(vaultKey);
     console.log("Vault Strategies:", strategies);
 
+    // 3. Get all token addresses involved
     const tokens = [vaultData.depositMint];
     const added = {[vaultData.depositMint]: true};
     for (const strategy of strategies) {
@@ -92,12 +96,14 @@ export default function VaultPage() {
       }
     }
     console.log("tokens:", tokens);
+
+    // 4. Fetch Token Prices and Infos from Jupiter for all tokens
     const tokenPrices = await fetchJupiterPrices(tokens);
     const tokenInfos = await fetchJupiterTokenInfos(tokens);
     console.log("Token Prices:", tokenPrices);
     console.log("Jupiter Token Infos:", tokenInfos);
 
-    // Get Token Balances
+    // 5. Fetch ATAs for all Jupiter Strategies
     const jupStrategyAtas = [];
     for (const strategy of strategies) {
       if(strategy.strategyType === "jupiterSwap") {
@@ -113,6 +119,7 @@ export default function VaultPage() {
     const jupBalancesRes = await connection.getMultipleParsedAccounts(jupStrategyAtas);
     console.log("Jupiter Strategy ATAs Balances:", jupBalancesRes);
 
+    // 6. Parse Collected Data
     const depositTokenInfo = tokenPrices[vaultData.depositMint];
     const depositData = {
       strategyType: "deposit",
