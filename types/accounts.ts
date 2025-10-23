@@ -22,8 +22,9 @@ function parsePublicKey(field: PublicKey | null): string {
     : field.toBase58();
 }
 
-function parseBN(field: BN): bigint {
-  return BigInt(field.toString());
+function parseBN(field: BN): number {
+  return field.toNumber()
+  //return BigInt(field.toString());
 }
 
 type pubkey = string;
@@ -36,6 +37,7 @@ type i64 = bigint;
 
 type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];
+type VaultDepositor = IdlAccounts<Mirrorfi>["vaultDepositor"];
 type Strategy = IdlAccounts<Mirrorfi>["strategy"];
 type User = IdlAccounts<Mirrorfi>["user"];
 type ProtocolStatus = IdlTypes<Mirrorfi>["protocolStatus"];
@@ -88,6 +90,16 @@ export interface ParsedStrategy extends ParsedProgramAccount {
 
 export interface ParsedUser extends ParsedProgramAccount {
   authority: pubkey;
+}
+
+export interface ParsedVaultDepositor extends ParsedProgramAccount {
+  authority: pubkey;
+  bump: u8;
+  padding0: u8[];
+  totalShares: u64;
+  totalCost: u64;
+  realizedPnl: i64;
+  padding1: u8[];
 }
 
 export function parseConfig({
@@ -149,6 +161,26 @@ export function parseVault({
   };
 }
 
+export function parseVaultDepositor({
+  authority,
+  bump,
+  padding0,
+  totalShares,
+  totalCost,
+  realizedPnl,
+  padding1,
+}: VaultDepositor): Omit<ParsedVaultDepositor, "publicKey"> {
+  return {
+    authority: parsePublicKey(authority),
+    bump,
+    padding0: padding0,
+    totalShares: parseBN(totalShares),
+    totalCost: parseBN(totalCost),
+    realizedPnl: parseBN(realizedPnl),
+    padding1: padding1,
+  };
+}
+
 export function parseStrategy(
   {
     vault,
@@ -157,11 +189,21 @@ export function parseStrategy(
     strategyType,
   }: Strategy
 ): Omit<ParsedStrategy, "publicKey"> {
+  const strategyName = parseEnum<ParsedStrategyType>(strategyType);
+  let data;
+  if (strategyName === "jupiterSwap") {
+    const targetMint = strategyType[strategyName].targetMint
+    data = {
+      targetMint: parsePublicKey(targetMint),
+    };
+  }
+
   return {
     vault: parsePublicKey(vault),
     depositsDeployed: parseBN(depositsDeployed),
     id,
-    strategyType: parseEnum<ParsedStrategyType>(strategyType),
+    strategyType: strategyName,
+    data,
   };
 };
 

@@ -53,12 +53,6 @@ export async function POST(req: NextRequest) {
       !PublicKey.isOnCurve(vault),
       depositMintTokenProgram,
     );
-    const receiptMintTokenAccount = getAssociatedTokenAddressSync(
-      receiptMint,
-      withdrawerPubkey,
-      !PublicKey.isOnCurve(withdrawerPubkey),
-      TOKEN_2022_PROGRAM_ID,
-    )
 
     const ix = await mirrorfiClient.program.methods
       .withdrawVault(new BN(amount))
@@ -70,13 +64,17 @@ export async function POST(req: NextRequest) {
         vault,
         vaultTokenAccount,
         withdrawer,
-        receiptMintTokenAccount,
       })
       .instruction();
 
     const tx = await buildTx([ix], withdrawerPubkey);
-
-    return bs58.encode(tx.serialize());
+    let res = {
+      tx: bs58.encode(tx.serialize()),
+    }
+    return new Response(
+      JSON.stringify(res),
+      { status: 200 }
+    );
   } catch (err) {
     console.error(err);
 

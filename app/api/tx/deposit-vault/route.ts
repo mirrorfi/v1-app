@@ -74,8 +74,13 @@ export async function POST(req: NextRequest) {
       .instruction();
 
     const tx = await buildTx([ix], depositorPubkey);
-
-    return bs58.encode(tx.serialize());
+    let res = {
+      tx: bs58.encode(tx.serialize()),
+    }
+    return new Response(
+      JSON.stringify(res),
+      { status: 200 }
+    );
   } catch (err) {
     console.error(err);
 
