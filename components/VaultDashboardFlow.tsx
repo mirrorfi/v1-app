@@ -3,6 +3,7 @@ import { BarChart3 } from "lucide-react"
 import { InteractiveFlow } from "@/components/ReactflowDisplay";
 import { useEffect, useState } from "react";
 import type { Node } from "reactflow";
+import { deposit } from "@kamino-finance/klend-sdk";
 
 const defaultStrategy = {
     "_id": "6822d965bd3c34b2c5adc4eb",
@@ -161,10 +162,103 @@ const defaultStrategy = {
     "apy": 95.66642519949491
 };
 
-export function VaultDashboardFlow() {
+interface VaultDashboardFlowProps {
+    depositData: any;
+    strategyData: any;
+}
 
+function getStrategyYCoordinate(numStrategies: number): number[] {
+    if (numStrategies === 0) return [];
+    if (numStrategies === 1) return [100];
+    if (numStrategies === 2) return [0, 200];
+    const ymin = -100
+    const step = 400 / (numStrategies - 1);
+
+    const coordinates = [];
+    for (let i = 0; i < numStrategies; i++) {
+        coordinates.push(Math.round(ymin + i * step));
+    }
+    return coordinates;
+}
+
+export function VaultDashboardFlow({ depositData, strategyData }: VaultDashboardFlowProps) {
     const [strategy, setStrategy] = useState<any>(defaultStrategy);
     const [updatedNodes, setUpdatedNodes] = useState<Node[]>([]);
+
+    useEffect(() => {
+        if(!depositData || !strategyData) return;
+        const strategy = {
+            nodes: [
+                {
+                    data: {
+                        label: "Vault",
+                        icon: null
+                    },
+                    position: { x: 50, y: 100 },
+                    id: "1",
+                    type: "customNode"
+                },
+                {
+                    data: {
+                        label: depositData.tokenInfo.symbol,
+                        icon: depositData.tokenInfo.icon
+                    },
+                    position: { x: 450, y: 100 },
+                    id: "2",
+                    type: "customNode"
+                },
+            ],
+            edges: [
+                {
+                    "style": {
+                        "strokeDasharray": "5, 5"
+                    },
+                    "markerEnd": {
+                        "type": "arrowclosed"
+                    },
+                    "id": "e1-2",
+                    "source": "1",
+                    "target": "2",
+                    "animated": true,
+                    "_id": "6822d965bd3c34b2c5adc4f2"
+                },
+            ]
+        }
+        let ycoordinates = getStrategyYCoordinate(strategyData.length);
+        strategyData.forEach((strat:any, i:number) => {
+            // Add Nodes
+            if (strat.strategyType === "jupiterSwap") {
+                strategy.nodes.push(
+                    {
+                        data: {
+                            label: `${strat.tokenInfo.symbol}`,
+                            icon: strat.tokenInfo.icon,
+                        },
+                        position: { x: 850, y: ycoordinates[i] },
+                        id: `${strategy.nodes.length + 1}`,
+                        type: "customNode"
+                    }
+                )
+            }
+            strategy.edges.push(
+                {
+                    "style": {
+                        "strokeDasharray": "5, 5"
+                    },
+                    "markerEnd": {
+                        "type": "arrowclosed"
+                    },
+                    "id": `e${2}-${strategy.nodes.length}`,
+                    "source": `2`,
+                    "target": `${strategy.nodes.length}`,
+                    "animated": true,
+                    "_id": "6822d965bd3c34b2c5adc4f2"
+                }
+            );
+        });
+        setStrategy(strategy);
+    }, [depositData, strategyData]);
+
 
     useEffect(() => {
         // Update the nodes in the strategy with their parent labels
@@ -191,7 +285,7 @@ export function VaultDashboardFlow() {
     }, [strategy.nodes, strategy.edges]);
 
     return (
-        <Card className={`h-[300px] sm:h-[400px] bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
+        <Card className={`h-[300px] sm:h-[425px] bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
         <CardHeader className="pb-2">
             <CardTitle className="text-white flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-blue-400" />

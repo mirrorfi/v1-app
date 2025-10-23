@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
 import { getVaultDepositTx, getVaultWithdrawTx } from "@/lib/api"
@@ -9,21 +8,34 @@ import { PublicKey, VersionedTransaction } from "@solana/web3.js"
 import { TOKEN_INFO, TokenInfo } from "@/lib/utils/tokens"
 import * as bs58 from "bs58"
 import { getConnection } from "@/lib/solana"
-import { formatNumber, formatAddress } from "@/lib/display"
+import { formatAddress, formatNumber } from "@/lib/display"
 import Image from "next/image"
 
 const connection = getConnection();
 
-export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, handleReload, tokenPrice, tokenBalance}: {vault: string, vaultData: any, positionBalance: number, handleReload: () => void, tokenPrice: number, tokenBalance: number}) {
+interface MobileExecuteCardProps {
+  vault: string,
+  vaultData: any,
+  tokenMint: string, 
+  positionBalance: number, 
+  handleReload: () => void,
+  tokenBalance: number,
+  tokenPrice: number, 
+  initialMode?: "deposit" | "withdraw"
+}
+
+export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance, handleReload, tokenBalance, tokenPrice, initialMode = "deposit"}: MobileExecuteCardProps) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
+  const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">(initialMode)
+
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
 
   const { publicKey, signTransaction } = useWallet()
   const { showNotification } = useNotification()
 
   // Mock data - replace with real data
-  const apy = 5.6
+  const apy = 6.8
 
   const handleAmountChange = (value: string) => {
     // Only allow numbers and decimal point
@@ -39,7 +51,6 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
     } else {
       amount = positionBalance;
     }
-    console.log("Amount Updated:", amount, "Percent:", percent);
     
     const computed = amount * percent
     setAmount(computed.toString())
@@ -57,21 +68,21 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
 
     setIsLoading(true)
     try {
-      const tokenInfo = TOKEN_INFO[vaultData.depositMint];
+      const tokenInfo = TOKEN_INFO[tokenMint];
       let res;
       // Fetch Transaction Details from API
       if (activeAction === "deposit") {
-        res = await getVaultDepositTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals);
+        res = await getVaultDepositTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, tokenInfo.tokenProgram);
       } else {
-        res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals);
+        const withdrawAll = positionBalance.toString() === amount;
+        res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, withdrawAll, tokenInfo.tokenProgram);
       }
       // Convert API Response to VersionedTransaction
       const encodedTx = res.tx;
       const instruction  = bs58.default.decode(encodedTx);
       const versionedTx = VersionedTransaction.deserialize(instruction);
+
       // Prompt user to sign and send transaction
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
-      versionedTx.message.recentBlockhash = blockhash;
       const signedTx = await signTransaction(versionedTx);
       const txid = await connection.sendRawTransaction(signedTx.serialize());
       console.log("Transaction ID:", txid);
@@ -86,39 +97,34 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
 
       handleReload();
     } catch (error) {
+      console.error("Error during transaction processing:", error);
+      
       // Show error notification
       showNotification({
         title: `${activeAction === "deposit" ? "Deposit" : "Withdrawal"} Failed`,
         message: `There was an error processing your ${activeAction}. Please try again.`,
         type: "error"
       });
-      console.error("Error during transaction processing:", error);
     }
     setIsLoading(false)
+
+    // Reset form or show success message
     setAmount("")
   }
 
   return (
     <>
-      <Card className={`bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-white text-lg">{vaultData? vaultData.name : "Loading..."}</CardTitle>
-            {/*<div className="text-lg text-green-400 font-medium">APY: {apy}%</div>*/}
-          </div>
-          <div className="mb-2 text-xs text-gray-400">
-            Created By: {vaultData ? formatAddress(vaultData.authority.toString()) : "Loading..."}
-          </div>
+        <div className="pb-4">
           <div className="text-sm text-gray-300 leading-relaxed">
-           {vaultData ? vaultData.description : "Loading..."}
+            {vaultData? vaultData.name : "Loading..."} 
           </div>
-        </CardHeader>
-
-        <CardContent className="space-y-4 pb-6">
-          {/*<div className="inline-flex items-center px-2 py-1 bg-blue-600/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-            {/*Lending
-          </div>*/}
-
+          <div className="flex mb-2 text-xs text-gray-400">
+            Created By: <div className="ml-2 mt-[1px] text-md font-mono">{vaultData ? formatAddress(vaultData.authority.toString()) : "Loading..."}</div>
+          </div>
+          <div className="text-sm text-gray-300 leading-relaxed font-normal">
+            {vaultData ? vaultData.description : "Loading..."}
+          </div>
+          
           <div className="space-y-3 mt-6">
             {/* Deposit/Withdraw Toggle */}
             <div className="flex rounded-md overflow-hidden">
@@ -139,47 +145,47 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
                 Withdraw
               </button>
             </div>
-            
+
+            {/* Amount Input */}
             <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Image src={`/PNG/usdc-logo.png`} alt="USDC Logo" width={25} height={25} />
-                  <span className="text-white font-medium">{vaultData ? TOKEN_INFO[vaultData.depositMint].symbol : ""}</span>
+                  <span className="text-white font-medium">{tokenInfo?.symbol}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handlePercent(0.25)}
-                  className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
-                >
-                  25%
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handlePercent(0.5)}
-                  className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
-                >
-                  50%
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handlePercent(1)}
-                  className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
-                >
-                  100%
-                </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePercent(0.25)}
+                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                  >
+                    25%
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePercent(0.5)}
+                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                  >
+                    50%
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePercent(1)}
+                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                  >
+                    100%
+                  </Button>
+                </div>
               </div>
-            </div>
-
               <div className="flex items-center justify-between pt-3 relative z-10">
                 <input
                   type="text"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  placeholder={`${vaultData ? TOKEN_INFO[vaultData.depositMint].symbol : ""}`}
+                  placeholder={`0 ${tokenInfo ? tokenInfo?.symbol : ""}`}
                   className="bg-transparent text-white text-lg font-medium outline-none flex-1 placeholder-gray-500 cursor-text relative z-20"
                   style={{ pointerEvents: 'auto' }}
                 />
@@ -195,21 +201,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
               {isLoading ? "Processing..." : activeAction === "deposit" ? "Deposit" : "Withdraw"}
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
     </>
   )
-}
-
-export function VaultDashboardExecuteCardSkeleton() {
-  return <>
-     <Card className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 border-slate-700/50 backdrop-blur-sm rounded-xl shadow-2xl p-6">
-        <Skeleton className="h-38 w-full" />
-        <Skeleton className="h-28 w-full" />
-        <div className="grid grid-cols-2 gap-4">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      </Card>
-  </>
 }

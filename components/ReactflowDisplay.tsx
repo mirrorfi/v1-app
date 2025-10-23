@@ -51,11 +51,12 @@ export function InteractiveFlow({
 
 export type NodeData = {
   label: string
-  description?: string
-  nodeType?: "protocol" | "token" | "lst"
-  percentage?: string
-  connectionCount: number
-  parentLabels?: string[]
+  icon?: string | null
+  // description?: string
+  // nodeType?: "protocol" | "token" | "lst"
+  // percentage?: string
+  // connectionCount: number
+  // parentLabels?: string[]
 }
 
 export function CustomNode({ data, isConnectable }: NodeProps<NodeData>) {
@@ -69,30 +70,22 @@ export function CustomNode({ data, isConnectable }: NodeProps<NodeData>) {
   return (
     <div className={nodeClass}>
       <div className="custom-node-header" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      {data.label != "Vault" ? (<Image
-        src={
-          data.nodeType === "lst"
-            ? LSTLogos[data.label]
-            : data.nodeType === "token"
-            ? tokenLogos[data.label]
-            : `/PNG/${getLogoName(data.label)}-logo.png`
-        }        alt={`${data.label} logo`}
-        width={24}
-        height={24}
-      />) : (
-        <Wallet/>)}
-      {data.label}
-      {(data.nodeType === "lst" || data.label.toLowerCase() === "meteora") && (
-        (data.nodeType === "lst") ? (
-          <div className="custom-node-content text-green-300 ml-4">
-            {apyValues[data.label] ? Math.round((apyValues[data.label])*10000)/100 : "N/A"}% APY
-          </div>
-        ) : (
-          <div className="custom-node-content text-green-300 ml-4">
-            {meteoraAPY ? Math.round(meteoraAPY*100)/100 : 0}% APY
-          </div>
-        )
-      )}
+        {data.icon ? (
+          <Image src={data.icon} alt={data.label} width={24} height={24} />
+          ) : ( <Wallet size={24} />)
+        }
+        {data.label}
+        {/*(data.nodeType === "lst" || data.label.toLowerCase() === "meteora") && (
+          (data.nodeType === "lst") ? (
+            <div className="custom-node-content text-green-300 ml-4">
+              {apyValues[data.label] ? Math.round((apyValues[data.label])*10000)/100 : "N/A"}% APY
+            </div>
+          ) : (
+            <div className="custom-node-content text-green-300 ml-4">
+              {meteoraAPY ? Math.round(meteoraAPY*100)/100 : 0}% APY
+            </div>
+          )
+        )*/}
       </div>
       <Handle type="source" position={Position.Right} isConnectable={isConnectable} />
       {/* Render handle only if label of node isn't "SOL Wallet" */}

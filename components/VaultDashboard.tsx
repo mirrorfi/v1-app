@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
 import { getVaultBalances } from "@/lib/api/vault"
-import { PublicKey, Keypair } from "@solana/web3.js"
-import { getVaultAccountInfo, getVaultDepositorAccountInfo } from "@/lib/utils/mirrorfi/accounts"
 import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { Skeleton } from "./ui/skeleton"
+import { mirrorfiClient } from '@/lib/solana-server';
+import { fetchJupiterPrices } from "@/lib/utils/jupiter"
+import { parseVault, parseVaultDepositor } from '@/types/accounts';
 
-import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
+import { VaultDashboardExecuteCard, VaultDashboardExecuteCardSkeleton } from "@/components/VaultDashboardExecuteCard"
 import { VaultDashboardChart } from "@/components/VaultDashboardChart";
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
@@ -19,92 +21,49 @@ import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosit
 import { VaultDashboardPNLCard } from "@/components/VaultDashboardPNLCard"
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
+import { TOKEN_INFO } from "@/lib/utils/tokens"
 
 interface StrategyDashboardProps {
   vault: string;
-  strategy: {
-    name: string
-    icon?: string
-    status: "active" | "inactive" | "pending"
-  }
-  activeTab: string
-  onTabChange?: (tab: string) => void
+  vaultData:any;
+  vaultDepositorInfo: any;
+  positionBalance:number;
+  tokenBalance:number;
+  tokenPrice:number;
+  isLoading: boolean;
+  error: string | null;
+  handleReload: () => void;
+  depositData: any;
+  strategiesData: any[];
 }
 
 const connection = getConnection();
 
-export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onTabChange }: StrategyDashboardProps) {
+const strategy = {
+  name: "My Super Hyped Strategy",
+  icon: "🚀",
+  status: "Active" as const,
+}
+
+export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
+  const [activeTab, setActiveTab] = useState("vault-stats")
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
     { id: "your-position", label: "Your Position" },
     //{ id: "overview", label: "Overview" },
   ]
+
   const { publicKey } = useWallet();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [reload, setReload] = useState(false);
   const [vaultBalances, setVaultBalances] = useState<any>(null);
-  const [positionBalance, setPositionBalance] = useState<number>(0);
-  const [vaultDepositTokenMint, setVaultDepositTokenMint] = useState<string | null>("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-  const [vaultDepositorInfo, setVaultDepositorInfo] = useState<any>(null);
-  const handleReload = () => {
-    setReload(!reload);
+
+  const onTabChange = (tabName: string) => {
+    setActiveTab(tabName)
   }
 
   const handleBackClick = () => {
     router.push('/');
   }
-
-  useEffect(() => {
-    setIsLoading(true);
-    setError(null); // Reset error state
-    
-    async function loadVault(){
-      // Try Loading vault key and check if it's valid
-      try {
-        const vaultKey = new PublicKey(vault);
-      } catch(e: any){
-        console.error("Invalid vault address:", e);
-        setError(`Invalid vault address: "${vault}" is not a valid Solana public key.`);
-        setIsLoading(false);
-        return;
-      }
-
-      try{
-        const vaultKey = new PublicKey(vault);
-        // Process that can be compiled together
-        // Batch 1: Get Balances
-        const balances = await getVaultBalances(vaultKey);
-        setVaultBalances(balances);
-        // Batch 2: Get Vault Account Info
-        const vaultData = await getVaultAccountInfo(connection, vaultKey);
-        setVaultDepositTokenMint(vaultData.deposit_token_mint.toBase58());
-        // Batch 3: Get User Position Info
-        if(publicKey){
-          const vaultDepositor = await getVaultDepositorAccountInfo(connection, vaultKey, publicKey);
-          if(vaultDepositor) {
-            setVaultDepositorInfo(vaultDepositor);
-            const positionShareToken = Number(vaultDepositor.total_shares) / 10**8;
-            const ownershipRatio = positionShareToken / balances.shareTokenSupply;
-            const positionBalance = ownershipRatio * balances.totalNAV;
-            setPositionBalance(positionBalance);
-          }
-        }
-      } catch (error: any) {
-        console.error("Error loading vault:", error);
-        
-        // Handle specific errors
-        if (error.message && error.message.includes('Vault not found')) {
-          setError(`Vault not found: The vault "${vault}" does not exist or is not accessible.`);
-        } else {
-          setError(`Failed to load vault data: ${error.message || 'Unknown error occurred'}`);
-        }
-      } 
-      setIsLoading(false);
-    }
-    loadVault();
-  }, [vault, publicKey, reload]);
 
   return (
     <div className="w-full max-w-7xl mx-auto p-8 md:p-6">
@@ -133,7 +92,7 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
                 <p className="text-red-300 mb-4">{error}</p>
                 <div className="flex gap-3">
                   <Button
-                    onClick={() => setReload(!reload)}
+                    onClick={handleReload}
                     variant="outline"
                     className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
                   >
@@ -158,23 +117,25 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
       {/* Main Dashboard Content - Only show if no error */}
       {!error && (
         <>
-          <div className="flex items-start gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
         <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
           <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
         </Avatar>
-        <div className="flex-1">
-          <h2 className="text-lg md:text-xl font-semibold text-white">{strategy.name}</h2>
-          <Badge
-            variant={strategy.status === "active" ? "default" : "secondary"}
-            className={`mt-1 text-xs ${
-              strategy.status === "active"
-                ? "bg-green-500/20 text-green-400 border-green-500/30"
-                : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-            }`}
-          >
-            {strategy.status}
-          </Badge>
-        </div>
+        {vaultData ? 
+          <div className="flex gap-2">
+            <h2 className="text-lg md:text-xl font-semibold text-white">{vaultData.name}</h2>
+            <Badge
+              variant={strategy.status === "Active" ? "default" : "secondary"}
+              className={`mt-1 text-xs ${
+                strategy.status === "Active"
+                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+              }`}
+            >
+              {strategy.status}
+            </Badge>
+          </div>
+        : <Skeleton className="h-6 w-32 md:h-8 md:w-48 rounded-md" />}
       </div>
 
       {/* Navigation Tabs - Mobile responsive */}
@@ -202,9 +163,9 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
           {/* Main Content */}
           {activeTab == "vault-stats" && (
             <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardFlow />
-              <VaultDashboardChart vaultAddress={vault} />
-              <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
+              <VaultDashboardFlow depositData={depositData} strategyData={strategiesData} />
+              {/*<VaultDashboardChart vaultAddress={vault} />*/}
+              <VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} />
             </div>
           )}
           {activeTab == "your-position" && (
@@ -212,21 +173,28 @@ export function VaultDashboard({ vault, strategy, activeTab = "vault-stats", onT
               <VaultDashboardPNLCard 
                 vaultDepositor={vaultDepositorInfo} 
                 positionBalance={positionBalance} 
-                tokenPrice={vaultBalances?.depositTokenPrice}
+                tokenPrice={tokenPrice}
                 isLoading={isLoading}
               />
-              <VaultDashboardUserPosition vaultDepositor={vaultDepositorInfo} positionBalance={positionBalance} tokenPrice={vaultBalances?.depositTokenPrice}/>
+              {/*<VaultDashboardUserPosition vaultDepositor={vaultDepositorInfo} positionBalance={positionBalance} tokenPrice={tokenPrice}/> */}
             </div>
           )}
           {activeTab == "overview" && (
             <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />
+              {/*<VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />*/}
             </div>
           )}
 
           {/* Execute Card - Show first on mobile */}
           <div className="xl:col-span-1 order-1 xl:order-2">
-            {vaultDepositTokenMint && <VaultDashboardExecuteCard vault={vault} tokenMint={vaultDepositTokenMint} positionBalance={positionBalance} handleReload={handleReload} /> }
+            {vaultData ? <VaultDashboardExecuteCard 
+              vault={vault} 
+              vaultData={vaultData} 
+              positionBalance={positionBalance} 
+              handleReload={handleReload} 
+              tokenPrice={tokenPrice} 
+              tokenBalance={tokenBalance} 
+            />: <VaultDashboardExecuteCardSkeleton />}
           </div>
         </div>
       </div>

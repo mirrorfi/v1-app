@@ -1,7 +1,7 @@
 "use client";
 import { Navbar } from '@/components/Navbar';
 import { useEffect, useState } from "react";
-import { getAllVaults } from '@/lib/api/vault';
+import { getAllVaults } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,8 +55,6 @@ export default function Home() {
     router.push(`/vault/${vaultPubkey}`);
   };
 
-
-
   const LoadingSkeleton = () => (
     <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg">
       <CardHeader className="pb-3">
@@ -93,7 +91,7 @@ export default function Home() {
               Vault Dashboard
             </h1>
             <p className="text-slate-400 text-lg">
-              Discover and invest in high-yield DeFi strategies
+              Discover and invest in Solana DeFi strategies
             </p>
           </div>
 
@@ -109,12 +107,12 @@ export default function Home() {
                     <div>
                       <p className="text-slate-400 text-sm">Total Net Deposits</p>
                       <p className="text-white font-semibold text-xl">
-                        {formatNumber(
+                        {/*formatNumber(
                           vaults.reduce((sum, vault) => {
                             const netDeposits = (vault.total_deposit - vault.total_withdrawal) / Math.pow(10, vault.deposit_token_decimals);
                             return sum + netDeposits;
                           }, 0)
-                        )}
+                        )*/} 0
                       </p>
                     </div>
                   </div>
@@ -130,7 +128,7 @@ export default function Home() {
                     <div>
                       <p className="text-slate-400 text-sm">Active Vaults</p>
                       <p className="text-white font-semibold text-xl">
-                        {vaults.filter(v => v.is_initialized && !v.is_closed).length}
+                        {/*vaults.filter(v => v.is_initialized && !v.is_closed).length*/}
                       </p>
                     </div>
                   </div>
@@ -165,7 +163,10 @@ export default function Home() {
             ) : vaults.length > 0 ? (
               // Vault cards
               vaults.map((vault, index) => (
-                <VaultCard key={vault.pubkey || `vault-${index}`} vault={vault} onClick={handleVaultClick} />
+                <div key={vault.pubkey || `vault-${index}`}>
+                  {JSON.stringify(vault)}
+                  {/*<VaultCard key={vault.pubkey || `vault-${index}`} vault={vault} onClick={handleVaultClick} />*/}
+                </div>
               ))
             ) : (
               // Empty state
