@@ -9,19 +9,16 @@ export interface VaultData {
     depositTokenProgram: PublicKey;
 }
 
-export async function getVaultInitializeTx(vaultData: VaultData) {
-    const res = await fetch("/api/tx/initialize", {
+export async function getVaultDepositTx(user: PublicKey, vault: PublicKey, depositAmount: number) {
+    const res = await fetch("/api/tx/deposit-vault", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            manager: vaultData.manager.toString(),
-            vaultId: vaultData.vaultId,
-            vaultName: vaultData.vaultName,
-            managerFeeRate: vaultData.managerFeeRate,
-            depositTokenMint: vaultData.depositTokenMint.toString(),
-            depositTokenProgram: vaultData.depositTokenProgram.toString(),
+            depositor: user.toString(),
+            vault: vault.toString(),
+            amount: depositAmount,
         }),
     });
     const data = await res.json();
@@ -29,36 +26,16 @@ export async function getVaultInitializeTx(vaultData: VaultData) {
     return data;
 }
 
-export async function getVaultDepositTx(user: PublicKey, vault: PublicKey, depositAmount: number, depositTokenProgram: PublicKey) {
-    const res = await fetch("/api/tx/deposit", {
+export async function getVaultWithdrawTx(user: PublicKey, vault: PublicKey, withdrawAmount: number) {
+    const res = await fetch("/api/tx/withdraw-vault", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            user: user.toString(),
+            withdrawer: user.toString(),
             vault: vault.toString(),
-            depositAmount,
-            depositTokenProgram: depositTokenProgram.toString(),
-        }),
-    });
-    const data = await res.json();
-    console.log(data);
-    return data;
-}
-
-export async function getVaultWithdrawTx(user: PublicKey, vault: PublicKey, withdrawAmount: number, withdrawAll: boolean, withdrawTokenProgram: PublicKey) {
-    const res = await fetch("/api/tx/withdraw", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            user: user.toString(),
-            vault: vault.toString(),
-            withdrawAmount,
-            withdrawAll,
-            withdrawTokenProgram: withdrawTokenProgram.toString(),
+            amount: withdrawAmount,
         }),
     });
     const data = await res.json();
