@@ -36,7 +36,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (typeof depositCap !== 'number' || depositCap <= 0) {
+    // depositCap is a bigint serialized as string
+    if (isNaN(depositCap) || BigInt(depositCap) <= BigInt(0)) {
       return NextResponse.json(
         { error: 'Deposit cap must be a positive number.' },
         { status: 400 }
@@ -50,7 +51,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (typeof lockedProfitDegradationDuration !== 'number' || lockedProfitDegradationDuration <= 0) {
+    // lockedProfitDegradationDuration is a bigint serialized as string
+    if (isNaN(lockedProfitDegradationDuration) || BigInt(lockedProfitDegradationDuration) <= BigInt(0)) {
       return NextResponse.json(
         { error: 'Locked profit degradation duration must be a positive number.' },
         { status: 400 }

@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (isNaN(amount) || Number(amount) <= 0) {
+    // amount is a bigint serialized as string
+    if (isNaN(amount) || BigInt(amount) <= BigInt(0)) {
       return NextResponse.json(
         { error: 'Amount must be a positive number.' },
         { status: 400 }

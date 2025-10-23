@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (isNaN(amount) || Number(amount) <= 0) {
+    // amount is a bigint serialized as string
+    if (isNaN(amount) || BigInt(amount) <= BigInt(0)) {
       return NextResponse.json(
         { error: 'Amount must be a positive number.' },
         { status: 400 }
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
     }
 
     const strategyAcc = await mirrorfiClient.fetchProgramAccount(strategy, "strategy", parseStrategy);
-    
+
     if (!strategyAcc) {
       return NextResponse.json(
         { error: 'Strategy account not found.' },
