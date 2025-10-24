@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
-import { fetchJupiterPrices, fetchJupiterTokenInfos } from "@/lib/utils/jupiter"
+import { getTokenInfos } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton"
 
 interface TokenOption {
@@ -14,7 +14,7 @@ interface TokenOption {
   symbol: string;
   icon: string;
   balance?: number;
-  price?: number;
+  price: number;
   value?: number;
 }
 
@@ -32,21 +32,25 @@ const TOKEN_OPTIONS: TokenOption[] = [
     mint: "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
     symbol: "JLP",
     icon: "https://wsrv.nl/?w=32&h=32&url=https%3A%2F%2Fstatic.jup.ag%2Fjlp%2Ficon.png&dpr=2&quality=80",
+    price: 1,
   },
   {
     mint: "So11111111111111111111111111111111111111112",
     symbol: "SOL",
-    icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+    icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
+    price: 1,
   },
   {
     mint: "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
     symbol: "cbBTC",
     icon: "https://wsrv.nl/?w=32&h=32&url=https%3A%2F%2Fipfs.io%2Fipfs%2FQmZ7L8yd5j36oXXydUiYFiFsRHbi3EdgC4RuFwvM7dcqge&dpr=2&quality=80",
+    price: 1,
   },
   {
     mint: "METvsvVRapdj9cFLzq4Tr43xK4tAjQfwX76z3n6mWQL",
     symbol: "MET",
     icon: "https://wsrv.nl/?w=32&h=32&url=https%3A%2F%2Fassets.meteora.ag%2Fmet-token.svg&dpr=2&quality=80",
+    price: 1,
   }
 ];
 
@@ -73,7 +77,7 @@ function TokenSelector({
     setValidationError('');
     
     try {
-      const tokenInfo = await fetchJupiterTokenInfos([mint]);
+      const tokenInfo = await getTokenInfos([mint]);
       
       if (!tokenInfo || Object.keys(tokenInfo).length === 0 || !tokenInfo[mint] || !tokenInfo[mint].icon) {
         setValidationError('Invalid token or not allowed');
@@ -389,7 +393,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             </div>
 
             {/* To Token */}
-            {toToken? 
+            {fromToken && toToken? 
             <div className="h-20 bg-slate-800/50 border border-slate-600/30 rounded-lg p-4 mt-2">
               <div className="mt-2 flex items-center gap-3">
                 <img src={toToken.icon} alt={toToken.symbol} className="w-8 h-8 rounded-full" />

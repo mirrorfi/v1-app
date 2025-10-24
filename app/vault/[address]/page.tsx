@@ -10,7 +10,7 @@ import { getAssociatedTokenAddressSync } from "@solana/spl-token"
 import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { mirrorfiClient } from '@/lib/solana-server';
-import { fetchJupiterPrices, fetchJupiterTokenInfos} from "@/lib/utils/jupiter"
+import { getPrices, getTokenInfos } from "@/lib/api";
 import { parseVault, parseVaultDepositor } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
@@ -52,7 +52,7 @@ export default function VaultPage() {
     const info = TOKEN_INFO[tokenMint]
     const userAta = getAssociatedTokenAddressSync(new PublicKey(tokenMint), user, false, info.tokenProgram);
     const accountInfo = await connection.getTokenAccountBalance(userAta);
-    const tokenPriceData = await fetchJupiterPrices([tokenMint]);
+    const tokenPriceData = await getPrices([tokenMint]);
     if (tokenPriceData[tokenMint]) setTokenPrice(tokenPriceData[tokenMint].usdPrice);
     if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
   }
@@ -98,9 +98,8 @@ export default function VaultPage() {
     console.log("tokens:", tokens);
 
     // 4. Fetch Token Prices and Infos from Jupiter for all tokens
-    const tokenPrices = await fetchJupiterPrices(tokens);
-    const tokenInfos = await fetchJupiterTokenInfos(tokens);
-    console.log("Token Prices:", tokenPrices);
+    const tokenInfos = await getTokenInfos(tokens);
+    console.log("Token Prices:", Object.entries(tokenInfos).map(([mint, info]) => ({ mint, usdPrice: info.usdPrice })));
     console.log("Jupiter Token Infos:", tokenInfos);
 
     // 5. Fetch ATAs for all Jupiter Strategies
@@ -120,7 +119,7 @@ export default function VaultPage() {
     console.log("Jupiter Strategy ATAs Balances:", jupBalancesRes);
 
     // 6. Parse Collected Data
-    const depositTokenInfo = tokenPrices[vaultData.depositMint];
+    const depositTokenInfo = tokenInfos[vaultData.depositMint];
     const depositData = {
       strategyType: "deposit",
       tokenInfo: tokenInfos[vaultData.depositMint],
@@ -133,7 +132,7 @@ export default function VaultPage() {
     const strategiesData = [];
     for (let i = 0; i < strategies.length; i++) {
       const strategy = strategies[i];
-      const tokenInfo = tokenPrices[strategy.data.targetMint];
+      const tokenInfo = tokenInfos[strategy.data.targetMint];
       const ataInfo = jupBalancesRes.value[i] as any;
       const ataBalance = ataInfo?.data.parsed.info.tokenAmount.uiAmount || 0;
 

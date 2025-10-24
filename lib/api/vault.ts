@@ -1,31 +1,13 @@
-// import { PublicKey } from "@solana/web3.js";
+import { wrappedFetch } from "../utils";
 
-// export async function getVaultBalances(vault: PublicKey) {
-//     // const res = await fetch("/api/tx/initialize", {
-//     //     method: "POST",
-//     //     headers: {
-//     //         "Content-Type": "application/json",
-//     //     },
-//     //     body: JSON.stringify({}),
-//     // });
-//     try {
-//         const res = await fetch(`/api/vault/balances?vault=${vault.toString()}`);
-//         const data = await res.json();
-//         console.log(data);
-//         return data;
-//     } catch (error) {
-//         console.error("Fetch Vault Balances Error:", error);
-//     }
-// }
+export async function getVaultBalance(vault: string): Promise<any> {
+  const res = await wrappedFetch(`/api/vault/balance?vault=${vault}`);
 
-// export async function getAllVaults() {
-//     try {
-//         const res = await fetch(`/api/vault/all`);
-//         const data = await res.json();
-//         console.log(data);
-//         return data;
-//     } catch (error) {
-//         console.error("Fetch All Vaults Error:", error);
-//         return null;
-//     }
-// }
+  return res;
+}
+
+export async function getVaultHistory(vault: string, timeframe: string = "7D"): Promise<any> {
+  const res = await wrappedFetch(`/api/vault/history?vault=${vault}&timeframe=${timeframe}`);
+
+  return res;
+}

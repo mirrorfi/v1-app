@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
-import { getVaultDepositTx, getVaultWithdrawTx } from "@/lib/api"
+import { getDepositVaultTx, getWithdrawVaultTx } from "@/lib/api"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey, VersionedTransaction } from "@solana/web3.js"
 import { TOKEN_INFO, TokenInfo } from "@/lib/utils/tokens"
@@ -72,15 +72,21 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
       let res;
       // Fetch Transaction Details from API
       if (activeAction === "deposit") {
-        res = await getVaultDepositTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, tokenInfo.tokenProgram);
+        res = await getDepositVaultTx({
+          amount: (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString(),
+          depositor: publicKey.toString(),
+          vault,
+        })
       } else {
         const withdrawAll = positionBalance.toString() === amount;
-        res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, withdrawAll, tokenInfo.tokenProgram);
+        // res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, withdrawAll, tokenInfo.tokenProgram);
+        res = await getWithdrawVaultTx({
+          amount: (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString(),
+          withdrawer: publicKey.toString(),
+          vault,
+        })
       }
-      // Convert API Response to VersionedTransaction
-      const encodedTx = res.tx;
-      const instruction  = bs58.default.decode(encodedTx);
-      const versionedTx = VersionedTransaction.deserialize(instruction);
+      const versionedTx = res;
 
       // Prompt user to sign and send transaction
       const signedTx = await signTransaction(versionedTx);

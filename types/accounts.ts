@@ -22,9 +22,8 @@ function parsePublicKey(field: PublicKey | null): string {
     : field.toBase58();
 }
 
-function parseBN(field: BN): number {
-  return field.toNumber()
-  //return BigInt(field.toString());
+function parseBN(field: BN): bigint {
+  return BigInt(field.toString());
 }
 
 type pubkey = string;
@@ -56,7 +55,10 @@ export interface ParsedConfig extends ParsedProgramAccount {
   admin: pubkey;
   treasuryAuthority: pubkey;
   nextVaultId: u64;
-  platformFeeBps: u16;
+  platformComissionFeeBps: u16;
+  platformDepositFeeBps: u16;
+  platformReferralFeeBps: u16;
+  platformWithdrawalFeeBps: u16;
   status: ParsedProtocolStatus;
 }
 
@@ -106,14 +108,19 @@ export function parseConfig({
   admin,
   treasuryAuthority,
   nextVaultId,
-  platformFeeBps,
+  platformComissionFeeBps,
+  platformDepositFeeBps,
+  platformReferralFeeBps,
+  platformWithdrawalFeeBps,
   status,
-  treasuryBump,
 }: Config): Omit<ParsedConfig, "publicKey"> {
   return {
     admin: parsePublicKey(admin),
     nextVaultId: parseBN(nextVaultId),
-    platformFeeBps,
+    platformComissionFeeBps,
+    platformDepositFeeBps,
+    platformReferralFeeBps,
+    platformWithdrawalFeeBps,
     status: parseEnum<ParsedProtocolStatus>(status),
     treasuryAuthority: parsePublicKey(treasuryAuthority),
   };
@@ -189,21 +196,37 @@ export function parseStrategy(
     strategyType,
   }: Strategy
 ): Omit<ParsedStrategy, "publicKey"> {
-  const strategyName = parseEnum<ParsedStrategyType>(strategyType);
-  let data;
-  if (strategyName === "jupiterSwap") {
-    const targetMint = strategyType[strategyName].targetMint
-    data = {
-      targetMint: parsePublicKey(targetMint),
-    };
+  const type = parseEnum<ParsedStrategyType>(strategyType);
+
+  let parsedStrategyType: ParsedStrategyType;
+
+  switch (type) {
+    case "jupiterSwap":
+      parsedStrategyType = {
+        jupiterSwap: {
+          targetMint: parsePublicKey(strategyType.jupiterSwap.targetMint),
+        },
+      };
+      break;
+    
+    case "kaminoLend":
+      parsedStrategyType = {
+        kaminoLend: {
+          obligation: parsePublicKey(strategyType.kaminoLend.obligation),
+          lendingMarket: parsePublicKey(strategyType.kaminoLend.lendingMarket),
+        },
+      };
+      break;
+    
+    default:
+      throw new Error(`Unknown strategy type: ${type}`);
   }
 
   return {
     vault: parsePublicKey(vault),
     depositsDeployed: parseBN(depositsDeployed),
     id,
-    strategyType: strategyName,
-    data,
+    strategyType: parsedStrategyType,
   };
 };
 
