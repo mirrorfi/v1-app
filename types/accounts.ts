@@ -22,17 +22,17 @@ function parsePublicKey(field: PublicKey | null): string {
     : field.toBase58();
 }
 
-function parseBN(field: BN): bigint {
-  return BigInt(field.toString());
+function parseBN(field: BN): string {
+  return field.toString();
 }
 
 type pubkey = string;
 type u8 = number;
 type u16 = number;
 type u32 = number;
-type u64 = bigint;
+type u64 = string;
 type i32 = number;
-type i64 = bigint;
+type i64 = string;
 
 type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];
