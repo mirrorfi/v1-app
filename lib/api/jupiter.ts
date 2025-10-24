@@ -1,5 +1,5 @@
 export async function getPrices(mint: string[]) {
-  const url = new URL(`${process.env.JUPITER_API_URL}/price/v3`);
+  const url = new URL(`${process.env.NEXT_PUBLIC_JUPITER_API_URL}/price/v3`);
 
   url.searchParams.append('ids', mint.join(','));
 
@@ -21,7 +21,7 @@ export async function getPrices(mint: string[]) {
 }
 
 export async function getTokenInfos(mint: string[]) {
-  const url = new URL(`${process.env.JUPITER_API_URL}/tokens/v2/search`);
+  const url = new URL(`${process.env.NEXT_PUBLIC_JUPITER_API_URL}/tokens/v2/search`);
 
   url.searchParams.append('query', mint.join(','));
 
