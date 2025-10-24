@@ -33,10 +33,25 @@ export function base64ToV0Tx(base64: string): VersionedTransaction {
 }
 
 export async function wrappedFetch(url: string, method: string = 'GET', body: any = null) {
-  const res = await fetch(url, {
-    method,
-    body: JSON.stringify(body),
-  });
+  let res;
+  if (method === 'GET') {
+    res = await fetch(url, {
+      method,
+      body: body//JSON.stringify(body),
+    });
+  }
+  else if (method === 'POST') {
+    res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+  }
+  else {
+    throw new Error(`Unsupported HTTP method: ${method}`);
+  }
   const data = await res.json();
 
   if (!res.ok) {
