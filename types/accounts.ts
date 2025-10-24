@@ -187,7 +187,7 @@ export function parseStrategy(
     vault: parsePublicKey(vault),
     depositsDeployed: parseBN(depositsDeployed),
     id,
-    strategyType: parseEnum<ParsedStrategyType>(strategyType),
+    strategyType: parsedStrategyType,
   };
 };
 
