@@ -115,14 +115,14 @@ export async function getInitializeVaultTx({
 }
 
 export async function getWithdrawVaultTx({
-  authority, withdrawer, vault
+  amount, withdrawer, vault
 }: {
-  authority: string,
+  amount: string,
   withdrawer: string,
   vault: string,
 }): Promise<VersionedTransaction> {
   const { tx } = await wrappedFetch("/api/tx/withdraw-vault", "POST", {
-    authority, withdrawer, vault
+    amount, withdrawer, vault
   });
 
   return base64ToV0Tx(tx);
