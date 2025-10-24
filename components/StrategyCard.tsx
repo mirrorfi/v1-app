@@ -38,7 +38,7 @@ export function StrategyCard({strategyData}: {strategyData: any}) {
   return (
     <Card className="relative bg-slate-800/80 border border-slate-600/30 rounded-xl p-6 backdrop-blur-sm hover:bg-slate-800/90 transition-all duration-200 overflow-hidden">
       {/* Background token image on the left */}
-      <div className="absolute left-0 top-0 w-128 h-full opacity-10 overflow-hidden">
+      <div className="absolute left-0 top-0 w-128 h-full opacity-25 overflow-hidden">
         <div 
           className="w-70 h-70 bg-contain bg-no-repeat bg-center transform -translate-x-8 -translate-y-12 rounded-full"
           style={{
