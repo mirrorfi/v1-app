@@ -6,8 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
-import { getTokenInfos } from "@/lib/api";
-import { Skeleton } from "./ui/skeleton"
+import { getTokenInfos, getExecuteStrategyJupiterSwap } from "@/lib/api";
+import { Skeleton } from "./ui/skeleton";
+import { useNotification } from "@/contexts/NotificationContext"
+import { useWallet } from "@solana/wallet-adapter-react"
+import { getConnection } from "@/lib/solana"
+
+const connection = getConnection();
 
 interface TokenOption {
   mint:string;
@@ -16,6 +21,7 @@ interface TokenOption {
   balance?: number;
   price: number;
   value?: number;
+  decimals?: number;
 }
 
 interface StrategyJupiterModalProps {
@@ -26,7 +32,7 @@ interface StrategyJupiterModalProps {
   depositData: any;
 }
 
-// Mock token options
+// Predefined token options for quick selection
 const TOKEN_OPTIONS: TokenOption[] = [
   {
     mint: "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
@@ -91,7 +97,8 @@ function TokenSelector({
         symbol: tokenInfo[mint].symbol,
         icon: tokenInfo[mint].icon,
         balance: 0,
-        price: tokenInfo[mint].usdPrice || 0
+        price: tokenInfo[mint].usdPrice || 0,
+        decimals: tokenInfo[mint].decimals,
       };
 
       setToken(newToken);
@@ -188,9 +195,12 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   const [strategyToken, setStrategyToken] = useState<TokenOption | null>(null); 
   const [depositToken, setDepositToken] = useState<TokenOption | null>(null);
   const [strategyPosition, setStrategyPosition] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fromToken = activeTab === 'add' ? depositToken : strategyToken;
   const toToken = activeTab === 'add' ? strategyToken : depositToken;
+  const { showNotification } = useNotification()
+  const { publicKey, signTransaction } = useWallet();
 
   useEffect(() => {
     if(strategyData) {
@@ -206,8 +216,10 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         balance: strategyData.balance.toFixed(3) as number,
         price: strategyData.tokenInfo.usdPrice as number,
         value: strategyData.value.toFixed(2) as number,
+        decimals: strategyData.tokenInfo.decimals as number,
       });
       setStrategyPosition({
+        strategyPda: strategyData.pda,
         amount: strategyData.balance.toFixed(3),
         initialCapital: strategyData.initialCapital.toFixed(2),
         initialCapitalValue: (strategyData.initialCapital * depositData.tokenInfo.usdPrice).toFixed(2),
@@ -229,6 +241,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         balance: depositData.balance,
         price: depositData.tokenInfo.usdPrice,
         value: depositData.value.toFixed(2),
+        decimals: depositData.tokenInfo.decimals,
       });
     }
   }, [strategyData, action]);
@@ -240,12 +253,76 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
     }
   }
 
-  const handleExecuteStrategy = () => {
-    const numAmount = parseFloat(amount);
-    if (numAmount > 0) {
-      //onExecuteStrategy(fromToken.symbol, toToken.symbol, numAmount, activeTab);
+  const handleExecuteStrategy = async () => {
+    setIsLoading(true);
+    try {
+      if(!publicKey || !signTransaction){
+        showNotification({
+          title: `Wallet Not Connected!`,
+          message: `Please connect your wallet to continue.`,
+          type: "error"
+        });
+        return;
+      }
+      if(!fromToken || !toToken || !fromToken.decimals){
+        showNotification({
+          title: `Execute Strategy Failed!`,
+          message: `Data has not been successfully loaded.`,
+          type: "error"
+        });
+        return;
+      }
+      const numAmount = parseFloat(amount);
+      if(!numAmount || numAmount <= 0){
+        showNotification({
+          title: `Execute Strategy Failed!`,
+          message: `Invalid amount.`,
+          type: "error"
+        });
+        return;
+      }
+      let res;
+      if (activeTab === 'add') {
+        res = await getExecuteStrategyJupiterSwap({
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          slippageBps: 100,
+          authority: publicKey.toString(),
+          strategy: strategyPosition.strategyPda,
+        });
+      }else {
+        showNotification({
+          title: `Action Failed!`,
+          message: `Strategy Closing / Withdrawal not supported yet.`,
+          type: "error"
+        });
+        return;
+      }
+      const versionedTx = res;
+      // Prompt user to sign and send transaction
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+      versionedTx.message.recentBlockhash = blockhash;
+      const signedTx = await signTransaction(versionedTx);
+      const txid = await connection.sendRawTransaction(signedTx.serialize());
+      console.log("Transaction ID:", txid);
+
+      showNotification({
+        title: `Strategy Successfully ${activeTab === "add" ? "Increased" : "Reduced"}!`,
+        message: `Your strategy has been processed successfully.`,
+        txId: txid,
+        type: "success"
+      });
+      
+      // Close Modal
       onClose();
+    } catch (error: any) {
+      showNotification({
+        title: `Action Failed`,
+        message: `There was an error processing your transaction. Please try again.`,
+        type: "error"
+      });
+      console.error("Error during transaction processing:", error);
     }
+    setIsLoading(false);
   };
 
   const handleTabChange = (tab: 'add' | 'reduce') => {
@@ -409,10 +486,10 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           {/* Execute Button */}
           <Button
             onClick={handleExecuteStrategy}
-            disabled={!amount || parseFloat(amount) <= 0}
-            className="w-full py-6 text-xl font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200"
+            disabled={!amount || parseFloat(amount) <= 0 || isLoading}
+            className="w-full h-14 py-6 text-xl font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200"
           >
-            Execute Strategy
+            {isLoading ? "Executing..." : "Execute Strategy"}
           </Button>
         </div>
       </DialogContent>

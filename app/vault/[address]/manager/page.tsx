@@ -111,6 +111,7 @@ export default function VaultPage() {
         console.log("Strategy Deployed:", strategy.depositsDeployed);
 
         strategiesData.push({
+          pda: strategy.publicKey,
           strategyType: strategyTypeKey,
           tokenInfo: tokenInfos[tokenMint],
           mint: tokenMint,
