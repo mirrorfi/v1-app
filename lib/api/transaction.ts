@@ -66,6 +66,24 @@ export async function getExitStrategyJupiterSwap({
   return base64ToV0Tx(tx);
 }
 
+export async function getInitializeAndExecuteStrategyJupiterSwap({
+  strategyType, authority, destinationMint, vault, amount, slippageBps
+}: {
+  strategyType: string,
+  authority: string,
+  destinationMint: string,
+  vault: string,
+  // bigint serialized as string
+  amount: string,
+  slippageBps: number
+}): Promise<VersionedTransaction> {
+  const { tx } = await wrappedFetch("/api/tx/initialize-and-execute/jupiter-swap", "POST", {
+    strategyType, authority, destinationMint, vault, amount, slippageBps
+  });
+
+  return base64ToV0Tx(tx);
+}
+
 export async function getInitializeStrategyTx({
   strategyType, authority, destinationMint, vault
 }: {
