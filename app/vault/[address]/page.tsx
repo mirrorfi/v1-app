@@ -16,6 +16,7 @@ import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { getVaultStrategies } from "@/lib/api/accounts";
+import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { mintTo } from "@solana/spl-token"
 import { deposit } from "@kamino-finance/klend-sdk"
 
@@ -223,6 +224,7 @@ export default function VaultPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
+      <GridStyleBackground />
       {/* Only show Navbar on desktop */}
       {!isMobile && <Navbar />}
       

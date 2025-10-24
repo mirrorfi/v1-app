@@ -19,6 +19,7 @@ import { getVaultStrategies } from "@/lib/api/accounts";
 import { mintTo } from "@solana/spl-token"
 import { deposit } from "@kamino-finance/klend-sdk"
 import { VaultManagerDashboard } from "@/components/VaultManagerDashboard"
+import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
@@ -179,6 +180,7 @@ export default function VaultPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
+      <GridStyleBackground />
       {/* Only show Navbar on desktop */}
       {!isMobile && <Navbar />}
 
