@@ -2,9 +2,13 @@ import { PublicKey } from "@solana/web3.js";
 import { wrappedFetch } from "../utils";
 
 export async function getVaultStrategies(vault: PublicKey) {
-    return await wrappedFetch(`/api/accounts/strategies?vault=${vault.toString()}`);
+    const res = await wrappedFetch(`/api/accounts/strategies?vault=${vault.toString()}`);
+
+    return res.strategies;
 }
 
 export async function getAllVaults() {
-    return await wrappedFetch(`/api/accounts/vaults`);
+    const res = await wrappedFetch(`/api/accounts/vaults`);
+
+    return res.vaults;
 }
