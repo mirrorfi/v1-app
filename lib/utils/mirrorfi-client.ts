@@ -145,5 +145,5 @@ export class MirrorFiClient {
     }
 
     return vaultAcc.nextStrategyId;
-  }
+  }
 }
