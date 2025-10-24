@@ -98,7 +98,9 @@ export async function POST(req: NextRequest) {
     const remainingAccounts = extractRemainingAccountsForSwap(
       executeSwapResult.swapInstruction,
     ).remainingAccounts;
-    const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))!.owner;
+    const tokenMintAccountInfos = (await SERVER_CONNECTION.getMultipleAccountsInfo([depositMint, targetMint]));
+    const depositMintTokenProgram = tokenMintAccountInfos[0]!.owner;
+    const targetMintTokenProgram = tokenMintAccountInfos[1]!.owner;
     const vaultDepositMintTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
       new PublicKey(vault),
@@ -119,7 +121,7 @@ export async function POST(req: NextRequest) {
         sourceMint: depositMint,
         vault,
         strategy,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: targetMintTokenProgram,
         vaultSourceTokenAccount: vaultDepositMintTokenAccount,
       })
       .remainingAccounts(remainingAccounts)
