@@ -78,8 +78,6 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
           vault,
         })
       } else {
-        const withdrawAll = positionBalance.toString() === amount;
-        // res = await getVaultWithdrawTx(publicKey, new PublicKey(vault), Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals, withdrawAll, tokenInfo.tokenProgram);
         res = await getWithdrawVaultTx({
           amount: (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString(),
           withdrawer: publicKey.toString(),
