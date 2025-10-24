@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   if (!vault) {
     return new Response(
-      JSON.stringify({ error: "vault is required." }), 
+      JSON.stringify({ error: "Vault is required." }), 
       { status: 400 }
     );
   }

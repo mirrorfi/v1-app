@@ -9,12 +9,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const vaultPda = searchParams.get("vault");
+  const vault = searchParams.get("vault");
 
-  if (!vaultPda) {
+  if (!vault) {
     return NextResponse.json(
       {
-        error: "vault is required.",
+        error: "Vault is required.",
       },
       {
         status: 400,
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const vaultAcc = await mirrorfiClient.fetchProgramAccount(vaultPda, "vault", parseVault);
+    const vaultAcc = await mirrorfiClient.fetchProgramAccount(vault, "vault", parseVault);
 
     if (!vaultAcc) {
       return NextResponse.json(
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       {
         memcmp: {
           offset: DISCRIMINATOR_SIZE,
-          bytes: vaultPda,
+          bytes: vault,
         },
       }
     ]
