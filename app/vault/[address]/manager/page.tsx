@@ -39,7 +39,7 @@ export default function VaultPage() {
 
   async function fetchVaultStrategies(vaultKey: PublicKey, vaultData: any) {
     let tokenInfo = TOKEN_INFO[vaultData.depositMint];
-
+    
     // 1. Fetch Deposit ATAs and Balances
     let vaultDepositAta = getAssociatedTokenAddressSync(new PublicKey(vaultData.depositMint), vaultKey, true, tokenInfo.tokenProgram);
     let vaultDepositMintBalanceRes = await connection.getTokenAccountBalance(vaultDepositAta);
@@ -52,12 +52,14 @@ export default function VaultPage() {
 
     // 3. Get all token addresses involved
     const tokens = [vaultData.depositMint];
-    const added = { [vaultData.depositMint]: true };
+    const added = {[vaultData.depositMint]: true};
     for (const strategy of strategies) {
-      if (!added[strategy.data.targetMint]) {
-        tokens.push(strategy.data.targetMint);
-        added[strategy.data.targetMint] = true;
+      if(strategy.strategyType.jupiterSwap) {
+        const targetMint = strategy.strategyType.jupiterSwap.targetMint;
+        tokens.push(targetMint);
+        added[targetMint] = true;
       }
+      // TO DO: Fetching for other strategies
     }
     console.log("tokens:", tokens);
 
@@ -69,12 +71,13 @@ export default function VaultPage() {
     // 5. Fetch ATAs for all Jupiter Strategies
     const jupStrategyAtas = [];
     for (const strategy of strategies) {
-      if (strategy.strategyType === "jupiterSwap") {
+      if(strategy.strategyType.jupiterSwap) {
+        const tokenMint = strategy.strategyType.jupiterSwap.targetMint;
         const ata = getAssociatedTokenAddressSync(
-          new PublicKey(strategy.data.targetMint),
-          vaultKey,
-          true,
-          new PublicKey(tokenInfos[strategy.data.targetMint].tokenProgram)
+          new PublicKey(tokenMint), 
+          vaultKey, 
+          true, 
+          new PublicKey(tokenInfos[tokenMint].tokenProgram)
         );
         jupStrategyAtas.push(ata);
       }
@@ -96,22 +99,29 @@ export default function VaultPage() {
     const strategiesData = [];
     for (let i = 0; i < strategies.length; i++) {
       const strategy = strategies[i];
-      const tokenInfo = tokenInfos[strategy.data.targetMint];
-      const ataInfo = jupBalancesRes.value[i] as any;
-      const ataBalance = ataInfo?.data.parsed.info.tokenAmount.uiAmount || 0;
+      const strategyTypeKey = Object.keys(strategy.strategyType)[0];
 
-      console.log("Strategy ATA Balance:", ataBalance);
-      console.log("Strategy Deployed:", strategy.depositsDeployed);
+      if(strategyTypeKey === "jupiterSwap") {
+        const tokenMint = strategy.strategyType.jupiterSwap.targetMint;
+        const tokenInfo = tokenInfos[tokenMint];
+        const ataInfo = jupBalancesRes.value[i] as any;
+        const ataBalance = ataInfo?.data.parsed.info.tokenAmount.uiAmount || 0;
 
-      strategiesData.push({
-        strategyType: strategy.strategyType,
-        tokenInfo: tokenInfos[strategy.data.targetMint],
-        mint: strategy.data.targetMint,
-        balance: ataBalance,
-        value: ataBalance * (tokenInfo.usdPrice || 0),
-        initialCapital: (strategy.depositsDeployed || 0) * (depositTokenInfo.usdPrice || 0) / 10 ** depositTokenInfo.decimals,
-        percentChange24h: tokenInfo.priceChange24h || 0,
-      });
+        console.log("Strategy ATA Balance:", ataBalance);
+        console.log("Strategy Deployed:", strategy.depositsDeployed);
+
+        strategiesData.push({
+          strategyType: strategyTypeKey,
+          tokenInfo: tokenInfos[tokenMint],
+          mint: tokenMint,
+          balance: ataBalance,
+          value: ataBalance * (tokenInfo.usdPrice || 0),
+          initialCapital: (strategy.depositsDeployed || 0) * (depositTokenInfo.usdPrice || 0) / 10**depositTokenInfo.decimals,
+          percentChange24h: tokenInfo.priceChange24h || 0,
+        });
+      }else {
+        throw new Error(`Strategy Type Not Integrated: ${strategyTypeKey}`);
+      }
     }
     console.log("Deposit Data:", depositData);
     console.log("Strategies Data:", strategiesData);
