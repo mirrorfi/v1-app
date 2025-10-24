@@ -7,8 +7,6 @@ import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey, Keypair } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync } from "@solana/spl-token"
-import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { getTokenInfos } from "@/lib/api";
 import { parseVault, parseVaultDepositor } from '@/types/accounts';
@@ -16,8 +14,6 @@ import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { getVaultStrategies } from "@/lib/api/accounts";
-import { mintTo } from "@solana/spl-token"
-import { deposit } from "@kamino-finance/klend-sdk"
 import { VaultManagerDashboard } from "@/components/VaultManagerDashboard"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 

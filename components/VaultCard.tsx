@@ -1,183 +1,144 @@
 "use client"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ArrowRight } from "lucide-react"
-import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts'
+import { ChevronDown, ChevronUp, ExternalLink, ArrowRight } from "lucide-react"
 
-interface VaultData {
-  pubkey: string;
-  is_initialized: boolean;
-  is_closed: boolean;
-  is_frozen: boolean;
-  version: number;
-  bump: number;
-  is_kamino: boolean;
-  is_meteora: boolean;
-  lookup_table: string;
-  manager: string;
-  deposit_token_mint: string;
-  deposit_token_decimals: number;
-  share_token_mint: string;
-  total_deposit: number;
-  total_withdrawal: number;
-  total_claimed_protocol_fee: number;
+interface VaultStrategy {
+  symbol: string;
+  icon: string;
+  apy?: number;
+}
+
+export interface VaultCardData {
+  name: string;
+  nav: number;
+  depositToken: {
+    symbol: string;
+    icon: string;
+    apy: number;
+  };
+  strategies: VaultStrategy[];
+  createdBy: string;
+  address: string;
 }
 
 interface VaultCardProps {
-  vault: VaultData;
-  onClick: (vaultPubkey: string) => void;
+  vault: VaultCardData;
+  onViewDetails: (vaultAddress: string) => void;
 }
 
-// Demo chart data
-const generateDemoChartData = () => {
-  const data = [];
-  let basePrice = 100;
-  for (let i = 0; i < 100; i++) {
-    basePrice += (Math.random() - 0.5) * 5;
-    data.push({
-      day: i,
-      price: Math.max(basePrice, i) // Keep price above 80
-    });
-  }
-  console.log("Demo Chart Data:", data);
-  return data;
-};
+export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const maxVisibleStrategies = 3;
+  const hasMoreStrategies = vault.strategies.length > maxVisibleStrategies;
+  const visibleStrategies = isExpanded 
+    ? vault.strategies 
+    : vault.strategies.slice(0, maxVisibleStrategies);
 
-const formatNumber = (num: number) => {
-  if (num >= 1000000) {
-    return `$${(num / 1000000).toFixed(1)}M`;
-  } else if (num >= 1000) {
-    return `$${(num / 1000).toFixed(1)}K`;
-  }
-  return `$${num.toFixed(2)}`;
-};
+  const handleCreatorClick = () => {
+    window.open(`https://solscan.io/account/${vault.createdBy}`, '_blank');
+  };
 
-const getVaultName = (vault: VaultData) => {
-  let name = "Vault";
-  if (vault.is_kamino && vault.is_meteora) {
-    name = "Kamino-Meteora Vault";
-  } else if (vault.is_kamino) {
-    name = "Kamino Vault";
-  } else if (vault.is_meteora) {
-    name = "Meteora Vault";
-  }
-  return name;
-};
-
-const getRiskLevel = (vault: VaultData) => {
-  // Demo risk calculation based on vault properties
-  if (vault.is_kamino && vault.is_meteora) {
-    return { level: "High", color: "bg-red-500/20 text-red-400 border-red-500/30" };
-  } else if (vault.is_kamino || vault.is_meteora) {
-    return { level: "Medium", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" };
-  }
-  return { level: "Low", color: "bg-green-500/20 text-green-400 border-green-500/30" };
-};
-
-const getDemoAPY = (vault: VaultData) => {
-  // Demo APY calculation
-  const baseAPY = 5.5;
-  const multiplier = vault.is_kamino ? 1.2 : 1.0;
-  const meteora = vault.is_meteora ? 1.1 : 1.0;
-  return (baseAPY * multiplier * meteora).toFixed(2);
-};
-
-export function VaultCard({ vault, onClick }: VaultCardProps) {
-  const vaultName = getVaultName(vault);
-  const netDeposits = vault.total_deposit - vault.total_withdrawal;
-  const totalNAV = netDeposits / Math.pow(10, vault.deposit_token_decimals);
-  const riskLevel = getRiskLevel(vault);
-  const apy = getDemoAPY(vault);
-  const chartData = generateDemoChartData();
-  
-  // Calculate min and max values for efficient chart space usage
-  const prices = chartData.map(d => d.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-  const padding = (maxPrice - minPrice) * 0.1; // 10% padding
-  const yAxisMin = Math.max(0, minPrice - padding);
-  const yAxisMax = maxPrice + padding;
-  
-  // Get creator address (first 4 and last 4 characters of manager)
-  const creatorAddress = `${vault.manager.slice(0, 4)}...${vault.manager.slice(-4)}`;
+  console.log("Loading:", vault);
 
   return (
-    <Card 
-      className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg hover:bg-blue-900/30 transition-all duration-200 cursor-pointer group"
-      onClick={() => onClick(vault.pubkey)}
-    >
-      <CardHeader>
-        {/* Top Section */}
-        <div className="flex items-start justify-between">
-          {/* Top Left: Circle Image & Title + Creator Address */}
+    <Card className="bg-slate-800/50 border-slate-600/30 rounded-xl p-6 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-200">
+      <CardContent className="p-0 space-y-4">
+        {/* Header Row - Vault Name and NAV */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-white">{vault.name}</h3>
           <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8 bg-gradient-to-br from-pink-500 to-rose-400">
-              <AvatarFallback className="text-white font-bold text-sm">
-                {vaultName.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="text-white text-base font-semibold group-hover:text-blue-300 transition-colors leading-tight">
-                {vaultName}
-              </h3>
-              <p className="text-slate-400 text-xs font-mono">
-                created by: {creatorAddress}
-              </p>
-            </div>
+            <div className="text-sm text-slate-400">NAV</div>
+            <div className="text-lg font-bold text-white">${vault.nav.toFixed(2)}</div>
           </div>
-          
-          {/* Top Right: APY */}
-          <div className="text-right">
-            <div className="text-emerald-400 font-bold text-xl">
-              {apy}%
-            </div>
-            <div className="text-slate-400 text-xs">
-              APY
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-3">
-        {/* Middle: Chart - More space allocated */}
-        <div className="h-32 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-              <YAxis 
-                domain={[yAxisMin, yAxisMax]} 
-                hide={true}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="price" 
-                stroke="#10b981" 
-                strokeWidth={2}
-                dot={false}
-                strokeDasharray="0"
-              />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
 
-        {/* Bottom Section - Compact */}
-        <div className="flex items-center justify-between">
-          {/* Bottom Left: Total NAV & Risk - More compact */}
-          <div className="space-y-1">
-            <div>
-              <div className="text-slate-400 text-xs">Total NAV</div>
-              <div className="text-white font-semibold text-base">
-                {formatNumber(totalNAV)}
-              </div>
+        {/* Deposit Token Section */}
+        <div className="space-y-2">
+          <div className="text-sm text-slate-400 font-medium">Deposit</div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2">
+              <img 
+                src={vault.depositToken.icon} 
+                alt={vault.depositToken.symbol} 
+                className="w-6 h-6 rounded-full" 
+              />
+              <span className="text-white font-medium">{vault.depositToken.symbol}</span>
             </div>
-          </div>
-          {/* Risk badge moved to right side for better balance */}
-          <div>
-            <Badge className={`text-xs ${riskLevel.color}`}>
-              Risk: {riskLevel.level}
+            <Badge variant="secondary" className="bg-green-600/20 text-green-400 border-green-500/30">
+              {vault.depositToken.apy}% APY
             </Badge>
           </div>
+        </div>
+
+        {/* Strategies Section */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-slate-400 font-medium">Strategies</div>
+            {hasMoreStrategies && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                {isExpanded ? (
+                  <>
+                    <span>Show Less</span>
+                    <ChevronUp className="h-3 w-3" />
+                  </>
+                ) : (
+                  <>
+                    <span>+{vault.strategies.length - maxVisibleStrategies} more</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {visibleStrategies.map((strategy, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2 border border-slate-600/30"
+              >
+                <img 
+                  src={strategy.icon} 
+                  alt={strategy.symbol} 
+                  className="w-5 h-5 rounded-full" 
+                />
+                <span className="text-white text-sm font-medium">{strategy.symbol}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer - Creator and Action */}
+        <div className="flex items-center justify-between pt-4 -mb-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-400">Created By:</span>
+            <button
+              onClick={handleCreatorClick}
+              className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              <span className="font-mono">
+                {vault.createdBy.slice(0, 4)}...{vault.createdBy.slice(-4)}
+              </span>
+              <ExternalLink className="h-3 w-3" />
+            </button>
+          </div>
+          
+          <Button
+            onClick={() => onViewDetails(vault.address)}
+            variant="outline"
+            size="sm"
+            className="bg-transparent border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400"
+          >
+            View Strategy
+            <ArrowRight className="h-3 w-3 ml-1" />
+          </Button>
         </div>
       </CardContent>
     </Card>
