@@ -1,24 +1,22 @@
+import { mongodbClient } from "@/lib/utils/mongodb";
 import { NextRequest } from "next/server";
-import { MongoClient } from "mongodb";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const vaultAddress = searchParams.get("vault");
+  const { searchParams } = req.nextUrl;
+
+  const vault = searchParams.get("vault");
+
+  if (!vault) {
+    return new Response(
+      JSON.stringify({ error: "vault is required." }), 
+      { status: 400 }
+    );
+  }
   const timeframe = searchParams.get("timeframe") || "7D";
-  
-  if (!vaultAddress) {
-    return new Response(JSON.stringify({ error: "Vault address not provided" }), { status: 400 });
-  }
 
-  if (!process.env.MONGODB_URI) {
-    return new Response(JSON.stringify({ error: "MongoDB URI not configured" }), { status: 500 });
-  }
-
-  const client = new MongoClient(process.env.MONGODB_URI);
-  
   try {
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB_NAME || "jarvis");
+    await mongodbClient.connect();
+    const db = mongodbClient.db(process.env.MONGODB_DB_NAME || "jarvis");
     const collection = db.collection(process.env.MONGODB_COLLECTION || "vault_data");
 
     // Calculate time range based on timeframe
@@ -35,7 +33,7 @@ export async function GET(req: NextRequest) {
     // Query MongoDB for historical data
     const historicalData = await collection
       .find({
-        "metadata.vaultAddress": vaultAddress,
+        "metadata.vaultAddress": vault,
         timestamp: {
           $gte: startTime,
           $lte: now,
@@ -53,19 +51,20 @@ export async function GET(req: NextRequest) {
     }));
 
     return Response.json({
-      vaultAddress,
+      vaultAddress: vault,
       timeframe,
       dataPoints: chartData.length,
       data: chartData,
     });
 
-  } catch (error: any) {
-    console.error("Failed to fetch historical vault data:", error);
+  } catch (err) {
+    console.error(err);
+
     return new Response(
-      JSON.stringify({ error: "Failed to fetch historical data" }), 
+      JSON.stringify({ error: err instanceof Error ? err.message : "Failed to fetch historical data." }), 
       { status: 500 }
     );
   } finally {
-    await client.close();
+    await mongodbClient.close();
   }
 }
