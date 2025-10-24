@@ -37,7 +37,7 @@ export async function wrappedFetch(url: string, method: string = 'GET', body: an
   if (method === 'GET') {
     res = await fetch(url, {
       method,
-      body: body//JSON.stringify(body),
+      body: body
     });
   }
   else if (method === 'POST') {
