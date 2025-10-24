@@ -26,13 +26,15 @@ function parseBN(field: BN): string {
   return field.toString();
 }
 
+// Denotes a bigint serialized as a string
+export type bigIntString = string;
 type pubkey = string;
 type u8 = number;
 type u16 = number;
 type u32 = number;
-type u64 = string;
+type u64 = bigIntString;
 type i32 = number;
-type i64 = string;
+type i64 = bigIntString;
 
 type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];

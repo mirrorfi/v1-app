@@ -35,7 +35,7 @@ export function base64ToV0Tx(base64: string): VersionedTransaction {
 export async function wrappedFetch(url: string, method: string = 'GET', body: any = null) {
   const res = await fetch(url, {
     method,
-    body,
+    body: JSON.stringify(body),
   });
   const data = await res.json();
 
