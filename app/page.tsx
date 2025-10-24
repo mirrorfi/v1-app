@@ -11,7 +11,7 @@ import { getConnection } from "@/lib/solana"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { StrategyFlow } from '@/components/StrategyFlow';
 import { getAllVaultBalances } from '@/lib/api';
-import { AlertCircle } from 'lucide-react';
+import { TrendingUp, DollarSign, Users, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 
 const connection = getConnection();
 
@@ -25,9 +25,8 @@ export default function Home() {
   useEffect(() => {
     setIsLoading(true);
     async function fetchAllVaults() {
-      console.log("Fetching Balances")
-      const vaultBalances = await getAllVaultBalances();
-      console.log(vaultBalances);
+      let vaultBalances = await getAllVaultBalances();
+      vaultBalances.sort((a:any, b:any) => b.vault.totalNav - a.vault.totalNav);
       if(!vaultBalances) {
         setError("Somehow something is wrong. Our team might be locking in...");
         return;
@@ -66,10 +65,6 @@ export default function Home() {
     fetchAllVaults();
     setIsLoading(false);
   }, [])
-
-  const handleVaultClick = (vaultPubkey: string) => {
-    router.push(`/vault/${vaultPubkey}`);
-  };
 
   // Mock vault data for the dashboard
   const mockVaults = [
@@ -263,22 +258,106 @@ export default function Home() {
             </p>
           </div>
 
-          {/* New Vault Dashboard Section */}
-          {vaultCardsData.length > 0 && 
-            <div className="mb-12">            
-              {/* Vault Cards Grid - 3 columns on desktop, responsive */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                {vaultCardsData.map((vault, index) => (
-                  <VaultCard
-                    key={index}
-                    vault={vault}
-                    onViewDetails={handleViewVaultDetails}
-                  />
-                ))}
+          {/* Loading Interface */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-6">
+              {/* Loading Spinner */}
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-slate-600/30 border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+                </div>
+              </div>
+              
+              {/* Loading Text */}
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-semibold text-white">Loading Vaults</h3>
+                <p className="text-slate-400">Fetching MirrorFi Vault Data...</p>
+              </div>
+
+              {/* Loading Skeleton Cards */}
+              <div className="w-full max-w-6xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <Card key={index} className="bg-slate-800/30 border-slate-600/20 rounded-xl p-6 backdrop-blur-sm">
+                      <CardContent className="p-0 space-y-4">
+                        {/* Header Skeleton */}
+                        <div className="flex items-center justify-between">
+                          <Skeleton className="h-6 w-32" />
+                          <div className="flex items-center gap-2">
+                            <Skeleton className="h-4 w-8" />
+                            <Skeleton className="h-6 w-16" />
+                          </div>
+                        </div>
+
+                        {/* Deposit Token Skeleton */}
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-16" />
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 bg-slate-700/30 rounded-lg px-3 py-2">
+                              <Skeleton className="w-6 h-6 rounded-full" />
+                              <Skeleton className="h-4 w-12" />
+                            </div>
+                            <Skeleton className="h-6 w-16 rounded-full" />
+                          </div>
+                        </div>
+
+                        {/* Strategies Skeleton */}
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-20" />
+                          <div className="flex flex-wrap gap-2">
+                            <Skeleton className="h-8 w-16 rounded-lg" />
+                            <Skeleton className="h-8 w-20 rounded-lg" />
+                            <Skeleton className="h-8 w-14 rounded-lg" />
+                          </div>
+                        </div>
+
+                        {/* Footer Skeleton */}
+                        <div className="flex items-center justify-between pt-4">
+                          <div className="flex items-center gap-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                          <Skeleton className="h-8 w-24 rounded" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </div>
-          }
+          ) : (
+            /* Vault Dashboard Section */
+            <>
+              {vaultCardsData.length > 0 && 
+                <div className="mb-12">            
+                  {/* Vault Cards Grid - 3 columns on desktop, responsive */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {vaultCardsData.map((vault, index) => (
+                      <VaultCard
+                        key={index}
+                        vault={vault}
+                        onViewDetails={handleViewVaultDetails}
+                      />
+                    ))}
+                  </div>
+                </div>
+              }
+
+              {/* Empty State when no vaults and not loading */}
+              {vaultCardsData.length === 0 && !error && (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="p-4 bg-slate-800/50 rounded-full mb-4">
+                    <DollarSign className="h-12 w-12 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Wait a sec...</h3>
+                  {/*<p className="text-slate-400 max-w-md">
+                    There are currently no vaults available. Please check back later.
+                  </p>*/}
+                </div>
+              )}
+            </>
+          )}
 
           {/* Error Display */}
           {error && (

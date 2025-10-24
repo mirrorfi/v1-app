@@ -68,9 +68,11 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
               />
               <span className="text-white font-medium">{vault.depositToken.symbol}</span>
             </div>
-            <Badge variant="secondary" className="bg-green-600/20 text-green-400 border-green-500/30">
-              {vault.depositToken.apy}% APY
-            </Badge>
+            {vault.depositToken.apy && 
+              <Badge variant="secondary" className="bg-green-600/20 text-green-400 border-green-500/30">
+                {vault.depositToken.apy}% APY
+              </Badge>
+            }
           </div>
         </div>
 
