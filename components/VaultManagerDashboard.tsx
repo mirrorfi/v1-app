@@ -57,7 +57,7 @@ export function VaultManagerDashboard({ vault, vaultData, isLoading, error, hand
   }
 
   const handleBackClick = () => {
-    router.push('/');
+    router.push(vaultData ? `/vault/${vaultData.publicKey}` : "/");
   }
 
   return (
@@ -70,7 +70,7 @@ export function VaultManagerDashboard({ vault, vaultData, isLoading, error, hand
           className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 h-auto"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
+          Back to Vault
         </Button>
       </div>
 

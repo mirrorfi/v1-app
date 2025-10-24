@@ -11,6 +11,8 @@ import * as bs58 from "bs58"
 import { getConnection } from "@/lib/solana"
 import { formatNumber, formatAddress } from "@/lib/display"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { ArrowUpRight } from "lucide-react"
 
 const connection = getConnection();
 
@@ -19,11 +21,15 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
 
+  const router = useRouter();
   const { publicKey, signTransaction } = useWallet()
   const { showNotification } = useNotification()
 
-  // Mock data - replace with real data
-  const apy = 5.6
+  // Check if current user has managing authority
+  const hasManagingAuthority = publicKey && vaultData && publicKey.toString() === vaultData.authority;
+  const handleManageVault = () => {
+    router.push(`/vault/${vault}/manager`);
+  }
 
   const handleAmountChange = (value: string) => {
     // Only allow numbers and decimal point
@@ -105,6 +111,23 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
 
   return (
     <>
+      {/* Management Authority Label - Right side */}
+      {hasManagingAuthority && (
+        <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-3 mb-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-orange-400 text-sm font-medium whitespace-nowrap">
+              You have managing authority to this vault
+            </span>
+            <Button
+              onClick={handleManageVault}
+              size="sm"
+              className="bg-orange-600 hover:bg-orange-700 text-white text-sm px-3 py-1 h-8"
+            >
+              Open <ArrowUpRight/>
+            </Button>
+          </div>
+        </div>
+      )}
       <Card className={`bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
         <CardHeader>
           <div className="flex items-center justify-between">

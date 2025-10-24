@@ -11,7 +11,7 @@ import { StrategyCard } from "@/components/StrategyCard";
 import { StrategyCardManager } from "@/components/StrategyCardManager";
 import { StrategyCreateModal } from "@/components/StrategyCreateModal";
 import { StrategyJupiterModal } from "@/components/StrategyJupiterModal"
-
+import { useRouter } from "next/navigation";
 
 interface VaultDashboardBalancesProps {
   depositData: any;
@@ -117,12 +117,20 @@ function ErrorState() {
   );
 }
 
-function EmptyState() {
+function EmptyState({vault}: {vault?: string}) {
+  const router = useRouter();
+  const openDepositPage = () => {
+    router.push(`/vault/${vault}`);
+  }
   return (
     <div className="flex flex-col items-center justify-center py-8 text-center">
       <Ban className="h-12 w-12 text-slate-500 mb-3" />
       <h3 className="text-lg font-medium text-white mb-1">No balance data available</h3>
-      <p className="text-sm text-slate-400 max-w-xs">There are no active positions in this vault. Create a position to see your balance data.</p>
+      <p className="text-sm text-slate-400 max-w-xs">There are no active positions in this vault. Create a position or deposit to vault to see balance data.</p>
+      {vault &&
+      <Button onClick={openDepositPage} variant="outline" className="mt-4 bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm">
+        Deposit to Vault
+      </Button>}
     </div>
   );
 }
@@ -202,7 +210,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
           <ErrorState />
         ) : isEmpty ? (
           /* Empty State */
-          <EmptyState />
+          <EmptyState vault={vaultData ? vaultData.publicKey : null} />
         ) : (
           /* Data Loaded State */
           <>

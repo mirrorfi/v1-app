@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronDown, ChevronUp, ExternalLink, ArrowRight } from "lucide-react"
+import { useIsMobile } from "@/lib/hooks/useIsMobile"
+import { useWallet } from "@solana/wallet-adapter-react"
 
 interface VaultStrategy {
   symbol: string;
@@ -33,10 +35,16 @@ interface VaultCardProps {
 export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const maxVisibleStrategies = 3;
+  const isMobile = useIsMobile();
+  const { publicKey } = useWallet();
+  
   const hasMoreStrategies = vault.strategies.length > maxVisibleStrategies;
   const visibleStrategies = isExpanded 
     ? vault.strategies 
     : vault.strategies.slice(0, maxVisibleStrategies);
+
+  // Check if current user owns this vault
+  const isUserVault = publicKey && publicKey.toString() === vault.createdBy;
 
   const handleCreatorClick = () => {
     window.open(`https://solscan.io/account/${vault.createdBy}`, '_blank');
@@ -49,7 +57,14 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
       <CardContent className="p-0 space-y-4">
         {/* Header Row - Vault Name and NAV */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">{vault.name}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-white">{vault.name}</h3>
+            {isUserVault && (
+              <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
+                Your Vault
+              </Badge>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <div className="text-sm text-slate-400">NAV</div>
             <div className="text-lg font-bold text-white">${vault.nav.toFixed(2)}</div>
@@ -77,7 +92,7 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
         </div>
 
         {/* Strategies Section */}
-        <div className="space-y-2">
+        <div className="space-y-2 min-h-[80px] flex flex-col">
           <div className="flex items-center justify-between">
             <div className="text-sm text-slate-400 font-medium">Strategies</div>
             {hasMoreStrategies && (
@@ -100,20 +115,26 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
             )}
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            {visibleStrategies.map((strategy, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2 border border-slate-600/30"
-              >
-                <img 
-                  src={strategy.icon} 
-                  alt={strategy.symbol} 
-                  className="w-5 h-5 rounded-full" 
-                />
-                <span className="text-white text-sm font-medium">{strategy.symbol}</span>
+          <div className="flex flex-wrap gap-2 flex-1">
+            {visibleStrategies.length > 0 ? (
+              visibleStrategies.map((strategy, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2 border border-slate-600/30"
+                >
+                  <img 
+                    src={strategy.icon} 
+                    alt={strategy.symbol} 
+                    className="w-5 h-5 rounded-full" 
+                  />
+                  <span className="text-white text-sm font-medium">{strategy.symbol}</span>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-start w-full h-12 text-slate-500 text-sm">
+                (X) No strategies configured yet.
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -123,7 +144,7 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
             <span className="text-sm text-slate-400">Created By:</span>
             <button
               onClick={handleCreatorClick}
-              className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              className="flex items-center gap-1 text-xs lg:text-sm text-blue-400 hover:text-blue-300 transition-colors"
             >
               <span className="font-mono">
                 {vault.createdBy.slice(0, 4)}...{vault.createdBy.slice(-4)}

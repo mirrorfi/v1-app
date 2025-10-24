@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
 import { getVaultBalances } from "@/lib/api/vault"
-import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
+import { ArrowLeft, AlertCircle, RefreshCw, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Skeleton } from "./ui/skeleton"
 import { mirrorfiClient } from '@/lib/solana-server';
@@ -57,12 +57,19 @@ export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionB
   const router = useRouter();
   const [vaultBalances, setVaultBalances] = useState<any>(null);
 
+  // Check if current user has managing authority
+  const hasManagingAuthority = publicKey && vaultData && publicKey.toString() === vaultData.authority;
+
   const onTabChange = (tabName: string) => {
     setActiveTab(tabName)
   }
 
   const handleBackClick = () => {
     router.push('/');
+  }
+
+  const handleManageVault = () => {
+    router.push(`/vault/${vault}/manager`);
   }
 
   return (
@@ -138,23 +145,25 @@ export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionB
         : <Skeleton className="h-6 w-32 md:h-8 md:w-48 rounded-md" />}
       </div>
 
-      {/* Navigation Tabs - Mobile responsive */}
-      <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto">
-        {tabs.map((tab) => (
-          <Button
-            key={tab.id}
-            variant={activeTab === tab.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => onTabChange?.(tab.id)}
-            className={`whitespace-nowrap text-xs md:text-sm ${
-              activeTab === tab.id
-                ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
-                : "bg-transparent border-blue-700/50 text-blue-300 hover:bg-blue-800/30 hover:text-white"
-            }`}
-          >
-            {tab.label}
-          </Button>
-        ))}
+      {/* Navigation Tabs with Management Authority - Mobile responsive */}
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 overflow-x-auto">
+          {tabs.map((tab) => (
+            <Button
+              key={tab.id}
+              variant={activeTab === tab.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => onTabChange?.(tab.id)}
+              className={`whitespace-nowrap text-xs md:text-sm ${
+                activeTab === tab.id
+                  ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
+                  : "bg-transparent border-blue-700/50 text-blue-300 hover:bg-blue-800/30 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-4">
