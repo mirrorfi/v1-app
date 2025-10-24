@@ -157,6 +157,32 @@ export function parseStrategy(
     strategyType,
   }: Strategy
 ): Omit<ParsedStrategy, "publicKey"> {
+  const type = parseEnum<ParsedStrategyType>(strategyType);
+
+  let parsedStrategyType: ParsedStrategyType;
+
+  switch (type) {
+    case "jupiterSwap":
+      parsedStrategyType = {
+        jupiterSwap: {
+          targetMint: parsePublicKey(strategyType.jupiterSwap.targetMint),
+        },
+      };
+      break;
+    
+    case "kaminoLend":
+      parsedStrategyType = {
+        kaminoLend: {
+          obligation: parsePublicKey(strategyType.kaminoLend.obligation),
+          lendingMarket: parsePublicKey(strategyType.kaminoLend.lendingMarket),
+        },
+      };
+      break;
+    
+    default:
+      throw new Error(`Unknown strategy type: ${type}`);
+  }
+
   return {
     vault: parsePublicKey(vault),
     depositsDeployed: parseBN(depositsDeployed),
