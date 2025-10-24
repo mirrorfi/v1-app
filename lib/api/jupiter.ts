@@ -41,7 +41,8 @@ export async function getTokenInfos(mint: string[]) {
       symbol: tokenInfo.symbol,
       icon: tokenInfo.icon,
       decimals: tokenInfo.decimals,
-      tokenProgram: tokenInfo.tokenProgram
+      tokenProgram: tokenInfo.tokenProgram,
+      usdPrice: tokenInfo.usdPrice,
     }
   })
 
