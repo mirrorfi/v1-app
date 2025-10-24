@@ -96,7 +96,6 @@ export function parseConfig({
   nextVaultId,
   platformFeeBps,
   status,
-  treasuryBump,
 }: Config): Omit<ParsedConfig, "publicKey"> {
   return {
     admin: parsePublicKey(admin),
