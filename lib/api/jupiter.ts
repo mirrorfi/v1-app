@@ -11,7 +11,7 @@ export async function getPrices(mint: string[]) {
     throw new Error(data.error || 'Unable to fetch token prices from Jupiter API.');
   }
 
-  const prices: Record<string, number> = {};
+  const prices: Record<string, any> = {};
 
   for (const key in data) {
     prices[key] = data[key].usdPrice;
@@ -43,6 +43,7 @@ export async function getTokenInfos(mint: string[]) {
       decimals: tokenInfo.decimals,
       tokenProgram: tokenInfo.tokenProgram,
       usdPrice: tokenInfo.usdPrice,
+      priceChange24h: tokenInfo.priceChange24h,
     }
   })
 
