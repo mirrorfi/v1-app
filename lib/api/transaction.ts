@@ -1,5 +1,6 @@
 import { VersionedTransaction } from "@solana/web3.js";
 import { base64ToV0Tx, wrappedFetch } from "../utils"
+import { bigIntString } from "@/types/accounts";
 
 export async function getCloseStrategyTx({
   authority,
@@ -37,8 +38,7 @@ export async function getDepositVaultTx({
 export async function getExecuteStrategyJupiterSwap({
   amount, slippageBps, authority, strategy
 }: {
-  // bigint serialized as string
-  amount: string,
+  amount: bigIntString,
   slippageBps: number,
   authority: string,
   strategy: string
@@ -53,8 +53,7 @@ export async function getExecuteStrategyJupiterSwap({
 export async function getExitStrategyJupiterSwap({
   amount, slippageBps, authority, strategy
 }: {
-  // bigint serialized as string
-  amount: string,
+  amount: bigIntString,
   slippageBps: number,
   authority: string,
   strategy: string
@@ -73,8 +72,7 @@ export async function getInitializeAndExecuteStrategyJupiterSwap({
   authority: string,
   destinationMint: string,
   vault: string,
-  // bigint serialized as string
-  amount: string,
+  amount: bigIntString,
   slippageBps: number
 }): Promise<VersionedTransaction> {
   const { tx } = await wrappedFetch("/api/tx/initialize-and-execute/jupiter-swap", "POST", {
@@ -117,10 +115,8 @@ export async function getInitializeVaultTx({
   name: string,
   description: string,
   managerFeeBps: number,
-  // bigint serialized as string
-  depositCap: string,
-  // bigint serialized as string
-  lockedProfitDegradationDuration: string,
+  depositCap: bigIntString,
+  lockedProfitDegradationDuration: bigIntString,
   depositMint: string,
   priceUpdateV2: string,
   authority: string,
