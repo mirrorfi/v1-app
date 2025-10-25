@@ -287,6 +287,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
         onClose={handleCloseJupiter}
         strategyData={openStrategyData}
         depositData={depositData} 
+        vaultData={vaultData}
       />
     </Card>
   )

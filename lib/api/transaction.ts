@@ -66,9 +66,9 @@ export async function getExitStrategyJupiterSwap({
 }
 
 export async function getInitializeAndExecuteStrategyJupiterSwap({
-  strategyType, authority, destinationMint, vault, amount, slippageBps
+  strategyType = "JupiterSwap", authority, destinationMint, vault, amount, slippageBps
 }: {
-  strategyType: string,
+  strategyType?: string,
   authority: string,
   destinationMint: string,
   vault: string,
@@ -121,7 +121,7 @@ export async function getInitializeVaultTx({
   priceUpdateV2: string,
   authority: string,
 }): Promise<VersionedTransaction> {
-  const { tx } = await wrappedFetch("/api/tx/initialize-user", "POST", {
+  const { tx } = await wrappedFetch("/api/tx/initialize-vault", "POST", {
     name, description, managerFeeBps, depositCap, lockedProfitDegradationDuration, depositMint, priceUpdateV2, authority
   });
 

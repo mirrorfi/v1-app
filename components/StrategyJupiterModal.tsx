@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
-import { getTokenInfos, getExecuteStrategyJupiterSwap } from "@/lib/api";
+import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton";
 import { useNotification } from "@/contexts/NotificationContext"
 import { useWallet } from "@solana/wallet-adapter-react"
@@ -30,6 +30,7 @@ interface StrategyJupiterModalProps {
   onClose: () => void;
   strategyData: any;
   depositData: any;
+  vaultData: any;
 }
 
 // Predefined token options for quick selection
@@ -188,7 +189,7 @@ function TokenSelector({
   );
 }
 
-export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, depositData }: StrategyJupiterModalProps) {
+export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, depositData, vaultData}: StrategyJupiterModalProps) {
   const [activeTab, setActiveTab] = useState<'add' | 'reduce'>('add');
   const [amount, setAmount] = useState<string>('100');
   const [selectDisabled, setSelectDisabled] = useState<boolean>(false);
@@ -264,7 +265,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         });
         return;
       }
-      if(!fromToken || !toToken || !fromToken.decimals){
+      if(!fromToken || !toToken || !fromToken.decimals || !vaultData){
         showNotification({
           title: `Execute Strategy Failed!`,
           message: `Data has not been successfully loaded.`,
@@ -282,7 +283,17 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         return;
       }
       let res;
-      if (activeTab === 'add') {
+      if( action === "new" || action === "newYield" ) {
+        res = await getInitializeAndExecuteStrategyJupiterSwap({
+          strategyType: "JupiterSwap",
+          authority: publicKey.toString(),
+          destinationMint: toToken.mint,
+          vault: vaultData.publicKey,
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          slippageBps: 100,
+        });
+      }
+      else if (activeTab === 'add') {
         res = await getExecuteStrategyJupiterSwap({
           amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
           slippageBps: 100,
@@ -489,7 +500,8 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             disabled={!amount || parseFloat(amount) <= 0 || isLoading}
             className="w-full h-14 py-6 text-xl font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200"
           >
-            {isLoading ? "Executing..." : "Execute Strategy"}
+            {isLoading ? "Executing..." : 
+              action === "new" || action === "newYield" ? "Create and Execute" : "Execute Strategy"}
           </Button>
         </div>
       </DialogContent>

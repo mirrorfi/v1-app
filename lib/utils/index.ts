@@ -24,7 +24,10 @@ export function stringToByteArray(str: string, length: number): number[] {
 }
 
 export function v0TxToBase64(tx: VersionedTransaction): string {
-  return Buffer.from(tx.serialize()).toString("base64");
+  return Buffer.from(tx.serialize({
+    requireAllSignatures: false,
+    verifySignatures: false,
+  })).toString("base64");
 }
 
 export function base64ToV0Tx(base64: string): VersionedTransaction {
