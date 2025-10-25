@@ -20,7 +20,6 @@ import { formatNumber } from "@/lib/display"
 interface MobileVaultDashboardProps {
   vault: string;
   vaultData:any;
-  vaultDepositorInfo: any;
   positionBalance:number;
   tokenBalance:number;
   tokenPrice:number;
@@ -38,7 +37,7 @@ const strategy = {
   status: "active" as const,
 }
 
-export function MobileVaultDashboard({ vault, vaultData, vaultDepositorInfo, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
+export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
   const { publicKey } = useWallet();
   const router = useRouter();
   const [showExecuteCard, setShowExecuteCard] = useState(false);
@@ -116,9 +115,8 @@ export function MobileVaultDashboard({ vault, vaultData, vaultDepositorInfo, pos
       {!error && (
         <div className="p-4 space-y-4">
           {/* PNL Card */}
-          {vaultDepositorInfo && (
-            <VaultDashboardPNLCard 
-              vaultDepositor={vaultDepositorInfo} 
+          {positionBalance && (
+            <VaultDashboardPNLCard
               positionBalance={positionBalance} 
               tokenPrice={tokenPrice}
               isLoading={isLoading}

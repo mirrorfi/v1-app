@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { Skeleton } from "./ui/skeleton"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { fetchJupiterPrices } from "@/lib/utils/jupiter"
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
+import { parseVault } from '@/types/accounts';
 
 import { VaultDashboardExecuteCard, VaultDashboardExecuteCardSkeleton } from "@/components/VaultDashboardExecuteCard"
 import { VaultDashboardChart } from "@/components/VaultDashboardChart";
@@ -26,7 +26,6 @@ import { TOKEN_INFO } from "@/lib/utils/tokens"
 interface StrategyDashboardProps {
   vault: string;
   vaultData:any;
-  vaultDepositorInfo: any;
   positionBalance:number;
   tokenBalance:number;
   tokenPrice:number;
@@ -45,7 +44,7 @@ const strategy = {
   status: "Active" as const,
 }
 
-export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
+export function VaultDashboard({ vault, vaultData, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
   const [activeTab, setActiveTab] = useState("vault-stats")
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
@@ -180,7 +179,6 @@ export function VaultDashboard({ vault, vaultData, vaultDepositorInfo, positionB
           {activeTab == "your-position" && (
             <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
               <VaultDashboardPNLCard 
-                vaultDepositor={vaultDepositorInfo} 
                 positionBalance={positionBalance} 
                 tokenPrice={tokenPrice}
                 isLoading={isLoading}

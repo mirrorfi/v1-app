@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { VaultCard, VaultCardData } from "@/components/VaultCard";
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { StrategyFlow } from '@/components/StrategyFlow';

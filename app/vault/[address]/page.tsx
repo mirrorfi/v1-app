@@ -11,14 +11,13 @@ import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { getPrices, getTokenInfos } from "@/lib/api";
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
+import { parseVault } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { getVaultStrategies } from "@/lib/api/accounts";
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
-import { mintTo } from "@solana/spl-token"
-import { deposit } from "@kamino-finance/klend-sdk"
+import { TOKEN_PROGRAM_2022_ID } from "@/lib/program/constants"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
@@ -36,10 +35,7 @@ export default function VaultPage() {
   const [error, setError] = useState<string | null>(null);
   const [vaultData, setVaultData] = useState<any>(null);
   const [reload, setReload] = useState(false);
-  const [vaultBalances, setVaultBalances] = useState<any>(null);
   const [positionBalance, setPositionBalance] = useState<number>(0);
-  const [vaultDepositTokenMint, setVaultDepositTokenMint] = useState<string | null>("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-  const [vaultDepositorInfo, setVaultDepositorInfo] = useState<any>(null);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
   const [tokenPrice, setTokenPrice] = useState<number>(0); 
   const [depositData, setDepositData] = useState<any>(null);
@@ -59,20 +55,14 @@ export default function VaultPage() {
     if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
   }
 
-  async function fetchUserVaultDepositor(vaultKey: PublicKey, user: PublicKey, tokenMint: string) {
+  async function fetchUserReceiptBalance(tokenMint: string, user: PublicKey) {
     const info = TOKEN_INFO[tokenMint]
-    const vaultDepositorPda = await mirrorfiClient.getVaultDepositorPda(vaultKey, user);
-    const vaultDepositorData = await mirrorfiClient.fetchProgramAccount(vaultDepositorPda.toBase58(), "vaultDepositor", parseVaultDepositor);
-    console.log("Vault Depositor Data:", vaultDepositorData);
-    setVaultDepositorInfo(vaultDepositorData);
-    if(vaultDepositorData) {
-      setVaultDepositorInfo(vaultDepositorData);
-      const positionShareToken = Number(vaultDepositorData.totalShares) / 10**info.tokenDecimals;
-      // TODO: Fetch Share Token Balance using Share Token Price
-      // const ownershipRatio = positionShareToken / balances.shareTokenSupply;
-      // const positionBalance = ownershipRatio * balances.totalNAV;
-      setPositionBalance(positionShareToken);
-    }
+    const userReceiptAta = getAssociatedTokenAddressSync(new PublicKey(tokenMint), user, false, TOKEN_PROGRAM_2022_ID); 
+    const userReceiptAccountInfo = await connection.getTokenAccountBalance(userReceiptAta);
+    const positionShareToken = userReceiptAccountInfo.value.uiAmount || 0;
+    // TODO: Fetch Share Token Balance using Share Token Price
+    const positionShareBalance = positionShareToken * 10**info.tokenDecimals;
+    setPositionBalance(positionShareBalance);
   }
 
   async function fetchVaultStrategies(vaultKey: PublicKey, vaultData: any) {
@@ -195,14 +185,13 @@ export default function VaultPage() {
         }
         console.log("Vault Data:", vaultData);
         setVaultData(vaultData);
-        setVaultDepositTokenMint(vaultData.depositMint);
         fetchVaultStrategies(vaultKey, vaultData);
         // Step 3: Get User Position Info
         if(publicKey){
           // Fetch Deposit Token Balance
           fetchUserBalance(vaultData.depositMint, publicKey);
           // Fetch Share Token Balance
-          fetchUserVaultDepositor(vaultKey, publicKey, vaultData.depositMint);
+          fetchUserReceiptBalance(vaultData.depositMint, publicKey);
         }
       } catch (error: any) {
         console.error("Error loading vault:", error);
@@ -234,7 +223,6 @@ export default function VaultPage() {
           <MobileVaultDashboard 
             vault={vault} 
             vaultData={vaultData} 
-            vaultDepositorInfo={vaultDepositorInfo}
             positionBalance={positionBalance}
             tokenBalance={tokenBalance}
             tokenPrice={tokenPrice}
@@ -249,7 +237,6 @@ export default function VaultPage() {
         <VaultDashboard 
           vault={vault} 
           vaultData={vaultData} 
-          vaultDepositorInfo={vaultDepositorInfo}
           positionBalance={positionBalance}
           tokenBalance={tokenBalance}
           tokenPrice={tokenPrice}

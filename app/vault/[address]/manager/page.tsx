@@ -9,7 +9,7 @@ import { PublicKey, Keypair } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync } from "@solana/spl-token"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { getTokenInfos } from "@/lib/api";
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
+import { parseVault } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
