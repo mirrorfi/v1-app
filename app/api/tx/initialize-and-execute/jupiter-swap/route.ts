@@ -125,6 +125,8 @@ export async function POST(req: NextRequest) {
     ];
 
     const tx = await buildTx(ixs, new PublicKey(authority));
+    const simulation = await SERVER_CONNECTION.simulateTransaction(tx);
+    console.log("Simulation logs:", simulation.value.logs);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),
