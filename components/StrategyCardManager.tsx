@@ -55,7 +55,9 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
             <h3 className="flex text-white font-semibold text-xl items-center gap-2">
               {strategyData.tokenInfo?.symbol || ''}
               <div className="text-sm mt-1">
-              {strategyData.strategyType === "deposit" ? "(Main Deposit)" : "(Yield)"}
+                {strategyData.strategyType === "deposit" ? "(Main Deposit)" : 
+                 apy == 0 ? "(Trade)" : "(Yield)"
+                }
               </div>
             </h3>
             <p className="text-gray-400 text-base">
@@ -64,6 +66,7 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
           </div>
           
           <div className="flex justify-end items-center gap-2">
+            <span className="text-slate-400">NAV:</span>
             <span className="text-white font-bold text-2xl">
               ${strategyData.value.toFixed(2)}
             </span>
