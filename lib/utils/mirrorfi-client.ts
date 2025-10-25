@@ -23,7 +23,7 @@ export class MirrorFiClient {
     )[0];
   }
 
-  private getTreasuryPda() {
+  getTreasuryPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("treasury")],
       programId,
