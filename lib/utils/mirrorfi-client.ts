@@ -66,17 +66,6 @@ export class MirrorFiClient {
     )[0];
   }
 
-  getVaultDepositorPda(vault: PublicKey, depositor: PublicKey) {
-    return PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("vault_depositor"),
-        vault.toBuffer(),
-        depositor.toBuffer(),
-      ],
-      programId,
-    )[0];
-  }
-
   async fetchProgramAccount<
     T extends keyof AccountNamespace<Mirrorfi>,
     R extends ParsedProgramAccount

@@ -170,42 +170,6 @@ export type Mirrorfi = {
           "writable": true
         },
         {
-          "name": "vaultDepositor",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  100,
-                  101,
-                  112,
-                  111,
-                  115,
-                  105,
-                  116,
-                  111,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              },
-              {
-                "kind": "account",
-                "path": "depositor"
-              }
-            ]
-          }
-        },
-        {
           "name": "depositMint"
         },
         {
@@ -223,7 +187,7 @@ export type Mirrorfi = {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vaultDepositor"
+                "path": "depositor"
               },
               {
                 "kind": "account",
@@ -1144,6 +1108,66 @@ export type Mirrorfi = {
           }
         },
         {
+          "name": "treasury"
+        },
+        {
+          "name": "treasuryTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
+              },
+              {
+                "kind": "account",
+                "path": "depositMintTokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "depositMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "priceUpdateV2"
         },
         {
@@ -1368,42 +1392,6 @@ export type Mirrorfi = {
           "writable": true
         },
         {
-          "name": "vaultDepositor",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  100,
-                  101,
-                  112,
-                  111,
-                  115,
-                  105,
-                  116,
-                  111,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              },
-              {
-                "kind": "account",
-                "path": "withdrawer"
-              }
-            ]
-          }
-        },
-        {
           "name": "depositMint"
         },
         {
@@ -1474,7 +1462,7 @@ export type Mirrorfi = {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vaultDepositor"
+                "path": "withdrawer"
               },
               {
                 "kind": "account",
@@ -1616,19 +1604,6 @@ export type Mirrorfi = {
         152,
         117,
         119
-      ]
-    },
-    {
-      "name": "vaultDepositor",
-      "discriminator": [
-        87,
-        109,
-        182,
-        106,
-        87,
-        96,
-        63,
-        211
       ]
     }
   ],
@@ -2424,56 +2399,6 @@ export type Mirrorfi = {
               "array": [
                 "u64",
                 32
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "vaultDepositor",
-      "serialization": "bytemuck",
-      "repr": {
-        "kind": "c"
-      },
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "padding0",
-            "type": {
-              "array": [
-                "u8",
-                7
-              ]
-            }
-          },
-          {
-            "name": "totalShares",
-            "type": "u64"
-          },
-          {
-            "name": "totalCost",
-            "type": "u64"
-          },
-          {
-            "name": "realizedPnl",
-            "type": "i64"
-          },
-          {
-            "name": "padding1",
-            "type": {
-              "array": [
-                "u64",
-                8
               ]
             }
           }

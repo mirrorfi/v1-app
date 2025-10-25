@@ -164,42 +164,6 @@
           "writable": true
         },
         {
-          "name": "vault_depositor",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  100,
-                  101,
-                  112,
-                  111,
-                  115,
-                  105,
-                  116,
-                  111,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              },
-              {
-                "kind": "account",
-                "path": "depositor"
-              }
-            ]
-          }
-        },
-        {
           "name": "deposit_mint"
         },
         {
@@ -217,7 +181,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_depositor"
+                "path": "depositor"
               },
               {
                 "kind": "account",
@@ -1138,6 +1102,66 @@
           }
         },
         {
+          "name": "treasury"
+        },
+        {
+          "name": "treasury_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "price_update_v2"
         },
         {
@@ -1362,42 +1386,6 @@
           "writable": true
         },
         {
-          "name": "vault_depositor",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  100,
-                  101,
-                  112,
-                  111,
-                  115,
-                  105,
-                  116,
-                  111,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              },
-              {
-                "kind": "account",
-                "path": "withdrawer"
-              }
-            ]
-          }
-        },
-        {
           "name": "deposit_mint"
         },
         {
@@ -1468,7 +1456,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_depositor"
+                "path": "withdrawer"
               },
               {
                 "kind": "account",
@@ -1610,19 +1598,6 @@
         152,
         117,
         119
-      ]
-    },
-    {
-      "name": "VaultDepositor",
-      "discriminator": [
-        87,
-        109,
-        182,
-        106,
-        87,
-        96,
-        63,
-        211
       ]
     }
   ],
@@ -2418,56 +2393,6 @@
               "array": [
                 "u64",
                 32
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "VaultDepositor",
-      "serialization": "bytemuck",
-      "repr": {
-        "kind": "c"
-      },
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "padding0",
-            "type": {
-              "array": [
-                "u8",
-                7
-              ]
-            }
-          },
-          {
-            "name": "total_shares",
-            "type": "u64"
-          },
-          {
-            "name": "total_cost",
-            "type": "u64"
-          },
-          {
-            "name": "realized_pnl",
-            "type": "i64"
-          },
-          {
-            "name": "padding1",
-            "type": {
-              "array": [
-                "u64",
-                8
               ]
             }
           }

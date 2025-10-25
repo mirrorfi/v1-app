@@ -38,7 +38,6 @@ type i64 = bigIntString;
 
 type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];
-type VaultDepositor = IdlAccounts<Mirrorfi>["vaultDepositor"];
 type Strategy = IdlAccounts<Mirrorfi>["strategy"];
 type User = IdlAccounts<Mirrorfi>["user"];
 type ProtocolStatus = IdlTypes<Mirrorfi>["protocolStatus"];
@@ -167,26 +166,6 @@ export function parseVault({
     status: parseEnum<ParsedVaultStatus>(status),
     nextStrategyId,
     id: parseBN(id),
-  };
-}
-
-export function parseVaultDepositor({
-  authority,
-  bump,
-  padding0,
-  totalShares,
-  totalCost,
-  realizedPnl,
-  padding1,
-}: VaultDepositor): Omit<ParsedVaultDepositor, "publicKey"> {
-  return {
-    authority: parsePublicKey(authority),
-    bump,
-    padding0: padding0,
-    totalShares: parseBN(totalShares),
-    totalCost: parseBN(totalCost),
-    realizedPnl: parseBN(realizedPnl),
-    padding1: padding1,
   };
 }
 
