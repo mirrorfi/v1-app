@@ -168,8 +168,8 @@ export default function VaultPage() {
       }
       setIsLoading(false);
       // wait 60s
-      await new Promise(resolve => setTimeout(resolve, 60000));
-      loadVault();
+      // await new Promise(resolve => setTimeout(resolve, 60000));
+      // loadVault();
     }
     loadVault();
   }, [vault, publicKey, reload]);
