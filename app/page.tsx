@@ -15,6 +15,7 @@ import { TrendingUp, DollarSign, Users, ArrowRight, AlertCircle, Loader2 } from 
 import { AccessCodeGate } from '@/components/AccessCodeGate';
 import { TermsOfService } from '@/components/TermsOfService';
 import { useWallet } from "@solana/wallet-adapter-react";
+import { registerUser } from '@/lib/utils/activity-logger';
 
 const connection = getConnection();
 
@@ -40,6 +41,9 @@ export default function Home() {
         setChecking(false);
         return;
       }
+
+      // Register user in database when they connect
+      await registerUser(publicKey.toBase58());
 
       // Check local signature
       const storedSignatures = localStorage.getItem("termsSignatures") || "{}";
