@@ -139,7 +139,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
   const [totalValue, setTotalValue] = useState<number>(0);
   const [hasError, setHasError] = useState<boolean>(false);
 
-  const isEmpty = depositData && depositData.balance == 0;
+  const isEmpty = !depositData;
   const [estimatedYield, setEstimatedYield] = useState<number>(0);
 
   const [isCreateStrategy, setIsCreateStrategy] = useState<boolean>(false);

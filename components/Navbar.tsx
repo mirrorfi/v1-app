@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -46,7 +47,12 @@ export function Navbar() {
             height={32}
             className="h-6 w-6 md:h-8 md:w-8"
           />
-          <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
+            <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
+              V1 Beta
+            </Badge>
+          </div>
         </div>
 
         {/* Navigation Menu - Hidden on mobile */}
