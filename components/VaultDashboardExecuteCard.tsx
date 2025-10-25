@@ -45,7 +45,6 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
     } else {
       amount = positionBalance;
     }
-    console.log("Amount Updated:", amount, "Percent:", percent);
     
     const computed = amount * percent
     setAmount(computed.toString())

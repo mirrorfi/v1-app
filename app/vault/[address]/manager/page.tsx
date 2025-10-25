@@ -41,11 +41,9 @@ export default function VaultPage() {
     let vaultDepositAta = getAssociatedTokenAddressSync(new PublicKey(vaultData.depositMint), vaultKey, true, tokenInfo.tokenProgram);
     let vaultDepositMintBalanceRes = await connection.getTokenAccountBalance(vaultDepositAta);
     let vaultDepositMintBalance = vaultDepositMintBalanceRes.value.uiAmount || 0;
-    console.log("TOKEN BALANCE:", vaultDepositMintBalance);
 
     // 2. Fetch Strategies
     const strategies = await getVaultStrategies(vaultKey);
-    console.log("Vault Strategies:", strategies);
 
     // 3. Get all token addresses involved
     const tokens = [vaultData.depositMint];
@@ -58,12 +56,9 @@ export default function VaultPage() {
       }
       // TO DO: Fetching for other strategies
     }
-    console.log("tokens:", tokens);
 
     // 4. Fetch Token Prices and Infos from Jupiter for all tokens
     const tokenInfos = await getTokenInfos(tokens);
-    console.log("Token Prices:", Object.entries(tokenInfos).map(([mint, info]) => ({ mint, usdPrice: info.usdPrice })));
-    console.log("Jupiter Token Infos:", tokenInfos);
 
     // 5. Fetch ATAs for all Jupiter Strategies
     const jupStrategyAtas = [];
@@ -80,7 +75,6 @@ export default function VaultPage() {
       }
     }
     const jupBalancesRes = await connection.getMultipleParsedAccounts(jupStrategyAtas);
-    console.log("Jupiter Strategy ATAs Balances:", jupBalancesRes);
 
     // 6. Parse Collected Data
     const depositTokenInfo = tokenInfos[vaultData.depositMint];
@@ -103,10 +97,6 @@ export default function VaultPage() {
         const tokenInfo = tokenInfos[tokenMint];
         const ataInfo = jupBalancesRes.value[i] as any;
         const ataBalance = ataInfo?.data.parsed.info.tokenAmount.uiAmount || 0;
-
-        console.log("Strategy ATA Balance:", ataBalance);
-        console.log("Strategy Deployed:", strategy.depositsDeployed);
-
         strategiesData.push({
           pda: strategy.publicKey,
           strategyType: strategyTypeKey,
@@ -121,8 +111,6 @@ export default function VaultPage() {
         throw new Error(`Strategy Type Not Integrated: ${strategyTypeKey}`);
       }
     }
-    console.log("Deposit Data:", depositData);
-    console.log("Strategies Data:", strategiesData);
     setDepositData(depositData);
     setStrategiesData(strategiesData);
   }
