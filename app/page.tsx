@@ -16,7 +16,7 @@ import { AccessCodeGate } from '@/components/AccessCodeGate';
 import { TermsOfService } from '@/components/TermsOfService';
 import { useWallet } from "@solana/wallet-adapter-react";
 
-// const connection = getConnection();
+const connection = getConnection();
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
