@@ -42,6 +42,7 @@ export default function CreatePage() {
     const {showNotification} = useNotification();
     const {publicKey, signTransaction} = useWallet();
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const [isLoading, setIsLoading] = useState(false)
     
     // Form state
     const [formData, setFormData] = useState({
@@ -72,68 +73,79 @@ export default function CreatePage() {
 
     const createAllowed = formData.name && formData.description && formData.commissionRate && formData.maxDeposit
     const handleCreate = async () => {
-        if (!publicKey || !signTransaction) {
-            showNotification({
-                title: `Wallet Not Connected!`,
-                message: `Please connect your wallet to continue.`,
-                type: "error"
-            });
-            return;
-        }
-        if (formData.description.length > 64) {
-            showNotification({
-                title: `Description Too Long!`,
-                message: `Please limit your description to 64 characters.`,
-                type: "error"
-            });
-            return;
-        }
-        if (Number(formData.commissionRate) > 30) {
-            showNotification({
-                title: `Notification Rate Too High!`,
-                message: `Please select a lower commission rate.`,
-                type: "error"
-            });
-            return;
-        }
-        const {pythOracle, tokenDecimals, tokenProgram} = TOKEN_INFO[tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint];
-        if (!pythOracle || !tokenDecimals || !tokenProgram) {
-            showNotification({
-                title: `Token Information Missing!`,
-                message: `Token Information Unknown. Please Try Again.`,
-                type: "error"
-            });
-            return;
-        }
-        console.log('Creating vault with data:', formData);
-        const nextVaultId = await mirrorfiClient.getNextVaultId();
-        const nextVaultPda = mirrorfiClient.getVaultPda(new BN(nextVaultId), publicKey);
+        setIsLoading(true);
+        try{
+            if (!publicKey || !signTransaction) {
+                showNotification({
+                    title: `Wallet Not Connected!`,
+                    message: `Please connect your wallet to continue.`,
+                    type: "error"
+                });
+                return;
+            }
+            if (formData.description.length > 64) {
+                showNotification({
+                    title: `Description Too Long!`,
+                    message: `Please limit your description to 64 characters.`,
+                    type: "error"
+                });
+                return;
+            }
+            if (Number(formData.commissionRate) > 30) {
+                showNotification({
+                    title: `Notification Rate Too High!`,
+                    message: `Please select a lower commission rate.`,
+                    type: "error"
+                });
+                return;
+            }
+            const {pythOracle, tokenDecimals, tokenProgram} = TOKEN_INFO[tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint];
+            if (!pythOracle || !tokenDecimals || !tokenProgram) {
+                showNotification({
+                    title: `Token Information Missing!`,
+                    message: `Token Information Unknown. Please Try Again.`,
+                    type: "error"
+                });
+                return;
+            }
+            console.log('Creating vault with data:', formData);
+            const nextVaultId = await mirrorfiClient.getNextVaultId();
+            const nextVaultPda = mirrorfiClient.getVaultPda(new BN(nextVaultId), publicKey);
 
-        const res = await getInitializeVaultTx({
-            name: formData.name,
-            description: formData.description,
-            managerFeeBps: parseInt(formData.commissionRate.replace('%', '')) * 100,
-            depositCap: (BigInt(parseFloat(formData.maxDeposit) * 10 ** tokenDecimals)).toString(),
-            lockedProfitDegradationDuration: "3600",
-            depositMint: tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint,
-            priceUpdateV2: pythOracle.toBase58(),
-            authority: publicKey.toString(),
-        });
-        const versionedTx = res;
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
-        versionedTx.message.recentBlockhash = blockhash;
-        const signedTx = await signTransaction(versionedTx);
-        const txid = await connection.sendRawTransaction(signedTx.serialize());
-        console.log("Transaction ID:", txid);
+            const res = await getInitializeVaultTx({
+                name: formData.name,
+                description: formData.description,
+                managerFeeBps: parseInt(formData.commissionRate.replace('%', '')) * 100,
+                depositCap: (BigInt(parseFloat(formData.maxDeposit) * 10 ** tokenDecimals)).toString(),
+                lockedProfitDegradationDuration: "3600",
+                depositMint: tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint,
+                priceUpdateV2: pythOracle.toBase58(),
+                authority: publicKey.toString(),
+            });
+            const versionedTx = res;
+            const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+            versionedTx.message.recentBlockhash = blockhash;
+            const signedTx = await signTransaction(versionedTx);
+            const txid = await connection.sendRawTransaction(signedTx.serialize());
+            console.log("Transaction ID:", txid);
 
-        showNotification({
-            title: `Successful!`,
-            message: `Your vault has been created successfully!`,
-            txId: txid,
-            type: "success"
-        });
+            showNotification({
+                title: `Successful!`,
+                message: `Your vault has been created successfully!`,
+                txId: txid,
+                type: "success"
+            });
 
-        router.push(`/vault/${nextVaultPda.toBase58()}`);
+            router.push(`/vault/${nextVaultPda.toBase58()}`);
+        } catch (error: any) {
+            console.error("Error creating vault:", error);
+            showNotification({
+                title: `Error Creating Vault!`,
+                message: error?.message || 'An unknown error occurred.',
+                type: "error"
+            });
+        }
+        setIsLoading(false);
     }
     
     const selectedToken = tokenOptions.find(token => token.symbol === formData.capitalToken)
@@ -283,9 +295,9 @@ export default function CreatePage() {
                             <Button
                                 onClick={handleCreate}
                                 className="w-full py-6 text-xl font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200 mt-8"
-                                disabled={!createAllowed}
+                                disabled={!createAllowed || isLoading}
                             >
-                                Create
+                                {isLoading ? 'Creating...' : 'Create'}
                             </Button>
                         </div>
                     </CardContent>

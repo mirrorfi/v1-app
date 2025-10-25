@@ -3,6 +3,9 @@
 import { FC, useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { GridStyleBackground } from "./ui/GridStyleBackground";
+import Image from "next/image"; 
+import { Badge } from "./ui/badge";
 
 interface AccessCodeGateProps {
   onAccessGranted: () => void;
@@ -49,17 +52,33 @@ export const AccessCodeGate: FC<AccessCodeGateProps> = ({ onAccessGranted }) => 
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Welcome to MirrorFi
-          </h1>
+      <GridStyleBackground />
+      <div className="w-full max-w-md space-y-4">
+        <div className="text-center pb-4">
+          <div className="flex h-16 md:h-20 justify-between items-center px-4 md:px-6">
+            {/* Logo and Title */}
+            <div className="flex w-full justify-center items-center space-x-2 md:space-x-3">
+              <Image
+                src="/SVG/MirrorFi-Logo-Blue.svg"
+                alt="MirrorFi Logo"
+                width={32}
+                height={32}
+                className="h-6 w-6 md:h-8 md:w-8"
+              />
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg md:text-xl font-semibold">MirrorFi</h1>
+                <Badge className="md:ml-2 bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
+                  V1 Beta
+                </Badge>
+              </div>
+            </div>
+          </div>
           <p className="text-muted-foreground">
             Please enter the access code to continue
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 relative">
           <div className="space-y-2">
             <Input
               type="text"

@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
     }
 
     const id = await mirrorfiClient.getNextVaultId();
+    const treasuryPda = mirrorfiClient.getTreasuryPda();
     const vaultPda = mirrorfiClient.getVaultPda(new BN(id), new PublicKey(authority));
     const depositMintPubkey = new PublicKey(depositMint);
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMintPubkey))!.owner;
@@ -97,6 +98,7 @@ export async function POST(req: NextRequest) {
       })
       .accountsPartial({
         authority,
+        treasury: treasuryPda,
         config: mirrorfiClient.configPda,
         depositMint,
         priceUpdateV2,

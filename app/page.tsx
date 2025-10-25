@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { VaultCard, VaultCardData } from "@/components/VaultCard";
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { StrategyFlow } from '@/components/StrategyFlow';
@@ -61,12 +60,6 @@ export default function Home() {
   }, [publicKey]);
 
   useEffect(() => {
-    // Only fetch vaults if user has passed all gates
-    if (!hasAccessCode || !hasSignedTerms || !connected) {
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
     async function fetchAllVaults() {
       let vaultBalances = await getAllVaultBalances();
@@ -132,13 +125,13 @@ export default function Home() {
     );
   }
 
-  if (connected && !hasSignedTerms) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        <TermsOfService onSign={handleTermsSigned} />
-      </div>
-    );
-  }
+  // if (connected && !hasSignedTerms) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800">
+  //       <TermsOfService onSign={handleTermsSigned} />
+  //     </div>
+  //   );
+  // }
 
   // Mock vault data for the dashboard
   const mockVaults = [

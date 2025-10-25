@@ -4,6 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { FC, useState } from "react";
 import { Button } from "./ui/button";
 import bs58 from "bs58";
+import { GridStyleBackground } from "./ui/GridStyleBackground";
 
 interface TermsOfServiceProps {
   onSign: () => void;
@@ -59,6 +60,7 @@ By signing this message, I agree to the following terms:
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
+      <GridStyleBackground />
       <h2 className="text-center text-3xl font-bold">Terms of Service</h2>
       <pre className="whitespace-pre-wrap bg-card p-4 rounded-lg">
         {TERMS_OF_SERVICE}

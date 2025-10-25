@@ -6,19 +6,17 @@ import { Navbar } from "@/components/Navbar"
 import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey, Keypair } from "@solana/web3.js"
-import { getAssociatedTokenAddressSync } from "@solana/spl-token"
+import { getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token"
 import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { getPrices, getTokenInfos } from "@/lib/api";
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
+import { parseVault } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { getVaultStrategies } from "@/lib/api/accounts";
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
-import { mintTo } from "@solana/spl-token"
-import { deposit } from "@kamino-finance/klend-sdk"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
@@ -36,10 +34,7 @@ export default function VaultPage() {
   const [error, setError] = useState<string | null>(null);
   const [vaultData, setVaultData] = useState<any>(null);
   const [reload, setReload] = useState(false);
-  const [vaultBalances, setVaultBalances] = useState<any>(null);
   const [positionBalance, setPositionBalance] = useState<number>(0);
-  const [vaultDepositTokenMint, setVaultDepositTokenMint] = useState<string | null>("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-  const [vaultDepositorInfo, setVaultDepositorInfo] = useState<any>(null);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
   const [tokenPrice, setTokenPrice] = useState<number>(0); 
   const [depositData, setDepositData] = useState<any>(null);
@@ -54,24 +49,22 @@ export default function VaultPage() {
     const userAta = getAssociatedTokenAddressSync(new PublicKey(tokenMint), user, false, info.tokenProgram);
     const accountInfo = await connection.getTokenAccountBalance(userAta);
     const tokenPriceData = await getPrices([tokenMint]);
-    console.log("Token Price Data:", tokenPriceData);
     if (tokenPriceData[tokenMint]) setTokenPrice(tokenPriceData[tokenMint]);
     if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
   }
 
-  async function fetchUserVaultDepositor(vaultKey: PublicKey, user: PublicKey, tokenMint: string) {
+  async function fetchUserReceiptBalance(vault: string, tokenMint: string, user: PublicKey) {
     const info = TOKEN_INFO[tokenMint]
-    const vaultDepositorPda = await mirrorfiClient.getVaultDepositorPda(vaultKey, user);
-    const vaultDepositorData = await mirrorfiClient.fetchProgramAccount(vaultDepositorPda.toBase58(), "vaultDepositor", parseVaultDepositor);
-    console.log("Vault Depositor Data:", vaultDepositorData);
-    setVaultDepositorInfo(vaultDepositorData);
-    if(vaultDepositorData) {
-      setVaultDepositorInfo(vaultDepositorData);
-      const positionShareToken = Number(vaultDepositorData.totalShares) / 10**info.tokenDecimals;
-      // TODO: Fetch Share Token Balance using Share Token Price
-      // const ownershipRatio = positionShareToken / balances.shareTokenSupply;
-      // const positionBalance = ownershipRatio * balances.totalNAV;
-      setPositionBalance(positionShareToken);
+    const receiptMint = mirrorfiClient.getReceiptMintPda(new PublicKey(vault));
+    const userReceiptAta = getAssociatedTokenAddressSync(receiptMint, user, false, TOKEN_2022_PROGRAM_ID);
+    try{
+      const userReceiptAccountInfo = await connection.getTokenAccountBalance(userReceiptAta);
+      const positionShareToken = userReceiptAccountInfo.value.uiAmount || 0;
+      // TODO: Fetch Share Position Balance by deriving Total Share * Share Token Price
+      const positionShareBalance = positionShareToken;
+      setPositionBalance(positionShareBalance);
+    } catch(e){
+      console.log("No Receipt Token Data found");
     }
   }
 
@@ -82,12 +75,10 @@ export default function VaultPage() {
     let vaultDepositAta = getAssociatedTokenAddressSync(new PublicKey(vaultData.depositMint), vaultKey, true, tokenInfo.tokenProgram);
     let vaultDepositMintBalanceRes = await connection.getTokenAccountBalance(vaultDepositAta);
     let vaultDepositMintBalance = vaultDepositMintBalanceRes.value.uiAmount || 0;
-    console.log("TOKEN BALANCE:", vaultDepositMintBalance);
 
     // 2. Fetch Strategies
     const strategies = await getVaultStrategies(vaultKey);
-    console.log("Vault Strategies:", strategies);
-
+  
     // 3. Get all token addresses involved
     const tokens = [vaultData.depositMint];
     const added = {[vaultData.depositMint]: true};
@@ -99,12 +90,9 @@ export default function VaultPage() {
       }
       // TO DO: Fetching for other strategies
     }
-    console.log("tokens:", tokens);
 
     // 4. Fetch Token Prices and Infos from Jupiter for all tokens
     const tokenInfos = await getTokenInfos(tokens);
-    console.log("Token Prices:", Object.entries(tokenInfos).map(([mint, info]) => ({ mint, usdPrice: info.usdPrice })));
-    console.log("Jupiter Token Infos:", tokenInfos);
 
     // 5. Fetch ATAs for all Jupiter Strategies
     const jupStrategyAtas = [];
@@ -121,7 +109,6 @@ export default function VaultPage() {
       }
     }
     const jupBalancesRes = await connection.getMultipleParsedAccounts(jupStrategyAtas);
-    console.log("Jupiter Strategy ATAs Balances:", jupBalancesRes);
 
     // 6. Parse Collected Data
     const depositTokenInfo = tokenInfos[vaultData.depositMint];
@@ -144,10 +131,6 @@ export default function VaultPage() {
         const tokenInfo = tokenInfos[tokenMint];
         const ataInfo = jupBalancesRes.value[i] as any;
         const ataBalance = ataInfo?.data.parsed.info.tokenAmount.uiAmount || 0;
-
-        console.log("Strategy ATA Balance:", ataBalance);
-        console.log("Strategy Deployed:", strategy.depositsDeployed);
-
         strategiesData.push({
           strategyType: strategyTypeKey,
           tokenInfo: tokenInfos[tokenMint],
@@ -161,8 +144,6 @@ export default function VaultPage() {
         throw new Error(`Strategy Type Not Integrated: ${strategyTypeKey}`);
       }
     }
-    console.log("Deposit Data:", depositData);
-    console.log("Strategies Data:", strategiesData);
     setDepositData(depositData);
     setStrategiesData(strategiesData);
   }
@@ -195,14 +176,13 @@ export default function VaultPage() {
         }
         console.log("Vault Data:", vaultData);
         setVaultData(vaultData);
-        setVaultDepositTokenMint(vaultData.depositMint);
         fetchVaultStrategies(vaultKey, vaultData);
         // Step 3: Get User Position Info
         if(publicKey){
           // Fetch Deposit Token Balance
           fetchUserBalance(vaultData.depositMint, publicKey);
           // Fetch Share Token Balance
-          fetchUserVaultDepositor(vaultKey, publicKey, vaultData.depositMint);
+          fetchUserReceiptBalance(vault, vaultData.depositMint, publicKey);
         }
       } catch (error: any) {
         console.error("Error loading vault:", error);
@@ -234,7 +214,6 @@ export default function VaultPage() {
           <MobileVaultDashboard 
             vault={vault} 
             vaultData={vaultData} 
-            vaultDepositorInfo={vaultDepositorInfo}
             positionBalance={positionBalance}
             tokenBalance={tokenBalance}
             tokenPrice={tokenPrice}
@@ -249,7 +228,6 @@ export default function VaultPage() {
         <VaultDashboard 
           vault={vault} 
           vaultData={vaultData} 
-          vaultDepositorInfo={vaultDepositorInfo}
           positionBalance={positionBalance}
           tokenBalance={tokenBalance}
           tokenPrice={tokenPrice}

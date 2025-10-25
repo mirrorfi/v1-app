@@ -10,13 +10,12 @@ import Image from "next/image"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 
 interface PNLCardProps {
-  vaultDepositor: any
   positionBalance: number
   tokenPrice: number
   isLoading?: boolean
 }
 
-export function VaultDashboardPNLCard({ vaultDepositor, positionBalance, tokenPrice, isLoading = false }: PNLCardProps) {
+export function VaultDashboardPNLCard({positionBalance, tokenPrice, isLoading = false }: PNLCardProps) {
   const isMobile = useIsMobile()
   const [pnlData, setPnlData] = useState<{
     totalPnl: number
@@ -35,24 +34,24 @@ export function VaultDashboardPNLCard({ vaultDepositor, positionBalance, tokenPr
   })
 
   useEffect(() => {
-    if (vaultDepositor && positionBalance && tokenPrice) {
-      const totalCost = Number(vaultDepositor.total_cost) / 1e6 * tokenPrice
-      const realizedPnl = Number(vaultDepositor.realized_pnl) / 1e6 * tokenPrice
+    if (positionBalance && tokenPrice) {
       const currentValue = positionBalance
-      const unrealizedPnl = currentValue - totalCost + realizedPnl
-      const totalPnl = realizedPnl + unrealizedPnl
-      const pnlPercentage = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0
+      // const totalCost = Number(vaultDepositor.total_cost) / 1e6 * tokenPrice
+      // const realizedPnl = Number(vaultDepositor.realized_pnl) / 1e6 * tokenPrice
+      // const unrealizedPnl = currentValue - totalCost + realizedPnl
+      // const totalPnl = realizedPnl + unrealizedPnl
+      // const pnlPercentage = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0
 
       setPnlData({
-        totalPnl,
-        pnlPercentage,
-        totalCost,
         currentValue,
-        realizedPnl,
-        unrealizedPnl
+        totalPnl: 0,
+        pnlPercentage: 0,
+        totalCost: 0,
+        realizedPnl: 0,
+        unrealizedPnl: 0
       })
     }
-  }, [vaultDepositor, positionBalance, tokenPrice])
+  }, [positionBalance, tokenPrice])
 
   //const isPositive = pnlData.totalPnl >= -0.01
   const isPositive = true;
@@ -81,7 +80,7 @@ export function VaultDashboardPNLCard({ vaultDepositor, positionBalance, tokenPr
   }
 
   // Empty state when no position
-  if (!vaultDepositor || !positionBalance) {
+  if (!positionBalance) {
     return (
       <Card className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 border-slate-700/50 backdrop-blur-sm rounded-xl shadow-2xl">
         <CardContent className="p-8">

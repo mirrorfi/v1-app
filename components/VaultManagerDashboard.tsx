@@ -5,23 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
-import { getVaultBalances } from "@/lib/api/vault"
 import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Skeleton } from "./ui/skeleton"
-import { mirrorfiClient } from '@/lib/solana-server';
-import { fetchJupiterPrices } from "@/lib/utils/jupiter"
-import { parseVault, parseVaultDepositor } from '@/types/accounts';
-
-import { VaultDashboardExecuteCard, VaultDashboardExecuteCardSkeleton } from "@/components/VaultDashboardExecuteCard"
-import { VaultDashboardChart } from "@/components/VaultDashboardChart";
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
-import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
-import { VaultDashboardPNLCard } from "@/components/VaultDashboardPNLCard"
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { TOKEN_INFO } from "@/lib/utils/tokens"
 
 interface StrategyDashboardProps {
   vault: string;

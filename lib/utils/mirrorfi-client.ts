@@ -23,7 +23,7 @@ export class MirrorFiClient {
     )[0];
   }
 
-  private getTreasuryPda() {
+  getTreasuryPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("treasury")],
       programId,
@@ -62,17 +62,6 @@ export class MirrorFiClient {
   getUserPda(authority: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("user"), authority.toBuffer()],
-      programId,
-    )[0];
-  }
-
-  getVaultDepositorPda(vault: PublicKey, depositor: PublicKey) {
-    return PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("vault_depositor"),
-        vault.toBuffer(),
-        depositor.toBuffer(),
-      ],
       programId,
     )[0];
   }
