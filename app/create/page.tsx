@@ -260,7 +260,7 @@ export default function CreatePage() {
                             
                             {/* Max User Deposit Cap */}
                             <div className="space-y-2">
-                                <label className="text-slate-400 text-sm font-medium">Max User Deposit Cap:</label>
+                                <label className="text-slate-400 text-sm font-medium">Max Deposit per User Cap:</label>
                                 <div className="relative">
                                     <Input
                                         value={formData.maxDeposit}
