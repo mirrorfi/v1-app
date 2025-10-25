@@ -12,17 +12,57 @@ import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { StrategyFlow } from '@/components/StrategyFlow';
 import { getAllVaultBalances } from '@/lib/api';
 import { TrendingUp, DollarSign, Users, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { AccessCodeGate } from '@/components/AccessCodeGate';
+import { TermsOfService } from '@/components/TermsOfService';
+import { useWallet } from "@solana/wallet-adapter-react";
 
-const connection = getConnection();
+// const connection = getConnection();
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [vaultCardsData, setVaultCardsData] = useState<VaultCardData[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [hasAccessCode, setHasAccessCode] = useState(false);
+  const [hasSignedTerms, setHasSignedTerms] = useState(false);
+  const [checking, setChecking] = useState(true);
   const router = useRouter();
-
+  const { connected, publicKey } = useWallet();
 
   useEffect(() => {
+    // Check if access code has been entered
+    const accessGranted = localStorage.getItem("mirrorfi_access_granted");
+    if (accessGranted === "true") {
+      setHasAccessCode(true);
+    }
+
+    const checkLocalSignature = async () => {
+      if (!publicKey) {
+        setChecking(false);
+        return;
+      }
+
+      // Check local signature
+      const storedSignatures = localStorage.getItem("termsSignatures") || "{}";
+      const signatures = JSON.parse(storedSignatures);
+      if (signatures[publicKey.toBase58()]) {
+        setHasSignedTerms(true);
+        setChecking(false);
+        return;
+      }
+
+      setChecking(false);
+    };
+
+    checkLocalSignature();
+  }, [publicKey]);
+
+  useEffect(() => {
+    // Only fetch vaults if user has passed all gates
+    if (!hasAccessCode || !hasSignedTerms || !connected) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     async function fetchAllVaults() {
       let vaultBalances = await getAllVaultBalances();
@@ -64,7 +104,37 @@ export default function Home() {
     }
     fetchAllVaults();
     setIsLoading(false);
-  }, [])
+  }, [hasAccessCode, hasSignedTerms, connected])
+
+  const handleAccessGranted = () => {
+    setHasAccessCode(true);
+  };
+
+  const handleTermsSigned = () => {
+    setHasSignedTerms(true);
+  };
+
+  // First check: Access code
+  if (!hasAccessCode) {
+    return <AccessCodeGate onAccessGranted={handleAccessGranted} />;
+  }
+
+  // Second check: Terms of service (only if wallet is connected)
+  if (checking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (connected && !hasSignedTerms) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        <TermsOfService onSign={handleTermsSigned} />
+      </div>
+    );
+  }
 
   // Mock vault data for the dashboard
   const mockVaults = [
