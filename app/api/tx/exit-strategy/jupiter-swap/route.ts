@@ -129,8 +129,8 @@ export async function POST(req: NextRequest) {
       .accounts({
         authority,
         config: mirrorfiClient.configPda,
-        destinationMint: targetMint,
-        sourceMint: depositMint,
+        destinationMint: depositMint,
+        sourceMint: targetMint,
         vault,
         strategy,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -142,6 +142,10 @@ export async function POST(req: NextRequest) {
       .instruction();
 
     const tx = await buildTx([ix], new PublicKey(authority));
+    const serialized = tx.serialize();
+    console.log(serialized);
+    // const simulation = await mirrorfiClient.program.provider.connection.simulateTransaction(tx);
+    // console.log("Simulation logs:", simulation.value.logs);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),

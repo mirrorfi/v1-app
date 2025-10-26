@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
-import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap } from "@/lib/api";
+import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap, getExitStrategyJupiterSwap } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton";
 import { useNotification } from "@/contexts/NotificationContext"
 import { useWallet } from "@solana/wallet-adapter-react"
@@ -301,12 +301,17 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           strategy: strategyPosition.strategyPda,
         });
       }else {
-        showNotification({
-          title: `Action Failed!`,
-          message: `Strategy Closing / Withdrawal not supported yet.`,
-          type: "error"
+        res = await getExitStrategyJupiterSwap({
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          slippageBps: 100,
+          authority: publicKey.toString(),
+          strategy: strategyPosition.strategyPda,
         });
-        return;
+        // showNotification({
+        //   title: `Action Failed!`,
+        //   message: `Strategy Closing / Withdrawal not supported yet.`,
+        //   type: "error"
+        // });
       }
       const versionedTx = res;
       // Prompt user to sign and send transaction
