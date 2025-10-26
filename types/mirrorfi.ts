@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/mirrorfi.json`.
  */
 export type Mirrorfi = {
-  "address": "M1RtniT4YxLewLRTnJkhEHB41hm7KXRWDtsMp3ZGGbX",
+  "address": "M1RzzrPZwnVDSJhT4Ve9iPiynzuo54K4WuSSXXY18YA",
   "metadata": {
     "name": "mirrorfi",
     "version": "0.1.0",
