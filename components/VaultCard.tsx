@@ -45,6 +45,10 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
 
   // Check if current user owns this vault
   const isUserVault = publicKey && publicKey.toString() === vault.createdBy;
+  
+  // Check if vault is verified (specific authority and user is not the creator)
+  const VERIFIED_AUTHORITY = "H1ZpCkCHJR9HxwLQSGYdCDt7pkqJAuZx5FhLHzWHdiEw";
+  const isVerifiedVault = vault.createdBy === VERIFIED_AUTHORITY && !isUserVault;
 
   const handleCreatorClick = () => {
     window.open(`https://solscan.io/account/${vault.createdBy}`, '_blank');
@@ -62,6 +66,11 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
             {isUserVault && (
               <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
                 Your Vault
+              </Badge>
+            )}
+            {isVerifiedVault && (
+              <Badge className="bg-green-600/20 text-green-400 border-green-500/30 text-xs px-2 py-1">
+                Verified
               </Badge>
             )}
           </div>

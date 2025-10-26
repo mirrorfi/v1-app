@@ -155,7 +155,7 @@ export default function CreatePage() {
             <GridStyleBackground />
             <Navbar />
             
-            <div className="relative z-20 pt-20 flex flex-col items-center justify-center">
+            <div className="relative z-20 flex flex-col items-center justify-center">
                 {/* Create Vault Form Card */}
                 <Card className="w-full max-w-md bg-slate-800/50 border-slate-600/30 rounded-xl backdrop-blur-sm">
                     <CardContent className="p-8">

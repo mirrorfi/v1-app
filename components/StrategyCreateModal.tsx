@@ -196,7 +196,7 @@ export function StrategyCreateModal({ isOpen, onClose, onCreateStrategy }: Strat
           </div>
 
           {/* Create Button */}
-          <div className="w-full justify-center pt-4">
+          <div className="w-full justify-center -mt-2">
             <Button
               onClick={handleCreateStrategy}
               disabled={!selectedStrategy}

@@ -41,9 +41,6 @@ export default function Home() {
         return;
       }
 
-      // Register user in database when they connect
-      await registerUser(publicKey.toBase58());
-
       // Check local signature
       const storedSignatures = localStorage.getItem("termsSignatures") || "{}";
       const signatures = JSON.parse(storedSignatures);
@@ -57,6 +54,12 @@ export default function Home() {
     };
 
     checkLocalSignature();
+  }, [publicKey]);
+
+  useEffect(() => {
+    if (publicKey) {
+      registerUser(publicKey.toBase58());
+    }
   }, [publicKey]);
 
   useEffect(() => {
