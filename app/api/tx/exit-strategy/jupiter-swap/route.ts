@@ -86,12 +86,12 @@ export async function POST(req: NextRequest) {
     const depositMint = new PublicKey(vaultAcc.depositMint);
     const targetMint = new PublicKey(strategyType.jupiterSwap.targetMint);
     const executeSwapResult = await swap(
-      depositMint,
       targetMint,
+      depositMint,
       amount,
       slippageBps,
       false,
-      false,
+      true,
       new PublicKey(vault),
       mirrorfiClient.program.provider.connection,
     );
