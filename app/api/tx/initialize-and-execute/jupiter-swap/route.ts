@@ -73,7 +73,9 @@ export async function POST(req: NextRequest) {
     }
 
     const depositMint = new PublicKey(vaultAcc.depositMint);
-    const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))?.owner;
+    const tokenMintAccountInfos = (await SERVER_CONNECTION.getMultipleAccountsInfo([depositMint, new PublicKey(destinationMint)]));
+    const depositMintTokenProgram = tokenMintAccountInfos[0]!.owner;
+    const destinationMintTokenProgram = tokenMintAccountInfos[1]!.owner;
     const vaultDepositMintTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
       new PublicKey(vault),
@@ -117,7 +119,7 @@ export async function POST(req: NextRequest) {
           sourceMint: vaultAcc.depositMint,
           vault,
           strategy,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: destinationMintTokenProgram,
           vaultSourceTokenAccount: vaultDepositMintTokenAccount,
         })
         .remainingAccounts(remainingAccounts)
