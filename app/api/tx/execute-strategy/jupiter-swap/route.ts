@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       .remainingAccounts(remainingAccounts)
       .instruction();
 
-    const tx = await buildTx([ix], new PublicKey(authority));
+    const tx = await buildTx([ix], new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),

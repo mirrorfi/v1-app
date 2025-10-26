@@ -124,9 +124,7 @@ export async function POST(req: NextRequest) {
         .instruction()
     ];
 
-    const tx = await buildTx(ixs, new PublicKey(authority));
-    const simulation = await SERVER_CONNECTION.simulateTransaction(tx);
-    console.log("Simulation logs:", simulation.value.logs);
+    const tx = await buildTx(ixs, new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),

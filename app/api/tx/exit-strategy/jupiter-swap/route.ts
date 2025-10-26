@@ -141,11 +141,7 @@ export async function POST(req: NextRequest) {
       .remainingAccounts(remainingAccounts)
       .instruction();
 
-    const tx = await buildTx([ix], new PublicKey(authority));
-    const serialized = tx.serialize();
-    console.log(serialized);
-    // const simulation = await mirrorfiClient.program.provider.connection.simulateTransaction(tx);
-    // console.log("Simulation logs:", simulation.value.logs);
+    const tx = await buildTx([ix], new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),
