@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const ix = await mirrorfiClient.program.methods
       .depositVault(new BN(amount))
       .accounts({
-        config: mirrorfiClient.configPda,
+        config: mirrorfiClient.getConfigPda(),
         depositMint,
         depositMintTokenProgram,
         depositor,

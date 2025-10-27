@@ -111,10 +111,10 @@ export async function POST(req: NextRequest) {
       !PublicKey.isOnCurve(vault),
       targetMintTokenProgram,
     );
-    const treasuryPda = mirrorfiClient.treasuryPda;
+    const treasuryPda = mirrorfiClient.getTreasuryPda();
     const treasuryTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
-      new PublicKey(treasuryPda),
+      treasuryPda,
       !PublicKey.isOnCurve(treasuryPda),
       depositMintTokenProgram,
     );
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       )
       .accounts({
         authority,
-        config: mirrorfiClient.configPda,
+        config: mirrorfiClient.getConfigPda(),
         destinationMint: depositMint,
         sourceMint: targetMint,
         vault,

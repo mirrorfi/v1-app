@@ -3,7 +3,7 @@ import { parseConfig } from '@/types/accounts';
 import { NextRequest, NextResponse } from 'next/server';
 
 export  async function GET(req: NextRequest) {
-  const configPda = mirrorfiClient.configPda;
+  const configPda = mirrorfiClient.getConfigPda();
 
   try {
     return NextResponse.json(

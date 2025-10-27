@@ -2,9 +2,6 @@ import { Mirrorfi } from "@/types/mirrorfi";
 import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
 import { AccountNamespace, BN, IdlAccounts, Program } from "@coral-xyz/anchor";
 import { parseConfig, ParsedProgramAccount, parseVault } from "@/types/accounts";
-import mirrorfiIdl from "@/idl/mirrorfi.json";
-
-const programId = new PublicKey(mirrorfiIdl.address);
 
 export class MirrorFiClient {
   program: Program<Mirrorfi>;
@@ -13,20 +10,21 @@ export class MirrorFiClient {
     this.program = program;
   }
   
-  configPda = this.getConfigPda();
-  treasuryPda = this.getTreasuryPda();
+  getProgramId() {
+    return this.program.programId;
+  }
 
-  private getConfigPda() {
+  getConfigPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("config")],
-      programId
+      this.program.programId
     )[0];
   }
 
   getTreasuryPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("treasury")],
-      programId,
+      this.program.programId
     )[0];
   }
 
@@ -37,14 +35,14 @@ export class MirrorFiClient {
         id.toArrayLike(Buffer, "le", 8),
         authority.toBuffer(),
       ],
-      programId,
+      this.program.programId
     )[0];
   }
 
   getReceiptMintPda(vault: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("receipt_mint"), vault.toBuffer()],
-      programId,
+      this.program.programId
     )[0];
   }
 
@@ -55,14 +53,14 @@ export class MirrorFiClient {
         vault.toBuffer(),
         id.toArrayLike(Buffer, "le", 1),
       ],
-      programId,
+      this.program.programId
     )[0];
   }
 
   getUserPda(authority: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("user"), authority.toBuffer()],
-      programId,
+      this.program.programId
     )[0];
   }
 
@@ -117,7 +115,7 @@ export class MirrorFiClient {
   }
 
   async getNextVaultId() {
-    const configAcc = await this.fetchProgramAccount(this.configPda.toBase58(), "config", parseConfig);
+    const configAcc = await this.fetchProgramAccount(this.getConfigPda().toBase58(), "config", parseConfig);
 
     if (!configAcc) {
       throw new Error("Config account not found.");

@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     const ix = await mirrorfiClient.program.methods
       .withdrawVault(new BN(amount))
       .accounts({
-        config: mirrorfiClient.configPda,
+        config: mirrorfiClient.getConfigPda(),
         depositMint,
         depositMintTokenProgram,
         receiptMint,

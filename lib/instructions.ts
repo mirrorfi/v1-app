@@ -46,7 +46,7 @@ export async function depositVaultIx({
   return await mirrorfiClient.program.methods
     .depositVault(new BN(amount))
     .accounts({
-      config: mirrorfiClient.configPda,
+      config: mirrorfiClient.getConfigPda(),
       depositMint,
       depositMintTokenProgram,
       depositor,
@@ -85,7 +85,7 @@ export async function executeStrategyJupiterSwapIx({
     .executeStrategyJupiterSwap(swapData, new BN(amount), slippageBps)
     .accounts({
       authority,
-      config: mirrorfiClient.configPda,
+      config: mirrorfiClient.getConfigPda(),
       destinationMint,
       sourceMint,
       vault,
@@ -132,7 +132,7 @@ export async function exitStrategyJupiterSwapIx({
     )
     .accounts({
       authority,
-      config: mirrorfiClient.configPda,
+      config: mirrorfiClient.getConfigPda(),
       destinationMint,
       sourceMint,
       vault,
@@ -187,7 +187,7 @@ export async function initializeAndExecuteStrategyIx({
       )
       .accounts({
         authority,
-        config: mirrorfiClient.configPda,
+        config: mirrorfiClient.getConfigPda(),
         destinationMint,
         sourceMint,
         vault,
@@ -270,7 +270,7 @@ export async function initializeVaultIx({
     })
     .accountsPartial({
       authority,
-      config: mirrorfiClient.configPda,
+      config: mirrorfiClient.getConfigPda(),
       depositMint,
       priceUpdateV2,
       depositMintTokenProgram,
@@ -299,7 +299,7 @@ export async function withdrawVaultIx({
   return await mirrorfiClient.program.methods
     .withdrawVault(new BN(amount))
     .accounts({
-      config: mirrorfiClient.configPda,
+      config: mirrorfiClient.getConfigPda(),
       depositMint,
       depositMintTokenProgram,
       receiptMint,

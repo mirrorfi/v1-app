@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
       )
       .accounts({
         authority,
-        config: mirrorfiClient.configPda,
+        config: mirrorfiClient.getConfigPda(),
         destinationMint: targetMint,
         sourceMint: depositMint,
         vault,

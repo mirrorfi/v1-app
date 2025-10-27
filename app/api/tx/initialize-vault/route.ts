@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       .accountsPartial({
         authority,
         treasury: treasuryPda,
-        config: mirrorfiClient.configPda,
+        config: mirrorfiClient.getConfigPda(),
         depositMint,
         priceUpdateV2,
         depositMintTokenProgram,
