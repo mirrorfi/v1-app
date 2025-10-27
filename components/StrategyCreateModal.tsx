@@ -124,7 +124,7 @@ function StrategyOptionCard({
         />
       </div>
 
-      <CardContent className="relative z-10 p-4">
+      <CardContent className="relative z-10 p-3 sm:p-4">
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-1">
@@ -165,8 +165,9 @@ export function StrategyCreateModal({ isOpen, onClose, onCreateStrategy }: Strat
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl bg-slate-900/95 border-slate-700/50 backdrop-blur-sm">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl bg-slate-900/95 border-slate-700/50 backdrop-blur-sm flex flex-col max-h-[85vh] sm:max-h-[90vh]">
+        {/* Fixed Header */}
+        <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold text-white">
               Create Strategy
@@ -182,9 +183,9 @@ export function StrategyCreateModal({ isOpen, onClose, onCreateStrategy }: Strat
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Strategy Options Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Scrollable Content Area */}
+        <div className="h-[600px] flex-1 overflow-y-auto pt-2 sm:pt-4 pb-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {STRATEGY_OPTIONS.map((option) => (
               <StrategyOptionCard
                 key={option.id}
@@ -194,21 +195,21 @@ export function StrategyCreateModal({ isOpen, onClose, onCreateStrategy }: Strat
               />
             ))}
           </div>
+        </div>
 
-          {/* Create Button */}
-          <div className="w-full justify-center -mt-2">
-            <Button
-              onClick={handleCreateStrategy}
-              disabled={!selectedStrategy}
-              className={`w-full h-15 py-4 text-xl font-semibold rounded-xl transition-all duration-200 ${
-                selectedStrategy
-                  ? 'bg-blue-600 hover:bg-blue-800 text-white shadow-lg shadow-blue-500/20'
-                  : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-              }`}
-            >
-              Create
-            </Button>
-          </div>
+        {/* Sticky Footer with Create Button */}
+        <div className="sticky bottom-0 flex-shrink-0 bg-slate-900/95 backdrop-blur-sm border-t border-slate-700/50 pt-4 pb-2 mt-4">
+          <Button
+            onClick={handleCreateStrategy}
+            disabled={!selectedStrategy}
+            className={`w-full h-12 sm:h-15 py-3 sm:py-4 text-lg sm:text-xl font-semibold rounded-xl transition-all duration-200 ${
+              selectedStrategy
+                ? 'bg-blue-600 hover:bg-blue-800 text-white shadow-lg shadow-blue-500/20'
+                : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
+          >
+            Create
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -12,6 +12,7 @@ import { StrategyCardManager } from "@/components/StrategyCardManager";
 import { StrategyCreateModal } from "@/components/StrategyCreateModal";
 import { StrategyJupiterModal } from "@/components/StrategyJupiterModal"
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
 
 interface VaultDashboardBalancesProps {
   depositData: any;
@@ -83,6 +84,7 @@ function KPICard({ title, value, icon: Icon, color = "blue" }: {
   icon: any; 
   color?: "blue" | "green" | "purple" 
 }) {
+  const isMobile = useIsMobile();
   const colorClasses = {
     blue: "from-blue-900/20 to-blue-800/10 border-blue-700/30 text-blue-400",
     green: "from-green-900/20 to-green-800/10 border-green-700/30 text-green-400", 
@@ -90,16 +92,16 @@ function KPICard({ title, value, icon: Icon, color = "blue" }: {
   };
 
   return (
-    <Card className={`bg-gradient-to-br ${colorClasses[color].split(' ').slice(0, 2).join(' ')} border ${colorClasses[color].split(' ')[2]} backdrop-blur-sm rounded-lg shadow-lg transition-all duration-200 hover:scale-105`}>
-      <CardContent className="p-4">
+    <Card className={`bg-gradient-to-br ${colorClasses[color].split(' ').slice(0, 2).join(' ')} border ${colorClasses[color].split(' ')[2]} py-2.5 md:py-6 backdrop-blur-sm rounded-lg shadow-lg transition-all duration-200 hover:scale-105`}>
+      <CardContent className="p-2 sm:p-4">
         <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <p className="text-slate-400 text-sm font-medium">{title}</p>
-            <p className="text-white text-2xl font-bold mt-1">{value}</p>
+          <div className="flex flex-col min-w-0 flex-1">
+            <p className="text-slate-400 text-xs sm:text-sm font-medium truncate">{title}</p>
+            <p className="text-white text-lg sm:text-2xl font-bold mt-1 truncate">{value}</p>
           </div>
-          <div className={`p-3 rounded-full bg-white/10 ${colorClasses[color].split(' ')[3]}`}>
-            <Icon className="h-6 w-6" />
-          </div>
+          {!isMobile && <div className={`p-1.5 sm:p-3 rounded-full bg-white/10 ${colorClasses[color].split(' ')[3]} flex-shrink-0 ml-1 sm:ml-0`}>
+            <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
+          </div>}
         </div>
       </CardContent>
     </Card>
@@ -140,6 +142,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
   const [hasError, setHasError] = useState<boolean>(false);
 
   const isEmpty = !depositData;
+  const isMobile = useIsMobile();
   const [estimatedYield, setEstimatedYield] = useState<number>(0);
 
   const [isCreateStrategy, setIsCreateStrategy] = useState<boolean>(false);
@@ -214,22 +217,23 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
         ) : (
           /* Data Loaded State */
           <>
+          {isMobile?<div className="py-1">Vault Positions</div>:""}
           {/* KPI Cards Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
             <KPICard 
-              title="Total NAV" 
+              title={isMobile? "NAV" : "Total NAV:"} 
               value={`$${totalValue.toFixed(2)}`} 
               icon={DollarSign} 
               color="blue" 
             />
             <KPICard 
-              title="Total Strategies" 
+              title={isMobile? "Strategies" : "Total Strategies:"} 
               value={strategiesData.length.toString()} 
               icon={Target} 
               color="purple" 
             />
             <KPICard 
-              title="Estimated Yield" 
+              title={isMobile? "Est. APY" : "Estimated Yield:"} 
               value={`${estimatedYield.toFixed(2)}%`} 
               icon={TrendingUp} 
               color="green" 

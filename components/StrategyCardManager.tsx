@@ -10,9 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { tokenLogos } from "@/constants/nodeOptions"
 import Image from "next/image"
 import { getStrategyAPY } from "@/lib/apy"
+import { useIsMobile } from "@/lib/hooks/useIsMobile"
 
 export function StrategyCardManager({strategyData, handleOpenStrategy}: {strategyData: any, handleOpenStrategy: (data: any) => void}) {
-
+  const isMobile = useIsMobile()
   const [apy, setAPY] = useState<number>(0);
 
   useEffect(() => {
@@ -36,11 +37,11 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
   
 
   return (
-    <Card className="relative bg-slate-800/80 border border-slate-600/30 rounded-xl p-6 backdrop-blur-sm hover:bg-slate-800/90 transition-all duration-200 overflow-hidden">
+    <Card className="relative bg-slate-800/80 border border-slate-600/30 rounded-xl p-4 md:p-6 backdrop-blur-sm hover:bg-slate-800/90 transition-all duration-200 overflow-hidden">
       {/* Background token image on the left */}
       <div className="absolute left-0 top-0 w-128 h-full opacity-25 overflow-hidden">
         <div 
-          className="w-70 h-70 bg-contain bg-no-repeat bg-center transform -translate-x-8 -translate-y-12 rounded-full"
+          className="w-50 h-50 md:w-70 md:h-70 bg-contain bg-no-repeat bg-center transform -translate-x-8 -translate-y-8 md:-translate-y-12 rounded-full"
           style={{
             backgroundImage: `url(${tokenIcon})`,
             filter: 'brightness(0.9)'
@@ -52,9 +53,9 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
         {/* Top row - Strategy name/APY and Value/Change */}
         <div className="flex items-start justify-between">
           <div className="flex flex-col">
-            <h3 className="flex text-white font-semibold text-xl items-center gap-2">
+            <h3 className={`${isMobile? "flex" : "flex"} text-white font-semibold text-lg md:text-xl items-center gap-2`}>
               {strategyData.tokenInfo?.symbol || ''}
-              <div className="text-sm mt-1">
+              <div className="text-xs md:text-sm mt-1">
                 {strategyData.strategyType === "deposit" ? "(Main Deposit)" : 
                  apy == 0 ? "(Trade)" : "(Yield)"
                 }
@@ -65,19 +66,23 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
             </p>
           </div>
           
-          <div className="flex justify-end items-center gap-2">
-            <span className="text-slate-400">NAV:</span>
-            <span className="text-white font-bold text-2xl">
-              ${strategyData.value.toFixed(2)}
-            </span>
-            <span className={`text-base font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-              ({isPositive ? '+' : ''}{percentageChange.toFixed(1)}%)
-            </span>
+          <div className={`${isMobile? "flex-col items-center" : "flex items-center"} justify-end gap-2`}>
+            <div className="flex gap-2 items-center">
+              <span className="text-slate-400 text-sm md:text-lg">NAV:</span>
+              <span className="text-white font-bold text-lg md:text-2xl">
+                ${strategyData.value.toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-end">
+              <span className={`text-sm md: text-lg text-base font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                ({isPositive ? '+' : ''}{percentageChange.toFixed(1)}%)
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Middle and Bottom rows - Aligned buttons with metrics */}
-        <div className="flex justify-between items-center mt-10">
+        <div className={`flex ${isMobile? "justify-end":"justify-between"} items-center mt-10`}>
           {/* Left side - Action buttons */}
           <div className="flex gap-3">
             {strategyData.strategyType !== "deposit" && 
@@ -113,7 +118,7 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
           </div>
 
           {/* Right side - Financial metrics */}
-          <div className="flex gap-8 text-base">
+          {!isMobile && <div className="flex gap-8 text-base">
             <span className="text-slate-400">
               Initial Capital: <span className="text-white font-medium">{strategyData.strategyType === "deposit"? "-" : `$${(strategyData.initialCapital || 0).toFixed(3)}`}</span>
             </span>
@@ -122,7 +127,7 @@ export function StrategyCardManager({strategyData, handleOpenStrategy}: {strateg
                 {strategyData.strategyType === "deposit"? <div className="text-white ml-1">-</div> : `${unrealizedProfit < 0 ? "-" : ""}$${Math.abs(unrealizedProfit).toFixed(5)}`}
               </span>
             </span>
-          </div>
+          </div>}
         </div>
       </div>
     </Card>
