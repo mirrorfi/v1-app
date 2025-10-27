@@ -9,7 +9,7 @@ import { PublicKey, Keypair } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token"
 import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/solana-client';
 import { getPrices, getTokenInfos } from "@/lib/api";
 import { parseVault } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
