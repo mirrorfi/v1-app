@@ -9,7 +9,7 @@ import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { Navbar } from "@/components/Navbar"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { ChevronDown } from "lucide-react"
-import { getInitializeVaultTx } from "@/lib/api/transaction"
+import { getInitializeVaultTx, sendTx } from "@/lib/api/transaction"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useNotification } from "@/contexts/NotificationContext"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
@@ -127,15 +127,7 @@ export default function CreatePage() {
             const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
             versionedTx.message.recentBlockhash = blockhash;
             const signedTx = await signTransaction(versionedTx);
-            const txid = await connection.sendRawTransaction(signedTx.serialize());
-            await connection.confirmTransaction(
-            {
-                signature: txid,
-                blockhash: blockhash,
-                lastValidBlockHeight: lastValidBlockHeight,
-                },
-                "confirmed"
-            );
+            const txid = await sendTx(signedTx);
             console.log("Transaction ID:", txid);
 
             showNotification({

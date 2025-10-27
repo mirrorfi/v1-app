@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
-import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap, getExitStrategyJupiterSwap } from "@/lib/api";
+import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap, getExitStrategyJupiterSwap, sendTx } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton";
 import { useNotification } from "@/contexts/NotificationContext"
 import { useWallet } from "@solana/wallet-adapter-react"
@@ -317,16 +317,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
       versionedTx.message.recentBlockhash = blockhash;
       const signedTx = await signTransaction(versionedTx);
-      const txid = await connection.sendRawTransaction(signedTx.serialize());
-      const latest = await connection.getLatestBlockhash();
-      await connection.confirmTransaction(
-        {
-          signature: txid,
-          blockhash: latest.blockhash,
-          lastValidBlockHeight: latest.lastValidBlockHeight,
-        },
-        "confirmed"
-      );
+      const txid = await sendTx(signedTx);
       console.log("Transaction ID:", txid);
 
       showNotification({

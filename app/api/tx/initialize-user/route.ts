@@ -1,5 +1,4 @@
 import { buildTx, mirrorfiClient } from "@/lib/solana-server";
-import { v0TxToBase64 } from "@/lib/utils";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,7 +23,7 @@ export async function POST(req: NextRequest) {
     const tx = await buildTx([ix], new PublicKey(authority));
 
     return NextResponse.json({
-      tx: v0TxToBase64(tx),
+      tx,
     });
   } catch (err) {
     console.error(err);

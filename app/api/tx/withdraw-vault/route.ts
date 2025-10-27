@@ -1,5 +1,4 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
-import { v0TxToBase64 } from "@/lib/utils";
 import { parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
 import { createCloseAccountInstruction, getAssociatedTokenAddressSync, NATIVE_MINT, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
@@ -90,7 +89,7 @@ export async function POST(req: NextRequest) {
     const tx = await buildTx(ixs, withdrawerPubkey);
 
     return NextResponse.json({
-      tx: v0TxToBase64(tx),
+      tx,
     });
   } catch (err) {
     console.error(err);

@@ -1,5 +1,5 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
-import { stringToByteArray, v0TxToBase64 } from "@/lib/utils";
+import { stringToByteArray } from "@/lib/utils";
 import { parseConfig } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     const tx = await buildTx([ix], new PublicKey(authority));
 
     return NextResponse.json({
-      tx: v0TxToBase64(tx),
+      tx,
     });
   } catch (err) {
     console.error(err);
