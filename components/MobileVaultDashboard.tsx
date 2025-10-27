@@ -105,13 +105,13 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenB
             </Button>
           </div>
           {/* PNL Card */}
-          {positionBalance && (
+          {positionBalance ? 
             <VaultDashboardPNLCard
               positionBalance={positionBalance} 
               tokenPrice={tokenPrice}
               isLoading={isLoading}
-            />
-          )}
+            /> : ""
+          }
 
           {hasManagingAuthority && (
             <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-3 mb-4">
