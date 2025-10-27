@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         sourceMint: targetMint,
         vault,
         strategy,
-        tokenProgram: targetMintTokenProgram,
+        tokenProgram: depositMintTokenProgram,
         vaultSourceTokenAccount: vaultTargetMintTokenAccount,
         vaultDestinationTokenAccount: vaultDepositMintTokenAccount,
         treasuryTokenAccount,
