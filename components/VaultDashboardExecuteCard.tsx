@@ -16,7 +16,7 @@ import { ArrowUpRight } from "lucide-react"
 
 const connection = getConnection();
 
-export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, handleReload, tokenPrice, tokenBalance}: {vault: string, vaultData: any, positionBalance: number, handleReload: () => void, tokenPrice: number, tokenBalance: number}) {
+export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance}: {vault: string, vaultData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number}) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
@@ -43,7 +43,8 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
     if (activeAction === "deposit") {
       amount = tokenBalance; // For deposit, use wallet balance
     } else {
-      amount = positionBalance;
+      amount = positionBalance*sharePrice;
+      console.log("User Maximum Withdraw Amount (USDC):", amount);
     }
     
     const computed = amount * percent
@@ -72,8 +73,14 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, ha
           vault,
         })
       } else {
+        let withdrawAmount = Math.floor(Number.parseFloat(amount) / sharePrice * 10 ** tokenInfo.tokenDecimals).toString();
+        // Precision Fix during Withdraw All
+        if (Number(withdrawAmount) * 1.00001 > positionBalance) {
+          withdrawAmount = (positionBalance * 10 ** tokenInfo.tokenDecimals).toString();
+        }
+        console.log("Withdraw Amount (in shares):", withdrawAmount);
         res = await getWithdrawVaultTx({
-          amount: (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString(),
+          amount: withdrawAmount,
           withdrawer: publicKey.toString(),
           vault,
         })

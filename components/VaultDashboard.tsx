@@ -27,6 +27,7 @@ interface StrategyDashboardProps {
   vault: string;
   vaultData:any;
   positionBalance:number;
+  sharePrice:number;
   tokenBalance:number;
   tokenPrice:number;
   isLoading: boolean;
@@ -44,7 +45,7 @@ const strategy = {
   status: "Active" as const,
 }
 
-export function VaultDashboard({ vault, vaultData, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
+export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
   const [activeTab, setActiveTab] = useState("vault-stats")
   const tabs = [
     { id: "vault-stats", label: "Vault Stats" },
@@ -198,6 +199,7 @@ export function VaultDashboard({ vault, vaultData, positionBalance, tokenBalance
               vault={vault} 
               vaultData={vaultData} 
               positionBalance={positionBalance} 
+              sharePrice={sharePrice}
               handleReload={handleReload} 
               tokenPrice={tokenPrice} 
               tokenBalance={tokenBalance} 
