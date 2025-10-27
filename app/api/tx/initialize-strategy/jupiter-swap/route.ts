@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     const tx = await buildTx([ix], new PublicKey(authority));
 
     return NextResponse.json({
-      tx: v0TxToBase64(tx),
+      tx,
     });
   } catch (err) {
     console.error(err);
