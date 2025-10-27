@@ -1,9 +1,8 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
 import { v0TxToBase64 } from "@/lib/utils";
-import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiter-swap";
+import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiter";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";

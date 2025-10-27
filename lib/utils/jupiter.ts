@@ -5,6 +5,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from "@solana/web3.js";
+import { wrappedFetch } from ".";
 
 const EXACT_OUT_ROUTE_DISCRIMINATOR = [208, 51, 239, 151, 123, 43, 237, 92];
 const ROUTE_DISCRIMINATOR = [229, 23, 203, 151, 122, 227, 173, 42];
@@ -70,12 +71,12 @@ export async function swap(
 }> {
   const quoteResponse = await (
     await fetch(
-      `https://lite-api.jup.ag/swap/v1/quote?inputMint=${inputMint.toString()}&outputMint=${outputMint.toString()}&amount=${amount}&slippageBps=${slippageBps}&onlyDirectRoutes=${onlyDirectRoutes}&swapMode=${exactOutRoute ? "ExactOut" : "ExactIn"}`,
+      `${process.env.JUPITER_API_URL}/swap/v1/quote?inputMint=${inputMint.toString()}&outputMint=${outputMint.toString()}&amount=${amount}&slippageBps=${slippageBps}&onlyDirectRoutes=${onlyDirectRoutes}&swapMode=${exactOutRoute ? "ExactOut" : "ExactIn"}`,
     )
   ).json();
 
   const instructions: any = await (
-    await fetch("https://lite-api.jup.ag/swap/v1/swap-instructions", {
+    await fetch(`${process.env.JUPITER_API_URL}/swap/v1/swap-instructions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -161,4 +162,16 @@ export function extractRemainingAccountsForSwap(
   return {
     remainingAccounts,
   };
+}
+
+export async function getPrices(mint: string[]) {
+  const res = await wrappedFetch(`/api/prices?mints=${mint.join(',')}`);
+
+  return res.prices;
+}
+
+export async function getTokenInfos(mint: string[]) {
+  const res = await wrappedFetch(`/api/tokens?mints=${mint.join(',')}`);
+
+  return res.tokenInfos;
 }
