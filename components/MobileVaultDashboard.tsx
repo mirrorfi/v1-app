@@ -20,6 +20,7 @@ interface MobileVaultDashboardProps {
   vault: string;
   vaultData:any;
   positionBalance:number;
+  sharePrice: number;
   tokenBalance:number;
   tokenPrice:number;
   isLoading: boolean;
@@ -31,7 +32,7 @@ interface MobileVaultDashboardProps {
 const connection = getConnection();
 
 
-export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
+export function MobileVaultDashboard({ vault, vaultData, positionBalance, sharePrice, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
   const { publicKey } = useWallet();
   const router = useRouter();
   const [showExecuteCard, setShowExecuteCard] = useState(false);
@@ -182,6 +183,7 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenB
                     vaultData={vaultData}
                     tokenMint={vaultData.depositMint} 
                     positionBalance={positionBalance} 
+                    sharePrice={sharePrice}
                     handleReload={handleReload}
                     initialMode={executeMode}
                     tokenBalance={tokenBalance}

@@ -18,13 +18,14 @@ interface MobileExecuteCardProps {
   vaultData: any,
   tokenMint: string, 
   positionBalance: number, 
+  sharePrice: number,
   handleReload: () => void,
   tokenBalance: number,
   tokenPrice: number, 
   initialMode?: "deposit" | "withdraw"
 }
 
-export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance, handleReload, tokenBalance, tokenPrice, initialMode = "deposit"}: MobileExecuteCardProps) {
+export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance, sharePrice, handleReload, tokenBalance, tokenPrice, initialMode = "deposit"}: MobileExecuteCardProps) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">(initialMode)
@@ -49,7 +50,9 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
     if (activeAction === "deposit") {
       amount = tokenBalance; // For deposit, use wallet balance
     } else {
-      amount = positionBalance;
+      console.log("Position Balance:", positionBalance);
+      //console.log("Share Pric")
+      amount = positionBalance * sharePrice;
     }
     
     const computed = amount * percent
@@ -78,8 +81,14 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
           vault,
         })
       } else {
+        let withdrawAmount = Math.floor(Number.parseFloat(amount) / sharePrice * 10 ** tokenInfo.tokenDecimals).toString();
+        // Precision Fix during Withdraw All
+        if (Number(withdrawAmount) * 1.00001 > positionBalance * 10 ** tokenInfo.tokenDecimals) {
+          withdrawAmount = (positionBalance * 10 ** tokenInfo.tokenDecimals).toString();
+        }
+
         res = await getWithdrawVaultTx({
-          amount: (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString(),
+          amount: withdrawAmount,
           withdrawer: publicKey.toString(),
           vault,
         })
@@ -87,6 +96,8 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
       const versionedTx = res;
 
       // Prompt user to sign and send transaction
+      const latestBlockhash = await connection.getLatestBlockhash();
+      versionedTx.message.recentBlockhash = latestBlockhash.blockhash;
       const signedTx = await signTransaction(versionedTx);
       const txid = await connection.sendRawTransaction(signedTx.serialize());
       console.log("Transaction ID:", txid);

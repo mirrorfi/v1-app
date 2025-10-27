@@ -35,6 +35,7 @@ export default function VaultPage() {
   const [vaultData, setVaultData] = useState<any>(null);
   const [reload, setReload] = useState(false);
   const [positionBalance, setPositionBalance] = useState<number>(0);
+  const [sharePrice, setSharePrice] = useState<number>(0);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
   const [tokenPrice, setTokenPrice] = useState<number>(0); 
   const [depositData, setDepositData] = useState<any>(null);
@@ -53,16 +54,26 @@ export default function VaultPage() {
     if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
   }
 
-  async function fetchUserReceiptBalance(vault: string, tokenMint: string, user: PublicKey) {
-    const info = TOKEN_INFO[tokenMint]
-    const receiptMint = mirrorfiClient.getReceiptMintPda(new PublicKey(vault));
+  async function fetchUserReceiptBalance(vaultData:any, vaultNav: number, user: PublicKey) {
+    if(!vaultData.publicKey){ throw new Error("Invalid vault data: missing publicKey"); }
+    if(!vaultData.depositMint){ throw new Error("Invalid vault data: missing depositMint"); }
+    const info = TOKEN_INFO[vaultData.depositMint];
+    const receiptMint = mirrorfiClient.getReceiptMintPda(new PublicKey(vaultData.publicKey));
     const userReceiptAta = getAssociatedTokenAddressSync(receiptMint, user, false, TOKEN_2022_PROGRAM_ID);
     try{
       const userReceiptAccountInfo = await connection.getTokenAccountBalance(userReceiptAta);
+      const receiptSupplyInfo = await connection.getTokenSupply(receiptMint);
+      console.log("User Receipt Balance:", userReceiptAccountInfo);
+      console.log("Receipt Supply Info:", receiptSupplyInfo);
       const positionShareToken = userReceiptAccountInfo.value.uiAmount || 0;
-      // TODO: Fetch Share Position Balance by deriving Total Share * Share Token Price
-      const positionShareBalance = positionShareToken;
-      setPositionBalance(positionShareBalance);
+      const receiptTotalSupply = receiptSupplyInfo.value.uiAmount || 0;
+      console.log(vaultData.userDeposits, vaultData.realizedPnl);
+      const vaultRealizedValuation = (Number(vaultData.userDeposits) + Number(vaultData.realizedPnl)) / 10**info.tokenDecimals;
+      console.log("Vault Realized Valuation:", vaultRealizedValuation);
+      const sharePrice = receiptTotalSupply > 0 ? vaultRealizedValuation / receiptTotalSupply : 0;
+      console.log("Calculated Share Price:", sharePrice);
+      setPositionBalance(positionShareToken);
+      setSharePrice(sharePrice);
     } catch(e){
       console.log("No Receipt Token Data found");
     }
@@ -146,6 +157,7 @@ export default function VaultPage() {
     }
     setDepositData(depositData);
     setStrategiesData(strategiesData);
+    return depositData.value + strategiesData.reduce((acc, curr) => acc + curr.value, 0);
   }
 
   useEffect(() => {
@@ -176,13 +188,13 @@ export default function VaultPage() {
         }
         console.log("Vault Data:", vaultData);
         setVaultData(vaultData);
-        fetchVaultStrategies(vaultKey, vaultData);
+        const vaultNav = await fetchVaultStrategies(vaultKey, vaultData);
         // Step 3: Get User Position Info
         if(publicKey){
           // Fetch Deposit Token Balance
           fetchUserBalance(vaultData.depositMint, publicKey);
           // Fetch Share Token Balance
-          fetchUserReceiptBalance(vault, vaultData.depositMint, publicKey);
+          fetchUserReceiptBalance(vaultData, vaultNav, publicKey);
         }
       } catch (error: any) {
         console.error("Error loading vault:", error);
@@ -214,6 +226,7 @@ export default function VaultPage() {
             vault={vault} 
             vaultData={vaultData} 
             positionBalance={positionBalance}
+            sharePrice={sharePrice}
             tokenBalance={tokenBalance}
             tokenPrice={tokenPrice}
             isLoading={isLoading}
@@ -228,6 +241,7 @@ export default function VaultPage() {
           vault={vault} 
           vaultData={vaultData} 
           positionBalance={positionBalance}
+          sharePrice={sharePrice}
           tokenBalance={tokenBalance}
           tokenPrice={tokenPrice}
           isLoading={isLoading}
