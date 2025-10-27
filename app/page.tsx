@@ -320,10 +320,10 @@ export default function Home() {
         <div className="w-full max-w-10xl mx-auto p-6 md:p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">
               Vault Dashboard
             </h1>
-            <p className="text-slate-400 text-lg">
+            <p className="text-slate-400 text-sm md:text-lg">
               Discover and invest in Solana DeFi strategies
             </p>
           </div>

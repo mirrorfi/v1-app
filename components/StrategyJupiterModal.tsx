@@ -397,8 +397,8 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
               <div>
                 <div className="text-slate-400 text-sm font-medium mb-1">Initial Capital</div>
                 {strategyPosition&&strategyToken&&depositToken?
-                  <div className="flex items-center gap-2">
-                    <div className="text-white font-semibold text-lg">{strategyPosition.initialCapital} {depositToken.symbol}</div>
+                  <div className="flex items-start gap-2">
+                    <div className="text-white font-semibold text-md md:text-lg">{strategyPosition.initialCapital} {depositToken.symbol}</div>
                     <div className="text-slate-400 text-sm">(${strategyPosition.initialCapitalValue})</div>
                   </div> :
                   <Skeleton className="w-32 h-6 rounded-lg" />
@@ -407,8 +407,8 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
               <div>
                 <div className="text-slate-400 text-sm font-medium mb-1">Current Position</div>
                 {strategyPosition&&strategyToken?
-                  <div className="flex items-center gap-2">
-                    <div className="text-white font-semibold text-lg">{strategyToken.balance} {strategyToken.symbol}</div>
+                  <div className="flex items-start gap-2">
+                    <div className="text-white font-semibold text-md md:text-lg">{strategyToken.balance} {strategyToken.symbol}</div>
                     <div className="text-slate-400 text-sm">(${strategyToken.value})</div>
                   </div> :
                   <Skeleton className="w-32 h-6 rounded-lg" />
@@ -443,7 +443,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             {fromToken ?
             <div className="bg-slate-800/50 border border-slate-600/30 rounded-lg p-4">
              
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3"> 
                   <img src={fromToken.icon} alt={fromToken.symbol} className="w-8 h-8 rounded-full" />
                   <div>

@@ -1,11 +1,10 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
-import { ArrowLeft, AlertCircle, RefreshCw, TrendingUp, TrendingDown } from "lucide-react"
+import { ArrowLeft, AlertCircle, RefreshCw, TrendingUp, TrendingDown, ArrowUpRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { VaultDashboardChart } from "@/components/VaultDashboardChart"
@@ -31,11 +30,6 @@ interface MobileVaultDashboardProps {
 }
 const connection = getConnection();
 
-const strategy = {
-  name: "My Super Hyped Strategy",
-  icon: "🚀",
-  status: "active" as const,
-}
 
 export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
   const { publicKey } = useWallet();
@@ -45,6 +39,11 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenB
 
   const handleBackClick = () => {
     router.push('/');
+  }
+
+  const hasManagingAuthority = publicKey && vaultData && publicKey.toString() === vaultData.authority;
+  const handleManageVault = () => {
+    router.push(`/vault/${vault}/manager`);
   }
 
   const handleDeposit = () => {
@@ -63,57 +62,48 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenB
 
   return (
     <div className="relative w-full max-w-md mx-auto pb-20"> {/* Added bottom padding for sticky buttons */}
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <Button
-          variant="ghost"
-          onClick={handleBackClick}
-          className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 h-auto"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6 bg-gradient-to-br from-pink-500 to-rose-400">
-            <AvatarFallback className="text-white font-bold text-xs">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <h1 className="text-lg font-semibold text-white">{strategy.name}</h1>
-        </div>
-        <Button
-          variant="ghost"
-          onClick={handleReload}
-          className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 h-auto"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </div>
-
       {/* Error Display */}
       {error && (
-        <Card className="bg-gradient-to-br from-red-900/20 to-red-800/10 border-red-700/30 backdrop-blur-sm rounded-lg shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="text-red-400 font-semibold text-sm mb-1">Error Loading Vault</h3>
-                <p className="text-red-300 text-sm mb-3">{error}</p>
-                <Button
-                  onClick={handleReload}
-                  variant="outline"
-                  size="sm"
-                  className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
-                >
-                  <RefreshCw className="h-3 w-3 mr-1" />
-                  Retry
-                </Button>
-              </div>
+        <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-700/30 backdrop-blur-sm rounded-lg shadow-lg p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-red-400 font-semibold text-sm mb-1">Error Loading Vault</h3>
+              <p className="text-red-300 text-sm mb-3">{error}</p>
+              <Button
+                onClick={handleReload}
+                variant="outline"
+                size="sm"
+                className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Retry
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Main Content - Only show if no error */}
       {!error && (
         <div className="p-4 space-y-4">
+          {/* Vault Title */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h1 className="text-lg font-semibold text-white">{vaultData?.name || 'Loading...'}</h1>
+              {vaultData?.description && (
+                <p className="text-sm text-slate-400 mt-1">{vaultData.description}</p>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              onClick={handleBackClick}
+              className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 h-auto"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          </div>
           {/* PNL Card */}
           {positionBalance && (
             <VaultDashboardPNLCard
@@ -121,6 +111,23 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, tokenB
               tokenPrice={tokenPrice}
               isLoading={isLoading}
             />
+          )}
+
+          {hasManagingAuthority && (
+            <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-3 mb-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-orange-400 text-sm font-medium whitespace-nowrap">
+                  You have managing authority
+                </span>
+                <Button
+                  onClick={handleManageVault}
+                  size="sm"
+                  className="bg-orange-600 hover:bg-orange-700 text-white text-sm px-3 py-1 h-8"
+                >
+                  Open <ArrowUpRight/>
+                </Button>
+              </div>
+            </div>
           )}
 
           {/* Positions */}

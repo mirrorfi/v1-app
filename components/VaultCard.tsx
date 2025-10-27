@@ -57,24 +57,26 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
   console.log("Loading:", vault);
 
   return (
-    <Card className="bg-slate-800/50 border-slate-600/30 rounded-xl p-6 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-200">
+    <Card  onClick={() => onViewDetails(vault.address)} className="bg-slate-800/50 border-slate-600/30 rounded-xl p-6 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-200">
       <CardContent className="p-0 space-y-4">
         {/* Header Row - Vault Name and NAV */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-white">{vault.name}</h3>
-            {isUserVault && (
-              <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
-                Your Vault
-              </Badge>
-            )}
-            {isVerifiedVault && (
-              <Badge className="bg-green-600/20 text-green-400 border-green-500/30 text-xs px-2 py-1">
-                Verified
-              </Badge>
-            )}
+            <div className={isMobile ? "flex-col gap-5": "flex gap-2 items-center"}>
+              <h3 className="text-sm md:text-lg font-semibold text-white">{vault.name}</h3>
+              {isUserVault && (
+                <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
+                  Your Vault
+                </Badge>
+              )}
+              {isVerifiedVault && (
+                <Badge className="bg-green-600/20 text-green-400 border-green-500/30 text-xs px-2 py-1">
+                  Verified
+                </Badge>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-2">
             <div className="text-sm text-slate-400">NAV</div>
             <div className="text-lg font-bold text-white">${vault.nav.toFixed(2)}</div>
           </div>
@@ -88,9 +90,9 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
               <img 
                 src={vault.depositToken.icon} 
                 alt={vault.depositToken.symbol} 
-                className="w-6 h-6 rounded-full" 
+                className="w-4 h-4 md:w-6 md:h-6  rounded-full" 
               />
-              <span className="text-white font-medium">{vault.depositToken.symbol}</span>
+              <span className="text-white font-medium text-xs sm:text-sm">{vault.depositToken.symbol}</span>
             </div>
             {vault.depositToken.apy && 
               <Badge variant="secondary" className="bg-green-600/20 text-green-400 border-green-500/30">
@@ -101,7 +103,7 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
         </div>
 
         {/* Strategies Section */}
-        <div className="space-y-2 min-h-[80px] flex flex-col">
+        <div className="space-y-2 flex flex-col">
           <div className="flex items-center justify-between">
             <div className="text-sm text-slate-400 font-medium">Strategies</div>
             {hasMoreStrategies && (
@@ -129,14 +131,14 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
               visibleStrategies.map((strategy, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2 border border-slate-600/30"
+                  className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-2 md:px-3 py-2 border border-slate-600/30"
                 >
                   <img 
                     src={strategy.icon} 
                     alt={strategy.symbol} 
-                    className="w-5 h-5 rounded-full" 
+                    className="w-3 h-3 md:w-5 md:h-5 rounded-full" 
                   />
-                  <span className="text-white text-sm font-medium">{strategy.symbol}</span>
+                  <span className="text-white text-xs md:text-sm font-medium">{strategy.symbol}</span>
                 </div>
               ))
             ) : (
@@ -148,9 +150,9 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
         </div>
 
         {/* Footer - Creator and Action */}
-        <div className="flex items-center justify-between pt-4 -mb-1">
+        <div className="flex items-end justify-between pt-1 md:pt-4 -mb-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">Created By:</span>
+            <span className="text-sm text-slate-400">{isMobile? "By:" : "Created By:"}</span>
             <button
               onClick={handleCreatorClick}
               className="flex items-center gap-1 text-xs lg:text-sm text-blue-400 hover:text-blue-300 transition-colors"
@@ -168,7 +170,7 @@ export function VaultCard({ vault, onViewDetails }: VaultCardProps) {
             size="sm"
             className="bg-transparent border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400"
           >
-            View Strategy
+            {isMobile? "View" : "View Strategy"}
             <ArrowRight className="h-3 w-3 ml-1" />
           </Button>
         </div>
