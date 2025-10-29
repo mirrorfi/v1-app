@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
-import { getDepositVaultTx, getWithdrawVaultTx } from "@/lib/api"
+import { getDepositVaultTx, getWithdrawVaultTx, sendTx } from "@/lib/api"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey, VersionedTransaction } from "@solana/web3.js"
 import { TOKEN_INFO, TokenInfo } from "@/lib/utils/tokens"
@@ -90,7 +90,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
       versionedTx.message.recentBlockhash = blockhash;
       const signedTx = await signTransaction(versionedTx);
-      const txid = await connection.sendRawTransaction(signedTx.serialize());
+      const txid = await sendTx(signedTx);
       console.log("Transaction ID:", txid);
       
       // Show success notification

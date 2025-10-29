@@ -10,8 +10,8 @@ import { randomUUID } from 'crypto';
 const SERVER_CLUSTER: Cluster = (process.env.SERVER_SOLANA_RPC_CLUSTER ??
   'mainnet-beta') as Cluster;
 export const SERVER_CONNECTION = new Connection(
-  process.env.SERVER_SOLANA_RPC_URL ?? 
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? 
+  process.env.SERVER_SOLANA_RPC_URL ??
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ??
   clusterApiUrl(SERVER_CLUSTER),
   'confirmed'
 );
@@ -87,4 +87,38 @@ export async function buildTx(
   };
 
   return data.result.transaction;
+}
+
+export async function sendTx(transaction: string): Promise<string> {
+  const res = await fetch(`${process.env.GATEWAY_URL}${process.env.GATEWAY_API}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id: randomUUID(),
+      jsonrpc: "2.0",
+      method: "sendTransaction",
+      params: [
+        transaction,
+        {
+          encoding: "base64",
+        },
+      ],
+    }),
+  })
+
+  const data = await res.json() as {
+    result?: string;
+    error?: {
+      code: number,
+      message: string
+    };
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error?.message || "Failed to send transaction.");
+  }
+
+  return data.result!;
 }

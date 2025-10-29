@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
-import { getDepositVaultTx, getWithdrawVaultTx } from "@/lib/api"
+import { getDepositVaultTx, getWithdrawVaultTx, sendTx } from "@/lib/api"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey, VersionedTransaction } from "@solana/web3.js"
 import { TOKEN_INFO, TokenInfo } from "@/lib/utils/tokens"
@@ -99,7 +99,7 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
       const latestBlockhash = await connection.getLatestBlockhash();
       versionedTx.message.recentBlockhash = latestBlockhash.blockhash;
       const signedTx = await signTransaction(versionedTx);
-      const txid = await connection.sendRawTransaction(signedTx.serialize());
+      const txid = await sendTx(signedTx);
       console.log("Transaction ID:", txid);
       
       // Show success notification
