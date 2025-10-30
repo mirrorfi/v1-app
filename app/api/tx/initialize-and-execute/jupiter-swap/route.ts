@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       amount,
       slippageBps,
       false,
-      false,
+      true,
       new PublicKey(vault),
       mirrorfiClient.program.provider.connection,
     );
