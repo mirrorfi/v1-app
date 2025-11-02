@@ -75,7 +75,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
       } else {
         let withdrawAmount = Math.floor(Number.parseFloat(amount) / sharePrice * 10 ** tokenInfo.tokenDecimals).toString();
         // Precision Fix during Withdraw All
-        if (Number(withdrawAmount) * 1.00001 > positionBalance) {
+        if (Number(withdrawAmount) * 1.00001 > positionBalance * 10 ** tokenInfo.tokenDecimals) {
           withdrawAmount = (positionBalance * 10 ** tokenInfo.tokenDecimals).toString();
         }
         console.log("Withdraw Amount (in shares):", withdrawAmount);
