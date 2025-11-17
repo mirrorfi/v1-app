@@ -214,14 +214,14 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         mint: strategyData.targetMint as string,
         symbol: strategyData.tokenInfo.symbol as string,
         icon: strategyData.tokenInfo.icon as string,
-        balance: strategyData.balance.toFixed(3) as number,
+        balance: strategyData.balance as number,
         price: strategyData.tokenInfo.usdPrice as number,
         value: strategyData.value.toFixed(2) as number,
         decimals: strategyData.tokenInfo.decimals as number,
       });
       setStrategyPosition({
         strategyPda: strategyData.pda,
-        amount: strategyData.balance.toFixed(3),
+        amount: strategyData.balance,
         initialCapital: strategyData.initialCapital.toFixed(2),
         initialCapitalValue: (strategyData.initialCapital * depositData.tokenInfo.usdPrice).toFixed(2),
       });
@@ -289,29 +289,25 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           authority: publicKey.toString(),
           destinationMint: toToken.mint,
           vault: vaultData.publicKey,
-          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
         });
       }
       else if (activeTab === 'add') {
         res = await getExecuteStrategyJupiterSwap({
-          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
           authority: publicKey.toString(),
           strategy: strategyPosition.strategyPda,
         });
       }else {
         res = await getExitStrategyJupiterSwap({
-          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
           authority: publicKey.toString(),
           strategy: strategyPosition.strategyPda,
+          all: amount === fromToken.balance?.toString(),
         });
-        // showNotification({
-        //   title: `Action Failed!`,
-        //   message: `Strategy Closing / Withdrawal not supported yet.`,
-        //   type: "error"
-        // });
       }
       const versionedTx = res;
       // Prompt user to sign and send transaction
@@ -319,6 +315,15 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
       versionedTx.message.recentBlockhash = blockhash;
       const signedTx = await signTransaction(versionedTx);
       const txid = await connection.sendRawTransaction(signedTx.serialize());
+      const latest = await connection.getLatestBlockhash();
+      await connection.confirmTransaction(
+        {
+          signature: txid,
+          blockhash: latest.blockhash,
+          lastValidBlockHeight: latest.lastValidBlockHeight,
+        },
+        "confirmed"
+      );
       console.log("Transaction ID:", txid);
 
       showNotification({
@@ -354,7 +359,8 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   const getQuickAmountPercentage = (percentage: number) => {
     if(!fromToken || !fromToken.balance) return "0";
     const baseAmount = activeTab === 'add' ? fromToken.balance : fromToken.balance;
-    return ((baseAmount * percentage) / 100).toFixed(2);
+    if (percentage === 100) { return baseAmount.toString(); }
+    return ((baseAmount * percentage) / 100).toString();
   };
 
   return (

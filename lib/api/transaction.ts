@@ -17,6 +17,21 @@ export async function getCloseStrategyTx({
   return base64ToV0Tx(tx);
 }
 
+export async function getCloseVaultTx({
+  authority,
+  vault,
+}: {
+  authority: string,
+  vault: string
+}): Promise<VersionedTransaction> {
+  let { tx } = await wrappedFetch("/api/tx/close-vault", "POST", {
+    authority,
+    vault,
+  });
+
+  return base64ToV0Tx(tx);
+}
+
 export async function getDepositVaultTx({
   amount,
   depositor,
@@ -51,15 +66,16 @@ export async function getExecuteStrategyJupiterSwap({
 }
 
 export async function getExitStrategyJupiterSwap({
-  amount, slippageBps, authority, strategy
+  amount, slippageBps, authority, strategy, all = false
 }: {
   amount: bigIntString,
   slippageBps: number,
   authority: string,
-  strategy: string
+  strategy: string,
+  all: boolean
 }): Promise<VersionedTransaction> {
   const { tx } = await wrappedFetch("/api/tx/exit-strategy/jupiter-swap", "POST", {
-    amount, slippageBps, authority, strategy
+    amount, slippageBps, authority, strategy, all
   });
 
   return base64ToV0Tx(tx);

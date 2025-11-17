@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { amount, slippageBps, authority, strategy } = await req.json();
+    let { amount, slippageBps, authority, strategy, all } = await req.json();
 
     if (!amount) {
       return NextResponse.json(
@@ -85,19 +85,6 @@ export async function POST(req: NextRequest) {
 
     const depositMint = new PublicKey(vaultAcc.depositMint);
     const targetMint = new PublicKey(strategyType.jupiterSwap.targetMint);
-    const executeSwapResult = await swap(
-      targetMint,
-      depositMint,
-      amount,
-      slippageBps,
-      false,
-      true,
-      new PublicKey(vault),
-      mirrorfiClient.program.provider.connection,
-    );
-    const remainingAccounts = extractRemainingAccountsForSwap(
-      executeSwapResult.swapInstruction,
-    ).remainingAccounts;
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))!.owner;
     const vaultDepositMintTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
@@ -112,6 +99,23 @@ export async function POST(req: NextRequest) {
       !PublicKey.isOnCurve(vault),
       targetMintTokenProgram,
     );
+    if (all) {
+      amount = (await SERVER_CONNECTION.getTokenAccountBalance(vaultTargetMintTokenAccount)).value.amount;
+    }
+
+    const executeSwapResult = await swap(
+      targetMint,
+      depositMint,
+      amount,
+      slippageBps,
+      false,
+      true,
+      new PublicKey(vault),
+      mirrorfiClient.program.provider.connection,
+    );
+    const remainingAccounts = extractRemainingAccountsForSwap(
+      executeSwapResult.swapInstruction,
+    ).remainingAccounts;
     const treasuryPda = mirrorfiClient.treasuryPda;
     const treasuryTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
@@ -120,7 +124,7 @@ export async function POST(req: NextRequest) {
       depositMintTokenProgram,
     );
 
-    let ix = await mirrorfiClient.program.methods
+    let exitIx = await mirrorfiClient.program.methods
       .exitStrategyJupiterSwap(
         executeSwapResult.swapInstruction.data,
         new BN(amount),
@@ -140,8 +144,18 @@ export async function POST(req: NextRequest) {
       })
       .remainingAccounts(remainingAccounts)
       .instruction();
+    let ixs = [exitIx];
+    
+    if (all) {
+      let closeIx = await mirrorfiClient.program.methods.closeStrategy().accounts({
+        authority,
+        vault,
+        strategy
+      }).instruction();
+      ixs.push(closeIx);
+    }
 
-    const tx = await buildTx([ix], new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
+    const tx = await buildTx(ixs, new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),
