@@ -355,7 +355,8 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   const getQuickAmountPercentage = (percentage: number) => {
     if(!fromToken || !fromToken.balance) return "0";
     const baseAmount = activeTab === 'add' ? fromToken.balance : fromToken.balance;
-    return ((baseAmount * percentage) / 100).toFixed(2);
+    if (percentage === 100) { return baseAmount.toString(); }
+    return ((baseAmount * percentage) / 100).toString();
   };
 
   return (
