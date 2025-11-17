@@ -17,6 +17,21 @@ export async function getCloseStrategyTx({
   return base64ToV0Tx(tx);
 }
 
+export async function getCloseVaultTx({
+  authority,
+  vault,
+}: {
+  authority: string,
+  vault: string
+}): Promise<VersionedTransaction> {
+  let { tx } = await wrappedFetch("/api/tx/close-vault", "POST", {
+    authority,
+    vault,
+  });
+
+  return base64ToV0Tx(tx);
+}
+
 export async function getDepositVaultTx({
   amount,
   depositor,
