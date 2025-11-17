@@ -51,15 +51,16 @@ export async function getExecuteStrategyJupiterSwap({
 }
 
 export async function getExitStrategyJupiterSwap({
-  amount, slippageBps, authority, strategy
+  amount, slippageBps, authority, strategy, all = false
 }: {
   amount: bigIntString,
   slippageBps: number,
   authority: string,
-  strategy: string
+  strategy: string,
+  all: boolean
 }): Promise<VersionedTransaction> {
   const { tx } = await wrappedFetch("/api/tx/exit-strategy/jupiter-swap", "POST", {
-    amount, slippageBps, authority, strategy
+    amount, slippageBps, authority, strategy, all
   });
 
   return base64ToV0Tx(tx);

@@ -214,14 +214,14 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         mint: strategyData.targetMint as string,
         symbol: strategyData.tokenInfo.symbol as string,
         icon: strategyData.tokenInfo.icon as string,
-        balance: strategyData.balance.toFixed(3) as number,
+        balance: strategyData.balance as number,
         price: strategyData.tokenInfo.usdPrice as number,
         value: strategyData.value.toFixed(2) as number,
         decimals: strategyData.tokenInfo.decimals as number,
       });
       setStrategyPosition({
         strategyPda: strategyData.pda,
-        amount: strategyData.balance.toFixed(3),
+        amount: strategyData.balance,
         initialCapital: strategyData.initialCapital.toFixed(2),
         initialCapitalValue: (strategyData.initialCapital * depositData.tokenInfo.usdPrice).toFixed(2),
       });
@@ -306,6 +306,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           slippageBps: 100,
           authority: publicKey.toString(),
           strategy: strategyPosition.strategyPda,
+          all: amount === fromToken.balance?.toString(),
         });
         // showNotification({
         //   title: `Action Failed!`,
