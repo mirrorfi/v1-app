@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/mirrorfi.json`.
  */
 export type Mirrorfi = {
-  "address": "M1RzzrPZwnVDSJhT4Ve9iPiynzuo54K4WuSSXXY18YA",
+  "address": "M1RtniT4YxLewLRTnJkhEHB41hm7KXRWDtsMp3ZGGbX",
   "metadata": {
     "name": "mirrorfi",
     "version": "0.1.0",
@@ -145,6 +145,45 @@ export type Mirrorfi = {
       "args": []
     },
     {
+      "name": "closeVault",
+      "discriminator": [
+        141,
+        103,
+        17,
+        126,
+        72,
+        75,
+        29,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "depositMint"
+        },
+        {
+          "name": "vaultTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "depositVault",
       "discriminator": [
         126,
@@ -170,18 +209,46 @@ export type Mirrorfi = {
           "writable": true
         },
         {
+          "name": "vaultDepositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "depositor"
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
           "name": "depositMint"
         },
         {
-          "name": "receiptMint",
-          "writable": true
-        },
-        {
           "name": "depositorTokenAccount",
-          "writable": true
-        },
-        {
-          "name": "receiptMintTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -191,11 +258,11 @@ export type Mirrorfi = {
               },
               {
                 "kind": "account",
-                "path": "receiptMintTokenProgram"
+                "path": "depositMintTokenProgram"
               },
               {
                 "kind": "account",
-                "path": "receiptMint"
+                "path": "depositMint"
               }
             ],
             "program": {
@@ -239,7 +306,60 @@ export type Mirrorfi = {
         },
         {
           "name": "vaultTokenAccount",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "depositMintTokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "depositMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           "name": "systemProgram",
@@ -247,10 +367,6 @@ export type Mirrorfi = {
         },
         {
           "name": "depositMintTokenProgram"
-        },
-        {
-          "name": "receiptMintTokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
@@ -580,7 +696,7 @@ export type Mirrorfi = {
           "type": "bytes"
         },
         {
-          "name": "amount",
+          "name": "swapInAmount",
           "type": "u64"
         },
         {
@@ -678,8 +794,7 @@ export type Mirrorfi = {
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
-          "name": "instructionsSysvar",
-          "address": "Sysvar1nstructions1111111111111111111111111"
+          "name": "instructionsSysvar"
         },
         {
           "name": "klendProgram",
@@ -692,7 +807,7 @@ export type Mirrorfi = {
       ],
       "args": [
         {
-          "name": "amount",
+          "name": "collateralAmount",
           "type": "u64"
         },
         {
@@ -820,7 +935,7 @@ export type Mirrorfi = {
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "destinationMint"
               }
             ]
           }
@@ -881,7 +996,7 @@ export type Mirrorfi = {
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "reserve"
               }
             ]
           }
@@ -897,6 +1012,9 @@ export type Mirrorfi = {
         },
         {
           "name": "lendingMarket"
+        },
+        {
+          "name": "reserve"
         },
         {
           "name": "seed1Account"
@@ -1022,35 +1140,6 @@ export type Mirrorfi = {
           "name": "depositMint"
         },
         {
-          "name": "receiptMint",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  99,
-                  101,
-                  105,
-                  112,
-                  116,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              }
-            ]
-          }
-        },
-        {
           "name": "vaultTokenAccount",
           "writable": true,
           "pda": {
@@ -1168,18 +1257,11 @@ export type Mirrorfi = {
           }
         },
         {
-          "name": "priceUpdateV2"
-        },
-        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
           "name": "depositMintTokenProgram"
-        },
-        {
-          "name": "receiptMintTokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
@@ -1392,11 +1474,11 @@ export type Mirrorfi = {
           "writable": true
         },
         {
-          "name": "depositMint"
+          "name": "vaultDepositor",
+          "writable": true
         },
         {
-          "name": "receiptMint",
-          "writable": true
+          "name": "depositMint"
         },
         {
           "name": "withdrawerTokenAccount",
@@ -1456,63 +1538,6 @@ export type Mirrorfi = {
           }
         },
         {
-          "name": "receiptMintTokenAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "withdrawer"
-              },
-              {
-                "kind": "account",
-                "path": "receiptMintTokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "receiptMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           "name": "vaultTokenAccount",
           "writable": true
         },
@@ -1522,10 +1547,6 @@ export type Mirrorfi = {
         },
         {
           "name": "depositMintTokenProgram"
-        },
-        {
-          "name": "receiptMintTokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
@@ -1552,19 +1573,6 @@ export type Mirrorfi = {
         250,
         204,
         130
-      ]
-    },
-    {
-      "name": "priceUpdateV2",
-      "discriminator": [
-        34,
-        241,
-        35,
-        99,
-        157,
-        126,
-        244,
-        205
       ]
     },
     {
@@ -1605,6 +1613,19 @@ export type Mirrorfi = {
         117,
         119
       ]
+    },
+    {
+      "name": "vaultDepositor",
+      "discriminator": [
+        87,
+        109,
+        182,
+        106,
+        87,
+        96,
+        63,
+        211
+      ]
     }
   ],
   "errors": [
@@ -1625,163 +1646,168 @@ export type Mirrorfi = {
     },
     {
       "code": 6003,
-      "name": "insufficientRemainingAccounts",
-      "msg": "Insufficient remaining accounts"
-    },
-    {
-      "code": 6004,
-      "name": "insufficientDataLength",
-      "msg": "Unable to deserialize data"
-    },
-    {
-      "code": 6005,
       "name": "mathOverflow",
       "msg": "Math overflow"
     },
     {
-      "code": 6006,
+      "code": 6004,
       "name": "conversionFailed",
       "msg": "Math conversion failed"
     },
     {
-      "code": 6007,
-      "name": "staleOracle",
-      "msg": "Oracle needs to be refreshed"
+      "code": 6005,
+      "name": "invalidBasisPoints",
+      "msg": "Basis points cannot exceed 10,000"
     },
     {
-      "code": 6008,
-      "name": "noReceiptTokensMinted",
-      "msg": "No receipt tokens will be minted for deposit"
-    },
-    {
-      "code": 6009,
-      "name": "noReceiptTokensBurned",
-      "msg": "No receipt tokens will be burned for withdraw"
-    },
-    {
-      "code": 6010,
+      "code": 6006,
       "name": "invalidConfig",
       "msg": "Config address does not match"
     },
     {
-      "code": 6011,
+      "code": 6007,
       "name": "invalidTreasury",
       "msg": "Treasury address does not match"
     },
     {
-      "code": 6012,
+      "code": 6008,
       "name": "invalidAdmin",
       "msg": "Admin does not match"
     },
     {
-      "code": 6013,
+      "code": 6009,
       "name": "invalidTreasuryAuthority",
       "msg": "Treasury authority does not match"
     },
     {
-      "code": 6014,
+      "code": 6010,
       "name": "protocolNotOperational",
       "msg": "Protocol is paused or in reduce-only status"
     },
     {
-      "code": 6015,
+      "code": 6011,
       "name": "protocolNotWithdrawable",
       "msg": "Protocol is not in a withdrawable status"
     },
     {
-      "code": 6016,
+      "code": 6012,
       "name": "invalidVault",
       "msg": "Vault address does not match"
     },
     {
-      "code": 6017,
+      "code": 6013,
       "name": "invalidVaultDepositor",
       "msg": "Vault depositor does not match"
     },
     {
-      "code": 6018,
-      "name": "invalidReceiptMint",
-      "msg": "Receipt mint address does not match"
-    },
-    {
-      "code": 6019,
+      "code": 6014,
       "name": "invalidVaultAuthority",
       "msg": "Vault authority does not match"
     },
     {
-      "code": 6020,
+      "code": 6015,
       "name": "invalidStrategyType",
       "msg": "Strategy type is invalid for this operation"
     },
     {
-      "code": 6021,
-      "name": "vaultDepositCapReached",
-      "msg": "Vault deposit cap exceeded"
-    },
-    {
-      "code": 6022,
+      "code": 6016,
       "name": "vaultNotOperational",
       "msg": "Vault is paused or in reduce-only status"
     },
     {
-      "code": 6023,
+      "code": 6017,
       "name": "vaultNotWithdrawable",
       "msg": "Vault is not in a withdrawable status"
     },
     {
-      "code": 6024,
+      "code": 6018,
       "name": "depositCapReached",
       "msg": "Deposit cap for the vault has been reached"
     },
     {
+      "code": 6019,
+      "name": "invalidVaultDestinationTokenAccount",
+      "msg": "Vault destination token account does not match"
+    },
+    {
+      "code": 6020,
+      "name": "invalidDepositMint",
+      "msg": "Deposit mint does not match"
+    },
+    {
+      "code": 6021,
+      "name": "vaultHasDepositsInStrategies",
+      "msg": "Vault cannot be closed until all deposits in strategies are withdrawn"
+    },
+    {
+      "code": 6022,
+      "name": "invalidSharesAmount",
+      "msg": "Shares amount must be greater than zero"
+    },
+    {
+      "code": 6023,
+      "name": "exceedsMaxRemovableShares",
+      "msg": "Shares to remove exceeds max removable shares"
+    },
+    {
+      "code": 6024,
+      "name": "managerFeeBpsTooHigh",
+      "msg": "Sum of manager fee BPS and platform fee BPS cannot exceed 10,000"
+    },
+    {
       "code": 6025,
-      "name": "insufficientVaultFundsToDeposit",
-      "msg": "Insufficient funds in the vault to deposit to strategy"
+      "name": "invalidVaultDepositorAuthority",
+      "msg": "Vault depositor authority does not match"
     },
     {
       "code": 6026,
-      "name": "zeroNetDeposits",
-      "msg": "Vault has zero net deposits, cannot mint or burn shares"
+      "name": "invalidVaultDepositorVault",
+      "msg": "Vault depositor vault does not match"
     },
     {
       "code": 6027,
+      "name": "insufficientShares",
+      "msg": "Vault depositor does not have enough shares"
+    },
+    {
+      "code": 6028,
       "name": "invalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6028,
-      "name": "strategyHasDepositsDeployed",
-      "msg": "Strategy cannot be closed until all desposits deployed are withdrawn"
-    },
-    {
       "code": 6029,
-      "name": "invalidProtocolProgram",
-      "msg": "Protocol program does not match"
+      "name": "strategyHasDepositsDeployed",
+      "msg": "Strategy cannot be closed until all deposits deployed are withdrawn"
     },
     {
       "code": 6030,
-      "name": "invalidObligation",
-      "msg": "Obligation address does not match"
-    },
-    {
-      "code": 6031,
-      "name": "invalidLendingMarket",
-      "msg": "Lending market address does not match"
-    },
-    {
-      "code": 6032,
       "name": "invalidDestinationMint",
       "msg": "Destination mint does not match"
     },
     {
-      "code": 6033,
+      "code": 6031,
       "name": "invalidSourceMint",
       "msg": "Source mint does not match strategy destination mint"
     },
     {
-      "code": 6034,
+      "code": 6032,
       "name": "invalidUser",
       "msg": "User address does not match"
+    },
+    {
+      "code": 6033,
+      "name": "invalidObligationCollateral",
+      "msg": "Reserve not found in obligation"
+    },
+    {
+      "code": 6034,
+      "name": "invalidObligation",
+      "msg": "Obligation address does not match"
+    },
+    {
+      "code": 6035,
+      "name": "invalidReserve",
+      "msg": "Reserve address does not match"
     }
   ],
   "types": [
@@ -1805,27 +1831,29 @@ export type Mirrorfi = {
           {
             "name": "nextVaultId",
             "docs": [
-              "Vault ID, increments with each new vault"
+              "Vault ID, increments with each new vault."
             ],
             "type": "u64"
           },
           {
-            "name": "platformComissionFeeBps",
+            "name": "platformPerformanceFeeBps",
             "docs": [
-              "Fee taken on profits in basis points"
+              "Fee taken from eligble profits above previous high water mark in basis points."
             ],
             "type": "u16"
           },
           {
-            "name": "platformDepositFeeBps",
-            "type": "u16"
-          },
-          {
             "name": "platformWithdrawalFeeBps",
+            "docs": [
+              "Fee taken from vault withdrawals in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platformReferralFeeBps",
+            "docs": [
+              "Fee taken as referral bonus in basis points."
+            ],
             "type": "u16"
           },
           {
@@ -1849,7 +1877,7 @@ export type Mirrorfi = {
             "type": {
               "array": [
                 "u8",
-                5
+                7
               ]
             }
           }
@@ -1916,115 +1944,7 @@ export type Mirrorfi = {
             "type": "u64"
           },
           {
-            "name": "lockedProfitDegradationDuration",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "priceFeedMessage",
-      "repr": {
-        "kind": "c"
-      },
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "feedId",
-            "docs": [
-              "`FeedId` but avoid the type alias because of compatibility issues with Anchor's `idl-build` feature."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "price",
-            "type": "i64"
-          },
-          {
-            "name": "conf",
-            "type": "u64"
-          },
-          {
-            "name": "exponent",
-            "type": "i32"
-          },
-          {
-            "name": "publishTime",
-            "docs": [
-              "The timestamp of this price update in seconds"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "prevPublishTime",
-            "docs": [
-              "The timestamp of the previous price update. This field is intended to allow users to",
-              "identify the single unique price update for any moment in time:",
-              "for any time t, the unique update is the one such that prev_publish_time < t <= publish_time.",
-              "",
-              "Note that there may not be such an update while we are migrating to the new message-sending logic,",
-              "as some price updates on pythnet may not be sent to other chains (because the message-sending",
-              "logic may not have triggered). We can solve this problem by making the message-sending mandatory",
-              "(which we can do once publishers have migrated over).",
-              "",
-              "Additionally, this field may be equal to publish_time if the message is sent on a slot where",
-              "where the aggregation was unsuccesful. This problem will go away once all publishers have",
-              "migrated over to a recent version of pyth-agent."
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "emaPrice",
-            "type": "i64"
-          },
-          {
-            "name": "emaConf",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "priceUpdateV2",
-      "docs": [
-        "A price update account. This account is used by the Pyth Receiver program to store a verified price update from a Pyth price feed.",
-        "It contains:",
-        "- `write_authority`: The write authority for this account. This authority can close this account to reclaim rent or update the account to contain a different price update.",
-        "- `verification_level`: The [`VerificationLevel`] of this price update. This represents how many Wormhole guardian signatures have been verified for this price update.",
-        "- `price_message`: The actual price update.",
-        "- `posted_slot`: The slot at which this price update was posted."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "writeAuthority",
-            "type": "pubkey"
-          },
-          {
-            "name": "verificationLevel",
-            "type": {
-              "defined": {
-                "name": "verificationLevel"
-              }
-            }
-          },
-          {
-            "name": "priceMessage",
-            "type": {
-              "defined": {
-                "name": "priceFeedMessage"
-              }
-            }
-          },
-          {
-            "name": "postedSlot",
+            "name": "lockedProfitDuration",
             "type": "u64"
           }
         ]
@@ -2063,21 +1983,13 @@ export type Mirrorfi = {
           {
             "name": "depositsDeployed",
             "docs": [
-              "Total deposits deployed to the strategy"
+              "Total deposits deployed to the strategy."
             ],
             "type": "u64"
           },
           {
             "name": "id",
             "type": "u8"
-          },
-          {
-            "name": "strategyType",
-            "type": {
-              "defined": {
-                "name": "strategyType"
-              }
-            }
           },
           {
             "name": "bump",
@@ -2090,6 +2002,14 @@ export type Mirrorfi = {
                 "u8",
                 5
               ]
+            }
+          },
+          {
+            "name": "strategyType",
+            "type": {
+              "defined": {
+                "name": "strategyType"
+              }
             }
           }
         ]
@@ -2117,7 +2037,7 @@ export type Mirrorfi = {
                 "type": "pubkey"
               },
               {
-                "name": "lendingMarket",
+                "name": "reserve",
                 "type": "pubkey"
               }
             ]
@@ -2137,13 +2057,7 @@ export type Mirrorfi = {
             }
           },
           {
-            "name": "platformComissionFeeBps",
-            "type": {
-              "option": "u16"
-            }
-          },
-          {
-            "name": "platformDepositFeeBps",
+            "name": "platformPerformanceFeeBps",
             "type": {
               "option": "u16"
             }
@@ -2276,88 +2190,123 @@ export type Mirrorfi = {
             }
           },
           {
-            "name": "depositMint",
+            "name": "lookupAddress",
             "docs": [
-              "Mint accepted as vault deposits"
+              "Vault's Lookup Address"
             ],
             "type": "pubkey"
           },
           {
-            "name": "priceUpdateV2",
+            "name": "depositMint",
             "docs": [
-              "Pyth PriceUpdateV2"
+              "Mint accepted as vault deposits."
             ],
             "type": "pubkey"
           },
           {
             "name": "depositCap",
             "docs": [
-              "Max deposits accepted"
+              "Max deposits accepted."
             ],
             "type": "u64"
           },
           {
             "name": "userDeposits",
             "docs": [
-              "Total user deposits, changes on user deposit/withdraw"
+              "Total user deposits, changes on user deposit/withdraw."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "totalShares",
+            "docs": [
+              "Total deposit shares, changes on user deposit/."
             ],
             "type": "u64"
           },
           {
             "name": "realizedPnl",
             "docs": [
-              "Total realized profit and loss across all strategies, accumulated on strategy deposit/withdraw, excluding fees",
+              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, excluding fees.",
               "",
-              "Profit is only realized when exiting from strategies and deposits are withdrawn back to vault token accounts"
+              "Profit is only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
             ],
             "type": "i64"
           },
           {
             "name": "depositsInStrategies",
             "docs": [
-              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed"
+              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed."
             ],
             "type": "u64"
           },
           {
             "name": "lockedProfit",
             "docs": [
-              "Currently locked profit amount"
+              "Currently locked profit amount."
             ],
             "type": "u64"
           },
           {
-            "name": "lockedProfitDegradationDuration",
+            "name": "lockedProfitDuration",
             "docs": [
-              "Duration over which locked profit degrades to zero in seconds"
+              "Duration over which depositor's share of vault profit cannot be fully withdrawn.",
+              "",
+              "A longer duration punishes late depositors attempting to front-run vault profit by depositing late and withdrawing at the earliest."
             ],
             "type": "u64"
           },
           {
             "name": "lastProfitLockTs",
             "docs": [
-              "Last timestamp when profit is recorded"
+              "Last timestamp when profit is recorded."
             ],
             "type": "i64"
           },
           {
-            "name": "lastRefreshTs",
+            "name": "assetPerShare",
             "docs": [
-              "Last vault refresh timestamp"
+              "Last recorded asset per share."
             ],
-            "type": "i64"
+            "type": {
+              "defined": {
+                "name": "wrappedDecimal"
+              }
+            }
+          },
+          {
+            "name": "highWaterMark",
+            "docs": [
+              "All-time highest recorded asset per share.",
+              "",
+              "Fees are only taken on profits above this mark."
+            ],
+            "type": {
+              "defined": {
+                "name": "wrappedDecimal"
+              }
+            }
+          },
+          {
+            "name": "align0",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "unclaimedManagerFee",
             "docs": [
-              "Claimable manager fees, accrues on profitable strategy exits"
+              "Claimable manager fees, accrues on profitable strategy exits."
             ],
             "type": "u64"
           },
           {
-            "name": "managerFeeBps",
+            "name": "performanceFeeBps",
             "docs": [
-              "Fee taken from positive user withdrawals in basis points"
+              "Fee taken from eligble profits above previous high water mark in basis points."
             ],
             "type": "u16"
           },
@@ -2372,7 +2321,7 @@ export type Mirrorfi = {
           {
             "name": "nextStrategyId",
             "docs": [
-              "Strategy ID, increments with each new strategy"
+              "Strategy ID, increments with each new strategy."
             ],
             "type": "u8"
           },
@@ -2381,15 +2330,11 @@ export type Mirrorfi = {
             "type": "u8"
           },
           {
-            "name": "receiptMintBump",
-            "type": "u8"
-          },
-          {
             "name": "padding0",
             "type": {
               "array": [
                 "u8",
-                2
+                3
               ]
             }
           },
@@ -2399,6 +2344,64 @@ export type Mirrorfi = {
               "array": [
                 "u64",
                 32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "vaultDepositor",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "shares",
+            "docs": [
+              "Total shares of the vault owned by the depositor."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "lastVaultAssetPerShare",
+            "docs": [
+              "Last recorded vault asset per share at the time of deposit/withdraw."
+            ],
+            "type": {
+              "defined": {
+                "name": "wrappedDecimal"
+              }
+            }
+          },
+          {
+            "name": "lastDepositTs",
+            "docs": [
+              "Timestamp of the last deposit made."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "padding0",
+            "type": {
+              "array": [
+                "u8",
+                7
               ]
             }
           }
@@ -2423,44 +2426,24 @@ export type Mirrorfi = {
       }
     },
     {
-      "name": "verificationLevel",
+      "name": "wrappedDecimal",
       "docs": [
-        "Pyth price updates are bridged to all blockchains via Wormhole.",
-        "Using the price updates on another chain requires verifying the signatures of the Wormhole guardians.",
-        "The usual process is to check the signatures for two thirds of the total number of guardians, but this can be cumbersome on Solana because of the transaction size limits,",
-        "so we also allow for partial verification.",
-        "",
-        "This enum represents how much a price update has been verified:",
-        "- If `Full`, we have verified the signatures for two thirds of the current guardians.",
-        "- If `Partial`, only `num_signatures` guardian signatures have been checked.",
-        "",
-        "# Warning",
-        "Using partially verified price updates is dangerous, as it lowers the threshold of guardians that need to collude to produce a malicious price update."
+        "Borsh serializable wrapper for [`Decimal`].",
+        "Calculations are never performed on this type directly as Solana's runtime has limited support for floating operations."
       ],
       "type": {
-        "kind": "enum",
-        "variants": [
+        "kind": "struct",
+        "fields": [
           {
-            "name": "partial",
-            "fields": [
-              {
-                "name": "numSignatures",
-                "type": "u8"
-              }
-            ]
+            "name": "scale",
+            "type": "u32"
           },
           {
-            "name": "full"
+            "name": "mantissa",
+            "type": "i64"
           }
         ]
       }
-    }
-  ],
-  "constants": [
-    {
-      "name": "maxOracleStalenessSecs",
-      "type": "u16",
-      "value": "120"
     }
   ]
 };
