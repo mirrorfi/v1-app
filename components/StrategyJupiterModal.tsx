@@ -289,30 +289,25 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           authority: publicKey.toString(),
           destinationMint: toToken.mint,
           vault: vaultData.publicKey,
-          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
         });
       }
       else if (activeTab === 'add') {
         res = await getExecuteStrategyJupiterSwap({
-          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
           authority: publicKey.toString(),
           strategy: strategyPosition.strategyPda,
         });
       }else {
         res = await getExitStrategyJupiterSwap({
-          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
           authority: publicKey.toString(),
           strategy: strategyPosition.strategyPda,
           all: amount === fromToken.balance?.toString(),
         });
-        // showNotification({
-        //   title: `Action Failed!`,
-        //   message: `Strategy Closing / Withdrawal not supported yet.`,
-        //   type: "error"
-        // });
       }
       const versionedTx = res;
       // Prompt user to sign and send transaction
@@ -320,6 +315,15 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
       versionedTx.message.recentBlockhash = blockhash;
       const signedTx = await signTransaction(versionedTx);
       const txid = await connection.sendRawTransaction(signedTx.serialize());
+      const latest = await connection.getLatestBlockhash();
+      await connection.confirmTransaction(
+        {
+          signature: txid,
+          blockhash: latest.blockhash,
+          lastValidBlockHeight: latest.lastValidBlockHeight,
+        },
+        "confirmed"
+      );
       console.log("Transaction ID:", txid);
 
       showNotification({

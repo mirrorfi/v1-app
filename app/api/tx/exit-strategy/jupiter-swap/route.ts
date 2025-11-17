@@ -92,8 +92,15 @@ export async function POST(req: NextRequest) {
       !PublicKey.isOnCurve(vault),
       depositMintTokenProgram,
     )
+    const targetMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(targetMint))!.owner;
+    const vaultTargetMintTokenAccount = getAssociatedTokenAddressSync(
+      targetMint,
+      new PublicKey(vault),
+      !PublicKey.isOnCurve(vault),
+      targetMintTokenProgram,
+    );
     if (all) {
-      amount = (await SERVER_CONNECTION.getTokenAccountBalance(vaultDepositMintTokenAccount)).value.amount;
+      amount = (await SERVER_CONNECTION.getTokenAccountBalance(vaultTargetMintTokenAccount)).value.amount;
     }
 
     const executeSwapResult = await swap(
@@ -109,13 +116,6 @@ export async function POST(req: NextRequest) {
     const remainingAccounts = extractRemainingAccountsForSwap(
       executeSwapResult.swapInstruction,
     ).remainingAccounts;
-    const targetMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(targetMint))!.owner;
-    const vaultTargetMintTokenAccount = getAssociatedTokenAddressSync(
-      targetMint,
-      new PublicKey(vault),
-      !PublicKey.isOnCurve(vault),
-      targetMintTokenProgram,
-    );
     const treasuryPda = mirrorfiClient.treasuryPda;
     const treasuryTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
@@ -146,14 +146,14 @@ export async function POST(req: NextRequest) {
       .instruction();
     let ixs = [exitIx];
     
-    // if (all) {
-    //   let closeIx = await mirrorfiClient.program.methods.closeStrategy().accounts({
-    //     authority,
-    //     vault,
-    //     strategy
-    //   }).instruction();
-    //   ixs.push(closeIx);
-    // }
+    if (all) {
+      let closeIx = await mirrorfiClient.program.methods.closeStrategy().accounts({
+        authority,
+        vault,
+        strategy
+      }).instruction();
+      ixs.push(closeIx);
+    }
 
     const tx = await buildTx(ixs, new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 

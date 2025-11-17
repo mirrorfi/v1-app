@@ -91,6 +91,15 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
       versionedTx.message.recentBlockhash = blockhash;
       const signedTx = await signTransaction(versionedTx);
       const txid = await connection.sendRawTransaction(signedTx.serialize());
+      const latest = await connection.getLatestBlockhash();
+      await connection.confirmTransaction(
+        {
+          signature: txid,
+          blockhash: latest.blockhash,
+          lastValidBlockHeight: latest.lastValidBlockHeight,
+        },
+        "confirmed"
+      );
       console.log("Transaction ID:", txid);
       
       // Show success notification
