@@ -146,14 +146,14 @@ export async function POST(req: NextRequest) {
       .instruction();
     let ixs = [exitIx];
     
-    if (all) {
-      let closeIx = await mirrorfiClient.program.methods.closeStrategy().accounts({
-        authority,
-        vault,
-        strategy
-      }).instruction();
-      ixs.push(closeIx);
-    }
+    // if (all) {
+    //   let closeIx = await mirrorfiClient.program.methods.closeStrategy().accounts({
+    //     authority,
+    //     vault,
+    //     strategy
+    //   }).instruction();
+    //   ixs.push(closeIx);
+    // }
 
     const tx = await buildTx(ixs, new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
