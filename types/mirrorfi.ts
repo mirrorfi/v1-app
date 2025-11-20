@@ -145,6 +145,45 @@ export type Mirrorfi = {
       "args": []
     },
     {
+      "name": "closeVault",
+      "discriminator": [
+        141,
+        103,
+        17,
+        126,
+        72,
+        75,
+        29,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "depositMint"
+        },
+        {
+          "name": "vaultTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "depositVault",
       "discriminator": [
         126,
@@ -580,7 +619,7 @@ export type Mirrorfi = {
           "type": "bytes"
         },
         {
-          "name": "amount",
+          "name": "swapInAmount",
           "type": "u64"
         },
         {
@@ -692,7 +731,7 @@ export type Mirrorfi = {
       ],
       "args": [
         {
-          "name": "amount",
+          "name": "collateralAmount",
           "type": "u64"
         },
         {
@@ -820,7 +859,7 @@ export type Mirrorfi = {
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "destinationMint"
               }
             ]
           }
@@ -881,7 +920,7 @@ export type Mirrorfi = {
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "reserve"
               }
             ]
           }
@@ -897,6 +936,9 @@ export type Mirrorfi = {
         },
         {
           "name": "lendingMarket"
+        },
+        {
+          "name": "reserve"
         },
         {
           "name": "seed1Account"
@@ -1655,118 +1697,118 @@ export type Mirrorfi = {
     },
     {
       "code": 6009,
-      "name": "noReceiptTokensBurned",
-      "msg": "No receipt tokens will be burned for withdraw"
-    },
-    {
-      "code": 6010,
       "name": "invalidConfig",
       "msg": "Config address does not match"
     },
     {
-      "code": 6011,
+      "code": 6010,
       "name": "invalidTreasury",
       "msg": "Treasury address does not match"
     },
     {
-      "code": 6012,
+      "code": 6011,
       "name": "invalidAdmin",
       "msg": "Admin does not match"
     },
     {
-      "code": 6013,
+      "code": 6012,
       "name": "invalidTreasuryAuthority",
       "msg": "Treasury authority does not match"
     },
     {
-      "code": 6014,
+      "code": 6013,
       "name": "protocolNotOperational",
       "msg": "Protocol is paused or in reduce-only status"
     },
     {
-      "code": 6015,
+      "code": 6014,
       "name": "protocolNotWithdrawable",
       "msg": "Protocol is not in a withdrawable status"
     },
     {
-      "code": 6016,
+      "code": 6015,
       "name": "invalidVault",
       "msg": "Vault address does not match"
     },
     {
-      "code": 6017,
+      "code": 6016,
       "name": "invalidVaultDepositor",
       "msg": "Vault depositor does not match"
     },
     {
-      "code": 6018,
+      "code": 6017,
       "name": "invalidReceiptMint",
       "msg": "Receipt mint address does not match"
     },
     {
-      "code": 6019,
+      "code": 6018,
       "name": "invalidVaultAuthority",
       "msg": "Vault authority does not match"
     },
     {
-      "code": 6020,
+      "code": 6019,
       "name": "invalidStrategyType",
       "msg": "Strategy type is invalid for this operation"
     },
     {
-      "code": 6021,
+      "code": 6020,
       "name": "vaultDepositCapReached",
       "msg": "Vault deposit cap exceeded"
     },
     {
-      "code": 6022,
+      "code": 6021,
       "name": "vaultNotOperational",
       "msg": "Vault is paused or in reduce-only status"
     },
     {
-      "code": 6023,
+      "code": 6022,
       "name": "vaultNotWithdrawable",
       "msg": "Vault is not in a withdrawable status"
     },
     {
-      "code": 6024,
+      "code": 6023,
       "name": "depositCapReached",
       "msg": "Deposit cap for the vault has been reached"
     },
     {
-      "code": 6025,
+      "code": 6024,
       "name": "insufficientVaultFundsToDeposit",
       "msg": "Insufficient funds in the vault to deposit to strategy"
     },
     {
-      "code": 6026,
+      "code": 6025,
       "name": "zeroNetDeposits",
       "msg": "Vault has zero net deposits, cannot mint or burn shares"
     },
     {
+      "code": 6026,
+      "name": "invalidVaultDestinationTokenAccount",
+      "msg": "Vault destination token account does not match"
+    },
+    {
       "code": 6027,
+      "name": "invalidDepositMint",
+      "msg": "Deposit mint does not match"
+    },
+    {
+      "code": 6028,
+      "name": "vaultHasDepositsInStrategies",
+      "msg": "Vault cannot be closed until all deposits in strategies are withdrawn"
+    },
+    {
+      "code": 6029,
       "name": "invalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6028,
-      "name": "strategyHasDepositsDeployed",
-      "msg": "Strategy cannot be closed until all desposits deployed are withdrawn"
-    },
-    {
-      "code": 6029,
-      "name": "invalidProtocolProgram",
-      "msg": "Protocol program does not match"
-    },
-    {
       "code": 6030,
-      "name": "invalidObligation",
-      "msg": "Obligation address does not match"
+      "name": "strategyHasDepositsDeployed",
+      "msg": "Strategy cannot be closed until all deposits deployed are withdrawn"
     },
     {
       "code": 6031,
-      "name": "invalidLendingMarket",
-      "msg": "Lending market address does not match"
+      "name": "invalidProtocolProgram",
+      "msg": "Protocol program does not match"
     },
     {
       "code": 6032,
@@ -1782,6 +1824,21 @@ export type Mirrorfi = {
       "code": 6034,
       "name": "invalidUser",
       "msg": "User address does not match"
+    },
+    {
+      "code": 6035,
+      "name": "invalidObligationCollateral",
+      "msg": "Reserve not found in obligation"
+    },
+    {
+      "code": 6036,
+      "name": "invalidObligation",
+      "msg": "Obligation address does not match"
+    },
+    {
+      "code": 6037,
+      "name": "invalidReserve",
+      "msg": "Reserve address does not match"
     }
   ],
   "types": [
@@ -2049,10 +2106,6 @@ export type Mirrorfi = {
     },
     {
       "name": "strategy",
-      "serialization": "bytemuck",
-      "repr": {
-        "kind": "c"
-      },
       "type": {
         "kind": "struct",
         "fields": [
@@ -2117,7 +2170,7 @@ export type Mirrorfi = {
                 "type": "pubkey"
               },
               {
-                "name": "lendingMarket",
+                "name": "reserve",
                 "type": "pubkey"
               }
             ]
@@ -2306,7 +2359,7 @@ export type Mirrorfi = {
           {
             "name": "realizedPnl",
             "docs": [
-              "Total realized profit and loss across all strategies, accumulated on strategy deposit/withdraw, excluding fees",
+              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, excluding fees",
               "",
               "Profit is only realized when exiting from strategies and deposits are withdrawn back to vault token accounts"
             ],

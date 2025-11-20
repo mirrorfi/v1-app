@@ -139,6 +139,45 @@
       "args": []
     },
     {
+      "name": "close_vault",
+      "discriminator": [
+        141,
+        103,
+        17,
+        126,
+        72,
+        75,
+        29,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "deposit_mint"
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "deposit_vault",
       "discriminator": [
         126,
@@ -814,7 +853,7 @@
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "destination_mint"
               }
             ]
           }
@@ -875,7 +914,7 @@
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "reserve"
               }
             ]
           }
@@ -891,6 +930,9 @@
         },
         {
           "name": "lending_market"
+        },
+        {
+          "name": "reserve"
         },
         {
           "name": "seed1_account"
@@ -1739,28 +1781,28 @@
     },
     {
       "code": 6027,
+      "name": "InvalidDepositMint",
+      "msg": "Deposit mint does not match"
+    },
+    {
+      "code": 6028,
+      "name": "VaultHasDepositsInStrategies",
+      "msg": "Vault cannot be closed until all deposits in strategies are withdrawn"
+    },
+    {
+      "code": 6029,
       "name": "InvalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6028,
-      "name": "StrategyHasDepositsDeployed",
-      "msg": "Strategy cannot be closed until all desposits deployed are withdrawn"
-    },
-    {
-      "code": 6029,
-      "name": "InvalidProtocolProgram",
-      "msg": "Protocol program does not match"
-    },
-    {
       "code": 6030,
-      "name": "InvalidObligation",
-      "msg": "Obligation address does not match"
+      "name": "StrategyHasDepositsDeployed",
+      "msg": "Strategy cannot be closed until all deposits deployed are withdrawn"
     },
     {
       "code": 6031,
-      "name": "InvalidLendingMarket",
-      "msg": "Lending market address does not match"
+      "name": "InvalidProtocolProgram",
+      "msg": "Protocol program does not match"
     },
     {
       "code": 6032,
@@ -1781,6 +1823,16 @@
       "code": 6035,
       "name": "InvalidObligationCollateral",
       "msg": "Reserve not found in obligation"
+    },
+    {
+      "code": 6036,
+      "name": "InvalidObligation",
+      "msg": "Obligation address does not match"
+    },
+    {
+      "code": 6037,
+      "name": "InvalidReserve",
+      "msg": "Reserve address does not match"
     }
   ],
   "types": [
@@ -2048,10 +2100,6 @@
     },
     {
       "name": "Strategy",
-      "serialization": "bytemuck",
-      "repr": {
-        "kind": "c"
-      },
       "type": {
         "kind": "struct",
         "fields": [
@@ -2116,7 +2164,7 @@
                 "type": "pubkey"
               },
               {
-                "name": "lending_market",
+                "name": "reserve",
                 "type": "pubkey"
               }
             ]

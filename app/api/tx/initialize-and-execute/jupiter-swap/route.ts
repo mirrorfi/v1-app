@@ -99,11 +99,10 @@ export async function POST(req: NextRequest) {
     const ixs = [
       await mirrorfiClient.program.methods
         .initializeStrategyJupiterSwap()
-        .accountsPartial({
+        .accounts({
           authority,
           destinationMint,
           vault,
-          strategy,
         })
         .instruction(),
       await mirrorfiClient.program.methods
