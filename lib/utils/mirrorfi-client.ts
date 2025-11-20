@@ -59,6 +59,17 @@ export class MirrorFiClient {
     )[0];
   }
 
+  getJupiterStrategyPda(vault: PublicKey, tokenMint: PublicKey) {
+    return PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("strategy"),
+        vault.toBuffer(),
+        tokenMint.toBuffer(),
+      ],
+      programId,
+    )[0];
+  }
+
   getUserPda(authority: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("user"), authority.toBuffer()],

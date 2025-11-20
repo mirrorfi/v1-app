@@ -263,6 +263,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           message: `Please connect your wallet to continue.`,
           type: "error"
         });
+        setIsLoading(false);
         return;
       }
       if(!fromToken || !toToken || !fromToken.decimals || !vaultData){
@@ -271,6 +272,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           message: `Data has not been successfully loaded.`,
           type: "error"
         });
+        setIsLoading(false);
         return;
       }
       const numAmount = parseFloat(amount);
@@ -280,6 +282,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           message: `Invalid amount.`,
           type: "error"
         });
+        setIsLoading(false);
         return;
       }
       let res;
