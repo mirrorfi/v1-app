@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
           tokenProgram,
         )
         const vaultAtaBal = (await getAccount(SERVER_CONNECTION, vaultAta, "confirmed", tokenProgram)).amount;
-        let totalNav = Number(vaultAtaBal) / (10 ** tokenInfo.decimals);
+        let totalNav = (Number(vaultAtaBal) / (10 ** tokenInfo.decimals)) * tokenInfo.usdPrice;
 
         // Accumulate NAV from each strategy
 
@@ -61,8 +61,11 @@ export async function GET(req: NextRequest) {
                 balance: ataAccBal.toString(),
                 nav,
                 decimals: tokenInfo.decimals,
+                name: tokenInfo.name,
                 icon: tokenInfo.icon,
                 symbol: tokenInfo.symbol,
+                usdPrice: tokenInfo.usdPrice,
+                tokenProgram: tokenInfo.tokenProgram,
               };
               delete (strategyWithNav as any).vault;
               return strategyWithNav;
@@ -78,8 +81,11 @@ export async function GET(req: NextRequest) {
             balance: vaultAtaBal.toString(),
             totalNav,
             decimals: tokenInfo.decimals,
+            name: tokenInfo.name,
             icon: tokenInfo.icon,
             symbol: tokenInfo.symbol,
+            usdPrice: tokenInfo.usdPrice,
+            tokenProgram: tokenInfo.tokenProgram,
           },
           strategies: strategiesWithNav,
         }

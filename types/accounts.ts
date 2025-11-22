@@ -40,6 +40,7 @@ type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];
 type Strategy = IdlAccounts<Mirrorfi>["strategy"];
 type User = IdlAccounts<Mirrorfi>["user"];
+type VaultDepositor = IdlAccounts<Mirrorfi>["vaultDepositor"];
 type ProtocolStatus = IdlTypes<Mirrorfi>["protocolStatus"];
 type StrategyType = IdlTypes<Mirrorfi>["strategyType"];
 type VaultStatus = IdlTypes<Mirrorfi>["vaultStatus"];
