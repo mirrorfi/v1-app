@@ -34,21 +34,14 @@ export async function POST(req: NextRequest) {
 
     const depositMint = new PublicKey(vaultAcc.depositMint);
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))!.owner;
-    const depositMintTokenAccount = getAssociatedTokenAddressSync(
-      depositMint,
-      new PublicKey(vault),
-      !PublicKey.isOnCurve(vault),
-      depositMintTokenProgram,
-    )
-
+    
     const ix = await mirrorfiClient.program.methods
       .closeVault()
       .accounts({
         authority,
         vault,
         depositMint,
-        vaultTokenAccount: depositMintTokenAccount,
-        tokenProgram: depositMintTokenProgram,
+        depositMintTokenProgram,
       })
       .instruction();
 

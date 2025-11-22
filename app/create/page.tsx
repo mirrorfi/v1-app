@@ -117,7 +117,7 @@ export default function CreatePage() {
                 description: formData.description,
                 managerFeeBps: parseInt(formData.commissionRate.replace('%', '')) * 100,
                 depositCap: (BigInt(parseFloat(formData.maxDeposit) * 10 ** tokenDecimals)).toString(),
-                lockedProfitDegradationDuration: "3600",
+                lockedProfitDuration: "3600",
                 depositMint: tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint,
                 priceUpdateV2: pythOracle.toBase58(),
                 authority: publicKey.toString(),
@@ -127,6 +127,14 @@ export default function CreatePage() {
             versionedTx.message.recentBlockhash = blockhash;
             const signedTx = await signTransaction(versionedTx);
             const txid = await connection.sendRawTransaction(signedTx.serialize());
+            await connection.confirmTransaction(
+            {
+                signature: txid,
+                blockhash: blockhash,
+                lastValidBlockHeight: lastValidBlockHeight,
+                },
+                "confirmed"
+            );
             console.log("Transaction ID:", txid);
 
             showNotification({

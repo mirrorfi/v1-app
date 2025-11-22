@@ -1,12 +1,13 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
 import { stringToByteArray, v0TxToBase64 } from "@/lib/utils";
+import { parseConfig } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, description, managerFeeBps, depositCap, lockedProfitDegradationDuration, depositMint, priceUpdateV2, authority } = await req.json();
+    const { name, description, managerFeeBps, depositCap, lockedProfitDuration, depositMint, priceUpdateV2, authority } = await req.json();
 
     if (!name) {
       return NextResponse.json(
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (lockedProfitDegradationDuration === undefined || lockedProfitDegradationDuration === null) {
+    if (lockedProfitDuration === undefined || lockedProfitDuration === null) {
       return NextResponse.json(
         { error: 'Locked profit degradation duration is required.' },
         { status: 400 }
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     }
 
     // lockedProfitDegradationDuration is a bigint serialized as string
-    if (isNaN(lockedProfitDegradationDuration) || BigInt(lockedProfitDegradationDuration) <= BigInt(0)) {
+    if (isNaN(lockedProfitDuration) || BigInt(lockedProfitDuration) <= BigInt(0)) {
       return NextResponse.json(
         { error: 'Locked profit degradation duration must be a positive number.' },
         { status: 400 }
@@ -81,29 +82,30 @@ export async function POST(req: NextRequest) {
     }
 
     const id = await mirrorfiClient.getNextVaultId();
+    const configPda = mirrorfiClient.getConfigPda();
     const treasuryPda = mirrorfiClient.getTreasuryPda();
-    const vaultPda = mirrorfiClient.getVaultPda(new BN(id), new PublicKey(authority));
     const depositMintPubkey = new PublicKey(depositMint);
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMintPubkey))!.owner;
 
+    const config = (await mirrorfiClient.fetchProgramAccount(configPda.toBase58(), "config", parseConfig))!;
+    const vaultPda = mirrorfiClient.getVaultPda(new BN(config.nextVaultId), new PublicKey(authority));
+    console.log("New Vault PDA:", vaultPda.toBase58());
+
     const ix = await mirrorfiClient.program.methods
       .initializeVault({
-        depositCap: new BN(depositCap),
-        description: stringToByteArray(description, 64),
-        lockedProfitDegradationDuration: new BN(
-          lockedProfitDegradationDuration,
-        ),
-        managerFeeBps,
         name: stringToByteArray(name, 32),
+        description: stringToByteArray(description, 64),
+        managerFeeBps,
+        depositCap: new BN(depositCap),
+        lockedProfitDuration: new BN(lockedProfitDuration),
       })
       .accountsPartial({
         authority,
         treasury: treasuryPda,
-        config: mirrorfiClient.configPda,
-        depositMint,
-        priceUpdateV2,
-        depositMintTokenProgram,
+        config: configPda,
         vault: vaultPda,
+        depositMint,
+        depositMintTokenProgram,
       })
       .instruction();
 

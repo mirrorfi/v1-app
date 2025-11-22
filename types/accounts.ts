@@ -56,7 +56,7 @@ export interface ParsedConfig extends ParsedProgramAccount {
   admin: pubkey;
   treasuryAuthority: pubkey;
   nextVaultId: u64;
-  platformComissionFeeBps: u16;
+  platformPerformanceFeeBps: u16;
   platformDepositFeeBps: u16;
   platformReferralFeeBps: u16;
   platformWithdrawalFeeBps: u16;
@@ -69,19 +69,22 @@ export interface ParsedVault extends ParsedProgramAccount {
   name: string;
   description: string;
   depositMint: pubkey;
-  priceUpdateV2: pubkey;
+  //_unused0: u8[];
   depositCap: u64;
   userDeposits: u64;
   realizedPnl: i64;
   depositsInStrategies: u64;
   lockedProfit: u64;
-  lockedProfitDegradationDuration: u64;
+  lockedProfitDuration: u64;
   lastProfitLockTs: i64;
-  lastRefreshTs: i64;
+  totalShares: i64;
   unclaimedManagerFee: u64;
-  managerFeeBps: u16;
+  performanceFeeBps: u16;
   status: ParsedVaultStatus;
   nextStrategyId: u8;
+  // Wrapped Decimal Not used:
+  // assetPerShare: WrappedDecimal;
+  // highWaterMark: WrappedDecimal;
 }
 
 export interface ParsedStrategy extends ParsedProgramAccount {
@@ -97,19 +100,18 @@ export interface ParsedUser extends ParsedProgramAccount {
 
 export interface ParsedVaultDepositor extends ParsedProgramAccount {
   authority: pubkey;
-  bump: u8;
-  padding0: u8[];
-  totalShares: u64;
-  totalCost: u64;
-  realizedPnl: i64;
-  padding1: u8[];
+  vault: pubkey;
+  shares: u64;
+  // Wrapped Decimal Not used:
+  // lastVaultAssetPerShare: WrappedDecimal;
+  lastDepositTs: i64;
 }
 
 export function parseConfig({
   admin,
   treasuryAuthority,
   nextVaultId,
-  platformComissionFeeBps,
+  platformPerformanceFeeBps,
   platformDepositFeeBps,
   platformReferralFeeBps,
   platformWithdrawalFeeBps,
@@ -118,7 +120,7 @@ export function parseConfig({
   return {
     admin: parsePublicKey(admin),
     nextVaultId: parseBN(nextVaultId),
-    platformComissionFeeBps,
+    platformPerformanceFeeBps,
     platformDepositFeeBps,
     platformReferralFeeBps,
     platformWithdrawalFeeBps,
@@ -132,17 +134,16 @@ export function parseVault({
   name,
   description,
   depositMint,
-  priceUpdateV2,
   depositCap,
   userDeposits,
   realizedPnl,
   depositsInStrategies,
   lockedProfit,
-  lockedProfitDegradationDuration,
+  lockedProfitDuration,
   lastProfitLockTs,
-  lastRefreshTs,
+  totalShares,
   unclaimedManagerFee,
-  managerFeeBps,
+  performanceFeeBps,
   status,
   nextStrategyId,
   id,
@@ -152,17 +153,17 @@ export function parseVault({
     name: byteArrayToString(name),
     description: byteArrayToString(description),
     depositMint: parsePublicKey(depositMint),
-    priceUpdateV2: parsePublicKey(priceUpdateV2),
+    //unused0: parseByteArray(unused0),
     depositCap: parseBN(depositCap),
     userDeposits: parseBN(userDeposits),
     realizedPnl: parseBN(realizedPnl),
     depositsInStrategies: parseBN(depositsInStrategies),
     lockedProfit: parseBN(lockedProfit),
-    lockedProfitDegradationDuration: parseBN(lockedProfitDegradationDuration),
+    lockedProfitDuration: parseBN(lockedProfitDuration),
     lastProfitLockTs: parseBN(lastProfitLockTs),
-    lastRefreshTs: parseBN(lastRefreshTs),
+    totalShares: parseBN(totalShares),
     unclaimedManagerFee: parseBN(unclaimedManagerFee),
-    managerFeeBps,
+    performanceFeeBps,
     status: parseEnum<ParsedVaultStatus>(status),
     nextStrategyId,
     id: parseBN(id),
@@ -216,5 +217,20 @@ export function parseUser({
 }: User): Omit<ParsedUser, "publicKey"> {
   return {
     authority: parsePublicKey(authority),
+  };
+}
+
+export function parseVaultDepositor({
+  authority,
+  vault,
+  shares,
+  //lastVaultAssetPerShare,
+  lastDepositTs,
+}: VaultDepositor): Omit<ParsedVaultDepositor, "publicKey"> {
+  return {
+    authority: parsePublicKey(authority),
+    vault: parsePublicKey(vault),
+    shares: parseBN(shares),
+    lastDepositTs: parseBN(lastDepositTs),
   };
 }

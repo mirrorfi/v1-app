@@ -11,7 +11,7 @@ import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { getPrices, getTokenInfos } from "@/lib/api";
-import { parseVault } from '@/types/accounts';
+import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
@@ -54,29 +54,22 @@ export default function VaultPage() {
     if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
   }
 
-  async function fetchUserReceiptBalance(vaultData:any, vaultNav: number, user: PublicKey) {
+  async function fetchUserReceiptBalance(vaultData: ParsedVault, vaultNav: number, user: PublicKey) {
     if(!vaultData.publicKey){ throw new Error("Invalid vault data: missing publicKey"); }
     if(!vaultData.depositMint){ throw new Error("Invalid vault data: missing depositMint"); }
     const info = TOKEN_INFO[vaultData.depositMint];
-    const receiptMint = mirrorfiClient.getReceiptMintPda(new PublicKey(vaultData.publicKey));
-    const userReceiptAta = getAssociatedTokenAddressSync(receiptMint, user, false, TOKEN_2022_PROGRAM_ID);
-    try{
-      const userReceiptAccountInfo = await connection.getTokenAccountBalance(userReceiptAta);
-      const receiptSupplyInfo = await connection.getTokenSupply(receiptMint);
-      console.log("User Receipt Balance:", userReceiptAccountInfo);
-      console.log("Receipt Supply Info:", receiptSupplyInfo);
-      const positionShareToken = userReceiptAccountInfo.value.uiAmount || 0;
-      const receiptTotalSupply = receiptSupplyInfo.value.uiAmount || 0;
-      console.log(vaultData.userDeposits, vaultData.realizedPnl);
-      const vaultRealizedValuation = (Number(vaultData.userDeposits) + Number(vaultData.realizedPnl)) / 10**info.tokenDecimals;
-      console.log("Vault Realized Valuation:", vaultRealizedValuation);
-      const sharePrice = receiptTotalSupply > 0 ? vaultRealizedValuation / receiptTotalSupply : 0;
-      console.log("Calculated Share Price:", sharePrice);
-      setPositionBalance(positionShareToken);
-      setSharePrice(sharePrice);
-    } catch(e){
-      console.log("No Receipt Token Data found");
-    }
+    // Fetch Vault Depositor Account
+    const vaultDepositorPda = mirrorfiClient.getVaultDepositorPda(new PublicKey(vaultData.publicKey), user);
+    const vaultDepositor = await mirrorfiClient.fetchProgramAccount(vaultDepositorPda.toBase58(), "vaultDepositor", parseVaultDepositor);
+    const userShares = vaultDepositor ? vaultDepositor.shares : "0";
+    // Calculate Share Price
+    const vaultRealizedValuation = Number(vaultData.userDeposits) + Number(vaultData.realizedPnl);
+    const sharePrice = Number(vaultData.totalShares) > 0 ? vaultRealizedValuation / Number(vaultData.totalShares) : 0;
+    console.log("Vault NAV:", vaultNav);
+    console.log("Vault Realized Valuation:", vaultRealizedValuation);
+    console.log("Calculated Share Price:", sharePrice);
+    setPositionBalance(Number(userShares) / 10**info.tokenDecimals);
+    setSharePrice(sharePrice);
   }
 
   async function fetchVaultStrategies(vaultKey: PublicKey, vaultData: any) {
@@ -177,7 +170,7 @@ export default function VaultPage() {
 
       try{
         const vaultKey = new PublicKey(vault);
-        // Process that can be compiled together
+        // TODO: Change Implementation to API calls
         // Batch 1: Get Balances
         // const balances = await getVaultBalances(vaultKey);
         // setVaultBalances(balances);
@@ -191,10 +184,8 @@ export default function VaultPage() {
         const vaultNav = await fetchVaultStrategies(vaultKey, vaultData);
         // Step 3: Get User Position Info
         if(publicKey){
-          // Fetch Deposit Token Balance
-          fetchUserBalance(vaultData.depositMint, publicKey);
-          // Fetch Share Token Balance
-          fetchUserReceiptBalance(vaultData, vaultNav, publicKey);
+          fetchUserBalance(vaultData.depositMint, publicKey); // Fetch Deposit Token Balance
+          fetchUserReceiptBalance(vaultData, vaultNav, publicKey); // Fetch Share Token Balance
         }
       } catch (error: any) {
         console.error("Error loading vault:", error);

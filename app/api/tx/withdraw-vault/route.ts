@@ -51,27 +51,20 @@ export async function POST(req: NextRequest) {
 
     const depositMint = vaultAcc.depositMint;
     const vaultPubkey = new PublicKey(vault);
-    const receiptMint = mirrorfiClient.getReceiptMintPda(vaultPubkey);
-    const depositMintPubkey = new PublicKey(depositMint);
     const withdrawerPubkey = new PublicKey(withdrawer);
+    const vaultDepositor = mirrorfiClient.getVaultDepositorPda(vaultPubkey, withdrawerPubkey);
+    const depositMintPubkey = new PublicKey(depositMint);
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMintPubkey))!.owner;
-    const vaultTokenAccount = getAssociatedTokenAddressSync(
-      depositMintPubkey,
-      new PublicKey(vault),
-      !PublicKey.isOnCurve(vault),
-      depositMintTokenProgram,
-    );
 
     const ix = await mirrorfiClient.program.methods
       .withdrawVault(new BN(amount))
       .accounts({
+        withdrawer,
         config: mirrorfiClient.configPda,
+        vault,
+        vaultDepositor,
         depositMint,
         depositMintTokenProgram,
-        receiptMint,
-        vault,
-        vaultTokenAccount,
-        withdrawer,
       })
       .instruction();
 

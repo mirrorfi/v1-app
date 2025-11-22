@@ -126,19 +126,19 @@ export async function getInitializeUserTx({
 }
 
 export async function getInitializeVaultTx({
-  name, description, managerFeeBps, depositCap, lockedProfitDegradationDuration, depositMint, priceUpdateV2, authority
+  name, description, managerFeeBps, depositCap, lockedProfitDuration, depositMint, priceUpdateV2, authority
 }: {
   name: string,
   description: string,
   managerFeeBps: number,
   depositCap: bigIntString,
-  lockedProfitDegradationDuration: bigIntString,
+  lockedProfitDuration: bigIntString,
   depositMint: string,
   priceUpdateV2: string,
   authority: string,
 }): Promise<VersionedTransaction> {
   const { tx } = await wrappedFetch("/api/tx/initialize-vault", "POST", {
-    name, description, managerFeeBps, depositCap, lockedProfitDegradationDuration, depositMint, priceUpdateV2, authority
+    name, description, managerFeeBps, depositCap, lockedProfitDuration, depositMint, priceUpdateV2, authority
   });
 
   return base64ToV0Tx(tx);
