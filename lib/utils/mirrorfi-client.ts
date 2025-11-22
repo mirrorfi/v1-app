@@ -16,7 +16,7 @@ export class MirrorFiClient {
   configPda = this.getConfigPda();
   treasuryPda = this.getTreasuryPda();
 
-  private getConfigPda() {
+  getConfigPda() {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("config")],
       programId
@@ -41,30 +41,30 @@ export class MirrorFiClient {
     )[0];
   }
 
-  getReceiptMintPda(vault: PublicKey) {
+  getVaultDepositorPda(vault: PublicKey, authority: PublicKey) {
     return PublicKey.findProgramAddressSync(
-      [Buffer.from("receipt_mint"), vault.toBuffer()],
+      [Buffer.from("vault_depositor"), authority.toBuffer(), vault.toBuffer()],
       programId,
     )[0];
   }
 
-  getStrategyPda(vault: PublicKey, id: BN) {
+  getStrategyPda(vault: PublicKey, protocolAccount: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [
         Buffer.from("strategy"),
         vault.toBuffer(),
-        id.toArrayLike(Buffer, "le", 1),
+        protocolAccount.toBuffer(),
       ],
       programId,
     )[0];
   }
 
-  getJupiterStrategyPda(vault: PublicKey, tokenMint: PublicKey) {
+  getJupiterStrategyPda(vault: PublicKey, protocolAccount: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [
         Buffer.from("strategy"),
         vault.toBuffer(),
-        tokenMint.toBuffer(),
+        protocolAccount.toBuffer(),
       ],
       programId,
     )[0];
@@ -101,6 +101,7 @@ export class MirrorFiClient {
     parser: (acc: IdlAccounts<Mirrorfi>[T]) => Omit<R, "publicKey">
   ): Promise<(R | null)[]> {
     const accs = await this.program.account[accountName].fetchMultiple(pdas);
+    console.log(accs);
 
     return accs.map((acc, i) => {
       return acc
@@ -118,6 +119,7 @@ export class MirrorFiClient {
     filters: GetProgramAccountsFilter[] = []
   ): Promise<R[]> {
     const accs = await this.program.account[accountName].all(filters);
+    console.log(accs);
 
     return accs.map(({ account, publicKey }) => {
       return {
@@ -135,15 +137,5 @@ export class MirrorFiClient {
     }
 
     return configAcc.nextVaultId;
-  }
-
-  async getNextStrategyId(vault: string) {
-    const vaultAcc = await this.fetchProgramAccount(vault, "vault", parseVault);
-
-    if (!vaultAcc) {
-      throw new Error("Vault account not found.");
-    }
-
-    return vaultAcc.nextStrategyId;
   }
 }
