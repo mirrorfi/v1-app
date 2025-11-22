@@ -8,8 +8,8 @@ import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey, Keypair } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync } from "@solana/spl-token"
 import { mirrorfiClient } from '@/lib/solana-server';
-import { getTokenInfos } from "@/lib/api";
-import { parseVault } from '@/types/accounts';
+import { getVaultBalance, ParsedVaultBalanceData, parseVaultBalanceData} from "@/lib/api";
+import { parseVault, ParsedVault } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
@@ -34,85 +34,45 @@ export default function VaultPage() {
     setReload(!reload);
   }
 
-  async function fetchVaultStrategies(vaultKey: PublicKey, vaultData: any) {
-    let tokenInfo = TOKEN_INFO[vaultData.depositMint];
-    
-    // 1. Fetch Deposit ATAs and Balances
-    let vaultDepositAta = getAssociatedTokenAddressSync(new PublicKey(vaultData.depositMint), vaultKey, true, tokenInfo.tokenProgram);
-    let vaultDepositMintBalanceRes = await connection.getTokenAccountBalance(vaultDepositAta);
-    let vaultDepositMintBalance = vaultDepositMintBalanceRes.value.uiAmount || 0;
-
-    // 2. Fetch Strategies
-    const strategies = await getVaultStrategies(vaultKey);
-
-    // 3. Get all token addresses involved
-    const tokens = [vaultData.depositMint];
-    const added = {[vaultData.depositMint]: true};
-    for (const strategy of strategies) {
-      if(strategy.strategyType.jupiterSwap) {
-        const targetMint = strategy.strategyType.jupiterSwap.targetMint;
-        tokens.push(targetMint);
-        added[targetMint] = true;
-      }
-      // TO DO: Fetching for other strategies
-    }
-
-    // 4. Fetch Token Prices and Infos from Jupiter for all tokens
-    const tokenInfos = await getTokenInfos(tokens);
-
-    // 5. Fetch ATAs for all Jupiter Strategies
-    const jupStrategyAtas = [];
-    for (const strategy of strategies) {
-      if(strategy.strategyType.jupiterSwap) {
-        const tokenMint = strategy.strategyType.jupiterSwap.targetMint;
-        const ata = getAssociatedTokenAddressSync(
-          new PublicKey(tokenMint), 
-          vaultKey, 
-          true, 
-          new PublicKey(tokenInfos[tokenMint].tokenProgram)
-        );
-        jupStrategyAtas.push(ata);
-      }
-    }
-    const jupBalancesRes = await connection.getMultipleParsedAccounts(jupStrategyAtas);
-
-    // 6. Parse Collected Data
-    const depositTokenInfo = tokenInfos[vaultData.depositMint];
-    const depositData = {
-      strategyType: "deposit",
-      tokenInfo: tokenInfos[vaultData.depositMint],
-      mint: vaultData.depositMint,
-      balance: vaultDepositMintBalance,
-      value: vaultDepositMintBalance * (depositTokenInfo.usdPrice || 0),
-      //change24h: 100 * (tokenPrices[vaultData.depositMint]?.priceChange24h || 0) / (tokenPrices[vaultData.depositMint]?.usdPrice || 1),
-      change24h: depositTokenInfo.priceChange24h || 0,
-    }
-    const strategiesData = [];
-    for (let i = 0; i < strategies.length; i++) {
-      const strategy = strategies[i];
+  async function fetchVaultBalances(vaultKey: PublicKey) {
+    // 1. Fetch Vault Balances from API
+    const vaultBalances = (await getVaultBalance(vaultKey.toBase58()))[0];
+    // 2. Parse Deposit Data
+    const vaultBalanceData = vaultBalances.vault;
+    const depositData: ParsedVaultBalanceData = parseVaultBalanceData(vaultBalanceData, "deposit");
+    // 3. Parse Strategies Data
+    const strategiesData: ParsedVaultBalanceData[] = [];
+    const depositTokenInfo = depositData.tokenInfo;
+    for(const strategy of vaultBalances.strategies){
       const strategyTypeKey = Object.keys(strategy.strategyType)[0];
-
-      if(strategyTypeKey === "jupiterSwap") {
-        const tokenMint = strategy.strategyType.jupiterSwap.targetMint;
-        const tokenInfo = tokenInfos[tokenMint];
-        const ataInfo = jupBalancesRes.value[i] as any;
-        const ataBalance = ataInfo?.data.parsed.info.tokenAmount.uiAmount || 0;
-        strategiesData.push({
-          pda: strategy.publicKey,
-          strategyType: strategyTypeKey,
-          tokenInfo: tokenInfos[tokenMint],
-          mint: tokenMint,
-          balance: ataBalance,
-          value: ataBalance * (tokenInfo.usdPrice || 0),
-          initialCapital: (strategy.depositsDeployed || 0) * (depositTokenInfo.usdPrice || 0) / 10**depositTokenInfo.decimals,
-          percentChange24h: tokenInfo.priceChange24h || 0,
-        });
-      }else {
-        throw new Error(`Strategy Type Not Integrated: ${strategyTypeKey}`);
-      }
+      let strategyData = parseVaultBalanceData(strategy, strategyTypeKey);
+      strategyData.initialCapital = Number(strategy.depositsDeployed) * (depositTokenInfo.usdPrice || 0) / 10**depositTokenInfo.decimals;
     }
+    // 4. Parse Vault Account Data
+    const vaultData: ParsedVault = {
+      id: vaultBalanceData.id,
+      authority: vaultBalanceData.authority,
+      name: vaultBalanceData.name,
+      description: vaultBalanceData.description,
+      depositMint: vaultBalanceData.depositMint,
+      depositCap: vaultBalanceData.depositCap,
+      userDeposits: vaultBalanceData.userDeposits,
+      realizedPnl: vaultBalanceData.realizedPnl,
+      depositsInStrategies: vaultBalanceData.depositsInStrategies,
+      lockedProfit: vaultBalanceData.lockedProfit,
+      lockedProfitDuration: vaultBalanceData.lockedProfitDuration,
+      lastProfitLockTs: vaultBalanceData.lastProfitLockTs,
+      totalShares: vaultBalanceData.totalShares,
+      unclaimedManagerFee: vaultBalanceData.unclaimedManagerFee,
+      performanceFeeBps: vaultBalanceData.performanceFeeBps,
+      status: vaultBalanceData.status,
+      nextStrategyId: vaultBalanceData.nextStrategyId,
+      publicKey: vaultKey.toBase58(),
+    }
+    setVaultData(vaultData);
     setDepositData(depositData);
     setStrategiesData(strategiesData);
+    return {vaultNav: vaultBalances.vault.totalNav, vaultData};
   }
 
   useEffect(() => {
@@ -124,7 +84,6 @@ export default function VaultPage() {
       try {
         const vaultKey = new PublicKey(vault);
       } catch (e: any) {
-        console.error("Invalid vault address:", e);
         setError(`Invalid vault address: "${vault}" is not a valid Solana public key.`);
         setIsLoading(false);
         return;
@@ -132,18 +91,7 @@ export default function VaultPage() {
 
       try {
         const vaultKey = new PublicKey(vault);
-        // Process that can be compiled together
-        // Batch 1: Get Balances
-        // const balances = await getVaultBalances(vaultKey);
-        // setVaultBalances(balances);
-        // Step 2: Get Vault Account Info
-        const vaultData = await mirrorfiClient.fetchProgramAccount(vault, "vault", parseVault);
-        if (!vaultData) {
-          throw new Error("Vault not found");
-        }
-        console.log("Vault Data:", vaultData);
-        setVaultData(vaultData);
-        fetchVaultStrategies(vaultKey, vaultData);
+        fetchVaultBalances(vaultKey);
       } catch (error: any) {
         console.error("Error loading vault:", error);
 
