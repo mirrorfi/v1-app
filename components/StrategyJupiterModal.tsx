@@ -220,7 +220,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         decimals: strategyData.tokenInfo.decimals as number,
       });
       setStrategyPosition({
-        strategyPda: strategyData.pda,
+        strategyPda: strategyData.publicKey,
         amount: strategyData.balance,
         initialCapital: strategyData.initialCapital.toFixed(2),
         initialCapitalValue: (strategyData.initialCapital * depositData.tokenInfo.usdPrice).toFixed(2),
