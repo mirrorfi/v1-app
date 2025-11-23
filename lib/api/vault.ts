@@ -6,6 +6,13 @@ export async function getVaultBalance(vault: string): Promise<any> {
   return res;
 }
 
+export async function getMultipleVaultBalances(vaults: string[]): Promise<any> {
+  const queryParams = vaults.map(vault => `vault=${vault}`).join('&');
+  const res = await wrappedFetch(`/api/vault/balance?${queryParams}`);
+
+  return res;
+}
+
 export async function getAllVaultBalances(): Promise<any> {
   const res = await wrappedFetch(`/api/vault/balance`);
 
@@ -36,6 +43,7 @@ export interface ParsedVaultBalanceData {
 
 export function parseVaultBalanceData(vaultBalanceData: any, strategyType: string, initialCapital: number = 0): ParsedVaultBalanceData {
   let depositData = {
+    publicKey: vaultBalanceData.publicKey,
     strategyType,
     tokenInfo: {
       name: vaultBalanceData.name,
