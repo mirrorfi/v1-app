@@ -47,6 +47,7 @@ export default function VaultPage() {
       const strategyTypeKey = Object.keys(strategy.strategyType)[0];
       let strategyData = parseVaultBalanceData(strategy, strategyTypeKey);
       strategyData.initialCapital = Number(strategy.depositsDeployed) * (depositTokenInfo.usdPrice || 0) / 10**depositTokenInfo.decimals;
+      strategiesData.push(strategyData);
     }
     // 4. Parse Vault Account Data
     const vaultData: ParsedVault = {
