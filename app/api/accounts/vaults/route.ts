@@ -4,6 +4,8 @@ import { DISCRIMINATOR_SIZE } from '@/lib/constants';
 import { BN } from '@coral-xyz/anchor';
 import { mirrorfiClient } from '@/lib/solana-server';
 import { parseVault } from '@/types/accounts';
+import { connectToDatabase } from '@/lib/database';
+import Vault from '@/lib/database/models/vault';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

@@ -13,6 +13,7 @@ import { formatNumber, formatAddress } from "@/lib/display"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ArrowUpRight } from "lucide-react"
+import { logActivity, LogActivityParams } from '@/lib/utils/activity-logger';
 
 const connection = getConnection();
 
@@ -110,6 +111,16 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
         type: "success"
       });
 
+      await logActivity({
+        wallet: publicKey.toString(),
+        activity: activeAction,
+        vault: vault,
+        token: tokenInfo.symbol,
+        amount: activeAction === "deposit" ? (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString() : (positionBalance * 10 ** tokenInfo.tokenDecimals).toString(),
+        amountInUsd: Number.parseFloat(usdValue).toString(),
+        txHash: txid,
+      })
+
       handleReload();
     } catch (error) {
       // Show error notification
@@ -168,7 +179,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
               <Button
                 onClick={() => setActiveAction("deposit")}
                 className={`flex-1 py-2 text-sm font-medium ${activeAction === "deposit" 
-                  ? "bg-blue-600 text-white" 
+                  ? "bg-orange-600 text-white hover:bg-orange-700" 
                   : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
               >
                 Deposit
@@ -176,7 +187,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
               <Button
                 onClick={() => setActiveAction("withdraw")}
                 className={`flex-1 py-2 text-sm font-medium ${activeAction === "withdraw" 
-                  ? "bg-blue-600 text-white" 
+                  ? "bg-orange-600 text-white hover:bg-orange-700" 
                   : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
               >
                 Withdraw
@@ -233,7 +244,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, positionBalance, sh
             <Button
               onClick={handleConfirm}
               disabled={!amount || Number.parseFloat(amount) <= 0 || isLoading}
-              className={`w-full text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed ${activeAction === "deposit" ? "bg-blue-600 hover:bg-blue-700" : "bg-red-500 hover:bg-red-600"}`}
+              className="w-full text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed bg-orange-600 hover:bg-orange-700"
             >
               {isLoading ? "Processing..." : activeAction === "deposit" ? "Deposit" : "Withdraw"}
             </Button>

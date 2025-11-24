@@ -4,7 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,6 +24,7 @@ const WalletMultiButtonDynamic = dynamic(
 export function Navbar() {
   const { publicKey } = useWallet();
   const address = publicKey?.toBase58() || "";
+  const router = useRouter();
 
   // Truncate wallet address for display
   const truncatedAddress = address
@@ -36,19 +37,32 @@ export function Navbar() {
   const title = "MirrorFi"; //pageTitles[pathname] || "MirrorFi";
 
   return (
-    <div className="border-b border-[#1a1b29] bg-[#0a0b14]">
+    <div className="border-b border-[#1a1b29] bg-[#0a0b14] sticky top-0 z-[100]">
       <div className="flex h-16 md:h-20 justify-between items-center px-4 md:px-6">
         {/* Logo and Title */}
-        <div className="flex items-center space-x-2 md:space-x-4">
-          <Image
-            src="/SVG/MirrorFi-Logo-Blue.svg"
-            alt="MirrorFi Logo"
-            width={32}
-            height={32}
-            className="h-6 w-6 md:h-8 md:w-8"
-          />
+        <div className="flex items-center space-x-2 md:space-x-4 clickable cursor-pointer"
+            onClick={() => {
+                  console.log("Logo clicked!");
+                  router.push("/");
+            }}
+            >
+          <div 
+            className="cursor-pointer relative z-50" 
+            onClick={() => {
+              console.log("Logo clicked!");
+              router.push("/");
+            }}
+          >
+            <Image
+              src="/SVG/MirrorFi-Logo-Blue.svg"
+              alt="MirrorFi Logo"
+              width={32}
+              height={32}
+              className="h-6 w-6 md:h-8 md:w-8"
+            />
+          </div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
+            <h1 className="text-lg md:text-xl font-semibold text-white">{title}</h1>
             <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 text-xs px-2 py-1">
               V1 Beta
             </Badge>
@@ -110,7 +124,7 @@ export function Navbar() {
         </div>
 
         {/* Wallet Button */}
-        <div className="flex items-center">
+        <div className="flex items-center relative z-[200]">
           <div className="scale-75 md:scale-100">
             <WalletMultiButtonDynamic />
           </div>

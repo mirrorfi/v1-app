@@ -17,6 +17,7 @@ import { getConnection } from "@/lib/solana"
 import { mirrorfiClient } from "@/lib/solana-server"
 import { BN } from "@coral-xyz/anchor"
 import { useRouter } from "next/navigation";
+import { createVault } from "@/lib/utils/vault-manager"
 
 const connection = getConnection();
 const tokenOptions = [
@@ -144,6 +145,11 @@ export default function CreatePage() {
                 type: "success"
             });
 
+            await createVault(
+                nextVaultPda.toBase58(),
+                formData.description
+            );
+
             router.push(`/vault/${nextVaultPda.toBase58()}`);
         } catch (error: any) {
             console.error("Error creating vault:", error);
@@ -159,7 +165,7 @@ export default function CreatePage() {
     const selectedToken = tokenOptions.find(token => token.symbol === formData.capitalToken)
     
     return (
-        <main className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background/95 to-blue-950/20">
+        <main className="relative min-h-screen w-full overflow-hidden bg-background">
             <GridStyleBackground />
             <Navbar />
             
