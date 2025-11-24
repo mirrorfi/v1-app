@@ -81,7 +81,6 @@ export async function GET(req: NextRequest) {
             balance: vaultAtaBal.toString(),
             totalNav,
             decimals: tokenInfo.decimals,
-            name: tokenInfo.name,
             icon: tokenInfo.icon,
             symbol: tokenInfo.symbol,
             usdPrice: tokenInfo.usdPrice,

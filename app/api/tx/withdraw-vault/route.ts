@@ -2,8 +2,7 @@ import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server"
 import { v0TxToBase64 } from "@/lib/utils";
 import { parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
-import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { createCloseAccountInstruction, getAssociatedTokenAddressSync, NATIVE_MINT, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -56,7 +55,7 @@ export async function POST(req: NextRequest) {
     const depositMintPubkey = new PublicKey(depositMint);
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMintPubkey))!.owner;
 
-    const ix = await mirrorfiClient.program.methods
+    const withdraw_ix = await mirrorfiClient.program.methods
       .withdrawVault(new BN(amount))
       .accounts({
         withdrawer,
@@ -67,8 +66,28 @@ export async function POST(req: NextRequest) {
         depositMintTokenProgram,
       })
       .instruction();
+    
+    const ixs = [withdraw_ix];
 
-    const tx = await buildTx([ix], withdrawerPubkey);
+    // Add SPL Token => Native Conversion if depositMint is native SOL
+    if (depositMintPubkey.equals(NATIVE_MINT)) {
+      const withdrawerAta = getAssociatedTokenAddressSync(
+        NATIVE_MINT,
+        withdrawerPubkey,
+        false
+      );
+
+      // Close the wrapped SOL account to convert back to native SOL
+      const closeAccountIx = createCloseAccountInstruction(
+        withdrawerAta,
+        withdrawerPubkey,
+        withdrawerPubkey
+      );
+
+      ixs.push(closeAccountIx);
+    }
+
+    const tx = await buildTx(ixs, withdrawerPubkey);
 
     return NextResponse.json({
       tx: v0TxToBase64(tx),
