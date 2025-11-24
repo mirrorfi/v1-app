@@ -124,27 +124,6 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
       {/* Main Dashboard Content - Only show if no error */}
       {!error && (
         <>
-          <div className="flex items-center gap-3 mb-4">
-        <Avatar className="h-8 w-8 md:h-10 md:w-10 bg-gradient-to-br from-pink-500 to-rose-400">
-          <AvatarFallback className="text-white font-bold text-sm md:text-base">{strategy.icon || strategy.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        {vaultData ? 
-          <div className="flex gap-2">
-            <h2 className="text-lg md:text-xl font-semibold text-white">{vaultData.name}</h2>
-            <Badge
-              variant={strategy.status === "Active" ? "default" : "secondary"}
-              className={`mt-1 text-xs ${
-                strategy.status === "Active"
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-              }`}
-            >
-              {strategy.status}
-            </Badge>
-          </div>
-        : <Skeleton className="h-6 w-32 md:h-8 md:w-48 rounded-md" />}
-      </div>
-
       {/* Navigation Tabs with Management Authority - Mobile responsive */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex flex-wrap gap-2 overflow-x-auto">

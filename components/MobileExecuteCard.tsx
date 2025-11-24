@@ -65,6 +65,15 @@ export function MobileExecuteCard({vault, vaultData, depositData, positionBalanc
       return
     }
 
+    if(activeAction === "deposit" && Number.parseFloat(amount) > vaultData.depositCap / 10 ** depositData.tokenInfo.decimals) {
+      showNotification({
+        title: "Deposit Failed",
+        message: `Deposit amount exceeds deposit cap.`,
+        type: "error"
+      });
+      return
+    }
+
     setIsLoading(true)
     try {
       let res;
@@ -210,6 +219,15 @@ export function MobileExecuteCard({vault, vaultData, depositData, positionBalanc
                 />
                 <span className="text-gray-400 text-sm pointer-events-none">${formatNumber(Number(usdValue), 2)}</span>
               </div>
+              {/* Max Deposit Label */}
+              {vaultData && <div className="mt-3 bg-amber-500/20 border-2 border-amber-500/50 rounded-lg p-3">
+                <div className="text-amber-300 font-semibold text-sm">
+                  ⚠️ Max Deposit: {Number(vaultData.depositCap) / 10**depositData.tokenInfo.decimals} {depositData?.tokenInfo.symbol || ""}
+                </div>
+                <div className="text-amber-200/50 text-xs mt-1 font-normal">
+                  This app is currently in beta
+                </div>
+              </div>}
             </div>
 
             <Button

@@ -60,6 +60,15 @@ export function VaultDashboardExecuteCard({vault, vaultData, depositData, positi
       return
     }
 
+    if(activeAction === "deposit" && Number.parseFloat(amount) > vaultData.depositCap / 10 ** depositData.tokenInfo.decimals) {
+      showNotification({
+        title: "Deposit Failed",
+        message: `Deposit amount exceeds deposit cap.`,
+        type: "error"
+      });
+      return
+    }
+
     setIsLoading(true)
     try {
       let res;
@@ -176,7 +185,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, depositData, positi
               <Button
                 onClick={() => setActiveAction("deposit")}
                 className={`flex-1 py-2 text-sm font-medium ${activeAction === "deposit" 
-                  ? "bg-orange-600 text-white hover:bg-orange-700" 
+                  ? "bg-blue-600 text-white hover:bg-blue-700" 
                   : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
               >
                 Deposit
@@ -184,7 +193,7 @@ export function VaultDashboardExecuteCard({vault, vaultData, depositData, positi
               <Button
                 onClick={() => setActiveAction("withdraw")}
                 className={`flex-1 py-2 text-sm font-medium ${activeAction === "withdraw" 
-                  ? "bg-orange-600 text-white hover:bg-orange-700" 
+                  ? "bg-blue-600 text-white hover:bg-blue-700" 
                   : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
               >
                 Withdraw
@@ -222,8 +231,8 @@ export function VaultDashboardExecuteCard({vault, vaultData, depositData, positi
                 >
                   100%
                 </Button>
+                </div>
               </div>
-            </div>
 
               <div className="flex items-center justify-between pt-3 relative z-10">
                 <input
@@ -236,12 +245,22 @@ export function VaultDashboardExecuteCard({vault, vaultData, depositData, positi
                 />
                 <span className="text-gray-400 text-sm pointer-events-none">${formatNumber(Number(usdValue), 2)}</span>
               </div>
+
+              {/* Max Deposit Label */}
+              {vaultData && <div className="mt-3 bg-amber-500/20 border-2 border-amber-500/50 rounded-lg p-3">
+                <div className="text-amber-300 font-semibold text-sm">
+                  ⚠️ Max Deposit: {Number(vaultData.depositCap) / 10**depositData.tokenInfo.decimals} {depositData?.tokenInfo.symbol || ""}
+                </div>
+                <div className="text-amber-200/50 text-xs mt-1 font-normal">
+                  This app is currently in beta
+                </div>
+              </div>}
             </div>
 
             <Button
               onClick={handleConfirm}
               disabled={!amount || Number.parseFloat(amount) <= 0 || isLoading}
-              className="w-full text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed bg-orange-600 hover:bg-orange-700"
+              className="w-full text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700"
             >
               {isLoading ? "Processing..." : activeAction === "deposit" ? "Deposit" : "Withdraw"}
             </Button>
