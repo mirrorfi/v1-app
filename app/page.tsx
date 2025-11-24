@@ -71,7 +71,7 @@ export default function Home() {
       let vaultBalances = await getAllVaultBalances();
       // Filter unshown vaults
       let filteredVaults = ["38TYBkK69EbZPaPLvyQauWcxE3WELtfxxdG3tkf2YCEG", "FVzD2g9ETgKsuRJiYk8bBFTbBnQ24xLhpRFwNvp5uwJq"];
-      vaultBalances = vaultBalances.filter((vaultBalance:any) => filteredVaults.includes(vaultBalance.vault.publicKey));
+      vaultBalances = vaultBalances.filter((vaultBalance:any) => !filteredVaults.includes(vaultBalance.vault.publicKey));
       // Sort based on NAV descending
       vaultBalances.sort((a:any, b:any) => b.vault.totalNav - a.vault.totalNav);
       if(!vaultBalances) {
