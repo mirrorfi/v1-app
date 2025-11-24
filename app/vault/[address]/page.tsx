@@ -5,25 +5,18 @@ import { MobileVaultDashboard } from "@/components/MobileVaultDashboard"
 import { Navbar } from "@/components/Navbar"
 import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
-import { PublicKey, Keypair } from "@solana/web3.js"
-import { getAssociatedTokenAddressSync } from "@solana/spl-token"
+import { PublicKey } from "@solana/web3.js"
+import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token"
 import { mirrorfiClient } from '@/lib/solana-server';
 import { getPrices, getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
   const {address: vault } = useParams<{ address: string }>();
-
-  const strategy = {
-    name: "My Super Hyped Strategy",
-    icon: "🚀",
-    status: "active" as const,
-  }
 
   const connection = getConnection();
   const { publicKey } = useWallet();
@@ -43,19 +36,27 @@ export default function VaultPage() {
     setReload(!reload);
   }
 
-  async function fetchUserBalance(tokenMint: string, user: PublicKey) {
-    const info = TOKEN_INFO[tokenMint]
-    const userAta = getAssociatedTokenAddressSync(new PublicKey(tokenMint), user, false, info.tokenProgram);
-    const accountInfo = await connection.getTokenAccountBalance(userAta);
-    const tokenPriceData = await getPrices([tokenMint]);
-    if (tokenPriceData[tokenMint]) setTokenPrice(tokenPriceData[tokenMint]);
-    if (accountInfo.value.uiAmount) setTokenBalance(accountInfo.value.uiAmount);
+  async function fetchUserBalance(depositData: ParsedVaultBalanceData, user: PublicKey) {
+    if(!depositData){ return; }
+    setTokenPrice(depositData.tokenInfo.usdPrice);
+    if (depositData.mint === NATIVE_MINT.toBase58()) {
+      const userBalance = await connection.getBalance(user);
+      const userUiBalance = userBalance / 10**depositData.tokenInfo.decimals;
+      const userDisplayedBalance = Math.max(0, userUiBalance - 0.01); 
+      setTokenBalance(userDisplayedBalance);
+    } else {
+      const tokenMint = depositData.mint;
+      const userAta = getAssociatedTokenAddressSync(new PublicKey(tokenMint), user, false, new PublicKey(depositData.tokenInfo.tokenProgram) );
+      const accountInfo = await connection.getTokenAccountBalance(userAta);
+      if (accountInfo.value.uiAmount) {
+        setTokenBalance(accountInfo.value.uiAmount);
+      }
+    }
   }
 
-  async function fetchUserReceiptBalance(vaultData: ParsedVault, vaultNav: number, user: PublicKey) {
+  async function fetchUserReceiptBalance(vaultData: ParsedVault, depositData: ParsedVaultBalanceData, user: PublicKey) {
     if(!vaultData.publicKey){ throw new Error("Invalid vault data: missing publicKey"); }
     if(!vaultData.depositMint){ throw new Error("Invalid vault data: missing depositMint"); }
-    const info = TOKEN_INFO[vaultData.depositMint];
     // Fetch Vault Depositor Account
     const vaultDepositorPda = mirrorfiClient.getVaultDepositorPda(new PublicKey(vaultData.publicKey), user);
     const vaultDepositor = await mirrorfiClient.fetchProgramAccount(vaultDepositorPda.toBase58(), "vaultDepositor", parseVaultDepositor);
@@ -63,10 +64,9 @@ export default function VaultPage() {
     // Calculate Share Price
     const vaultRealizedValuation = Number(vaultData.userDeposits) + Number(vaultData.realizedPnl);
     const sharePrice = Number(vaultData.totalShares) > 0 ? vaultRealizedValuation / Number(vaultData.totalShares) : 0;
-    console.log("Vault NAV:", vaultNav);
     console.log("Vault Realized Valuation:", vaultRealizedValuation);
     console.log("Calculated Share Price:", sharePrice);
-    setPositionBalance(Number(userShares) / 10**info.tokenDecimals);
+    setPositionBalance(Number(userShares) / 10**depositData.tokenInfo.decimals);
     setSharePrice(sharePrice);
   }
 
@@ -109,7 +109,7 @@ export default function VaultPage() {
     setVaultData(vaultData);
     setDepositData(depositData);
     setStrategiesData(strategiesData);
-    return {vaultNav: vaultBalances.vault.totalNav, vaultData};
+    return {vaultData, depositData};
   }
 
   useEffect(() => {
@@ -129,10 +129,10 @@ export default function VaultPage() {
 
       try{
         const vaultKey = new PublicKey(vault);
-        const {vaultNav, vaultData} = await fetchVaultBalances(vaultKey);
+        const {depositData, vaultData} = await fetchVaultBalances(vaultKey);
         if(publicKey){
-          fetchUserBalance(vaultData.depositMint, publicKey);      // Fetch User's Deposit Token Balance
-          fetchUserReceiptBalance(vaultData, vaultNav, publicKey); // Fetch User's Share Token Balance
+          fetchUserBalance(depositData, publicKey); // Fetch User's Deposit Token Balance
+          fetchUserReceiptBalance(vaultData, depositData, publicKey); // Fetch User's Share Token Balance
         }
       } catch (error: any) {
         console.error("Error loading vault:", error);

@@ -181,7 +181,7 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, shareP
                   <MobileExecuteCard 
                     vault={vault} 
                     vaultData={vaultData}
-                    tokenMint={vaultData.depositMint} 
+                    depositData={depositData}
                     positionBalance={positionBalance} 
                     sharePrice={sharePrice}
                     handleReload={handleReload}

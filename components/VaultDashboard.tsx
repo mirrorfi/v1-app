@@ -198,6 +198,7 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
             {vaultData ? <VaultDashboardExecuteCard 
               vault={vault} 
               vaultData={vaultData} 
+              depositData={depositData}
               positionBalance={positionBalance} 
               sharePrice={sharePrice}
               handleReload={handleReload} 

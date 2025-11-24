@@ -2,11 +2,8 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
-import { getDepositVaultTx, getWithdrawVaultTx } from "@/lib/api"
+import { getDepositVaultTx, getWithdrawVaultTx, ParsedVaultBalanceData } from "@/lib/api"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { PublicKey, VersionedTransaction } from "@solana/web3.js"
-import { TOKEN_INFO, TokenInfo } from "@/lib/utils/tokens"
-import * as bs58 from "bs58"
 import { getConnection } from "@/lib/solana"
 import { formatAddress, formatNumber } from "@/lib/display"
 import Image from "next/image"
@@ -16,7 +13,7 @@ const connection = getConnection();
 interface MobileExecuteCardProps {
   vault: string,
   vaultData: any,
-  tokenMint: string, 
+  depositData: any,
   positionBalance: number, 
   sharePrice: number,
   handleReload: () => void,
@@ -25,12 +22,10 @@ interface MobileExecuteCardProps {
   initialMode?: "deposit" | "withdraw"
 }
 
-export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance, sharePrice, handleReload, tokenBalance, tokenPrice, initialMode = "deposit"}: MobileExecuteCardProps) {
+export function MobileExecuteCard({vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenBalance, tokenPrice, initialMode = "deposit"}: MobileExecuteCardProps) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">(initialMode)
-
-  const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
 
   const { publicKey, signTransaction } = useWallet()
   const { showNotification } = useNotification()
@@ -64,6 +59,7 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
   const handleConfirm = async () => {
     console.log("Confirming Action")
     if (!amount || Number.parseFloat(amount) <= 0) return
+    if (!depositData) return
     if (!publicKey || !signTransaction) {
       alert("Please connect your wallet")
       return
@@ -71,20 +67,19 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
 
     setIsLoading(true)
     try {
-      const tokenInfo = TOKEN_INFO[tokenMint];
       let res;
       // Fetch Transaction Details from API
       if (activeAction === "deposit") {
         res = await getDepositVaultTx({
-          amount: (Number.parseFloat(amount) * 10 ** tokenInfo.tokenDecimals).toString(),
+          amount: (Number.parseFloat(amount) * 10 ** depositData.tokenInfo.decimals).toString(),
           depositor: publicKey.toString(),
           vault,
         })
       } else {
-        let withdrawAmount = Math.floor(Number.parseFloat(amount) / sharePrice * 10 ** tokenInfo.tokenDecimals).toString();
+        let withdrawAmount = Math.floor(Number.parseFloat(amount) / sharePrice * 10 ** depositData.tokenInfo.decimals).toString();
         // Precision Fix during Withdraw All
-        if (Number(withdrawAmount) * 1.00001 > positionBalance * 10 ** tokenInfo.tokenDecimals) {
-          withdrawAmount = (positionBalance * 10 ** tokenInfo.tokenDecimals).toString();
+        if (Number(withdrawAmount) * 1.00001 > positionBalance * 10 ** depositData.tokenInfo.decimals) {
+          withdrawAmount = (positionBalance * 10 ** depositData.tokenInfo.decimals).toString();
         }
 
         res = await getWithdrawVaultTx({
@@ -114,7 +109,7 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
       // Show success notification
       showNotification({
         title: `${activeAction === "deposit" ? "Deposit" : "Withdrawal"} Successful`,
-        message: `Your ${activeAction} of ${amount} ${tokenInfo?.symbol} has been processed successfully.`,
+        message: `Your ${activeAction} of ${amount} ${depositData.tokenInfo.symbol} has been processed successfully.`,
         txId: txid,
         type: "success"
       });
@@ -174,8 +169,8 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
             <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Image src={`/PNG/usdc-logo.png`} alt="USDC Logo" width={25} height={25} />
-                  <span className="text-white font-medium">{tokenInfo?.symbol}</span>
+                  <Image src={depositData? depositData.tokenInfo.icon : `/PNG/usdc-logo.png`} alt="USDC Logo" width={25} height={25} />
+                  <span className="text-white font-medium">{depositData ? depositData.tokenInfo.symbol : ""}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
@@ -209,7 +204,7 @@ export function MobileExecuteCard({vault, vaultData, tokenMint, positionBalance,
                   type="text"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  placeholder={`0 ${tokenInfo ? tokenInfo?.symbol : ""}`}
+                  placeholder={`0 ${depositData ? depositData.tokenInfo.symbol : ""}`}
                   className="bg-transparent text-white text-lg font-medium outline-none flex-1 placeholder-gray-500 cursor-text relative z-20"
                   style={{ pointerEvents: 'auto' }}
                 />
