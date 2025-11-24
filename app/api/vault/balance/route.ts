@@ -7,8 +7,14 @@ import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const vaults = searchParams.getAll('vault');
   try {
-    const allVaultAccs = await mirrorfiClient.fetchAllProgramAccounts("vault", parseVault);
+    let allVaultAccs = await mirrorfiClient.fetchAllProgramAccounts("vault", parseVault);
+    // Filter Vault Accounts based on the provided vault PDAs
+    if(vaults.length > 0){
+      allVaultAccs = allVaultAccs.filter(vaultAcc => vaults.includes(vaultAcc.publicKey));
+    }
 
     const vaultAndStrategies = await Promise.all(
       allVaultAccs.map(async (vault) => {
