@@ -5,7 +5,7 @@ import { TrendingUp, DollarSign, BarChart3, ChartNoAxesCombined } from "lucide-r
 
 import { useState, useEffect, useCallback, useRef } from "react"
 
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
 import { getChartData, ChartDataItem } from "@/lib/utils/chartData"
 
 // Define types for data selection
@@ -31,10 +31,10 @@ const CustomTooltip = ({ active, payload, label, dataType }: CustomTooltipProps)
       switch(dataType) {
         case "Balance":
           // Balance is already calculated as balance * 10^-decimals
-          return value.toLocaleString('en-US', { 
+          return `$${value.toLocaleString('en-US', { 
             minimumFractionDigits: 2, 
             maximumFractionDigits: 9
-          })
+          })}`
         case "NAV":
           // NAV is shown as dollar value
           return `$${value.toLocaleString('en-US', { 
@@ -162,11 +162,11 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
         // Format balance with appropriate scale
         return (value: number) => {
           if (value >= 1000000) {
-            return `${(value / 1000000).toFixed(1)}M`
+            return `$${(value / 1000000).toFixed(1)}M`
           } else if (value >= 1000) {
-            return `${(value / 1000).toFixed(0)}k`
+            return `$${(value / 1000).toFixed(0)}k`
           } else {
-            return `${value.toFixed(0)}`
+            return `$${value.toFixed(4)}`
           }
         }
       case "NAV":
@@ -177,7 +177,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
           } else if (value >= 1000) {
             return `$${(value / 1000).toFixed(0)}k`
           } else {
-            return `$${value.toFixed(2)}`
+            return `$${value.toFixed(4)}`
           }
         }
       default:
@@ -193,11 +193,28 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
     const values = data.map(item => item.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
+    const range = max - min;
+    const avgValue = (max + min) / 2;
     
-    // For both Balance and NAV, start from 0 to show full scale
-    // Add a small buffer on top for better visualization
-    const buffer = max * 0.05;
-    return [0, max + buffer];
+    // Calculate the percentage change from min to max
+    const percentageChange = avgValue > 0 ? (range / avgValue) : 0;
+    
+    // If the fluctuation is very small (< 5% of average), zoom in to emphasize changes
+    if (percentageChange < 0.05 && range > 0) {
+      // Zoom in: set domain close to min/max with small padding
+      const padding = range * 0.15; // 15% padding on each side
+      return [Math.max(0, min - padding), max + padding];
+    }
+    // If fluctuation is moderate (5-20%), show from slightly below min
+    else if (percentageChange < 0.2) {
+      const padding = range * 0.1;
+      return [Math.max(0, min - padding), max + padding];
+    }
+    // If there's significant variation (>20%), maximize height by starting from 0
+    else {
+      const topPadding = max * 0.05;
+      return [0, max + topPadding];
+    }
   }
   
   // Calculate the y-axis domain based on current data
@@ -280,7 +297,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart
+              <AreaChart
                 data={data}
                 onMouseMove={(e: any) => {
                   if (e && e.activeTooltipIndex !== undefined) {
@@ -289,6 +306,20 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 }}
                 onMouseLeave={() => setActiveIndex(null)}
               >
+                <defs>
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="50%" stopColor="#10b981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid 
+                  strokeDasharray="3 3" 
+                  stroke="#334155" 
+                  opacity={0.3}
+                  horizontal={true}
+                  vertical={false}
+                />
                 <XAxis 
                   dataKey="X-Axis" 
                   axisLine={false} 
@@ -311,11 +342,13 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                     strokeDasharray: "4 4",
                   }}
                 />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="value"
                   stroke="#10b981"
                   strokeWidth={3}
+                  fill="url(#colorValue)"
+                  fillOpacity={1}
                   dot={false}
                   activeDot={{
                     r: 5,
@@ -324,7 +357,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                     strokeWidth: 2,
                   }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           )}
         </div>
