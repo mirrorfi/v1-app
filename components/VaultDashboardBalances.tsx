@@ -9,8 +9,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Skeleton } from "@/components/ui/skeleton"
 import { StrategyCard } from "@/components/StrategyCard";
 import { StrategyCardManager } from "@/components/StrategyCardManager";
-import { StrategyCreateModal } from "@/components/StrategyCreateModal";
-import { StrategyJupiterModal } from "@/components/StrategyJupiterModal"
+import { StrategyCreateModal } from "@/components/strategy/StrategyCreateModal";
+import { StrategyJupiterModal } from "@/components/strategy/StrategyJupiterModal";
+import { MeteoraDAMMModal } from "@/components/strategy/MeteoraDAMMModal";
 import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -155,6 +156,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
 
   const [isCreateStrategy, setIsCreateStrategy] = useState<boolean>(false);
   const [isOpenJupiter, setIsOpenJupiter] = useState<string>("");
+  const [isOpenDAMM, setIsOpenDAMM] = useState<string>("");
   const [openStrategyData, setOpenStrategyData] = useState<any>(null);
 
   useEffect(() => {
@@ -175,6 +177,9 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
     else if (strategyType === "jupiterSwap") {
       handleOpenJupiter("new", null);
     }
+    else if (strategyType === "meteora-damm") {
+      setIsOpenDAMM("add");
+    }
     // TODO: Implement strategy creation logic
   };
 
@@ -187,6 +192,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
     setOpenStrategyData(strategyData);
   };
   const handleCloseJupiter = () => {setIsOpenJupiter("");}
+  const handleCloseDAMM = () => {setIsOpenDAMM("");}
 
   const handleCloseCreateStrategy = () => {
     setIsCreateStrategy(false);
@@ -357,6 +363,10 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
         strategyData={openStrategyData}
         depositData={depositData} 
         vaultData={vaultData}
+      />
+      <MeteoraDAMMModal
+        isOpen={isOpenDAMM === "add" || isOpenDAMM === "reduce"}
+        onClose={handleCloseDAMM}
       />
     </Card>
   )

@@ -3,3 +3,4 @@ export * from "./carrot";
 export * from "./vault";
 export * from "./accounts";
 export * from "./jupiter";
+export * from "./meteora";
