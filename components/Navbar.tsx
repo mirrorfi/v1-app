@@ -107,10 +107,10 @@ export function Navbar() {
               <div className="border-l border-[#3f4152] h-4 mx-4" />
 
               <NavigationMenuItem>
-                <Link href="/profile" legacyBehavior passHref>
+                <Link href="/portfolio" legacyBehavior passHref>
                   <NavigationMenuLink
                     className={`text-sm font-medium ${
-                      pathname === "/profile"
+                      pathname === "/portfolio"
                         ? "text-primary"
                         : "text-foreground"
                     }  hover:text-primary`}
