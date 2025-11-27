@@ -2,6 +2,7 @@ import { BN, IdlAccounts, IdlTypes } from "@coral-xyz/anchor";
 import { Mirrorfi } from "./mirrorfi";
 import { ExtractDefinedKeys } from "./generators";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { wrappedI80F48toBigNumber } from "./wrappedI80F48";
 
 function byteArrayToString(array: number[] | Uint8Array): string {
   // Find the first null byte (0) to determine actual string length
@@ -26,6 +27,40 @@ function parseBN(field: BN): string {
   return field.toString();
 }
 
+function parseStrategyType(strategyType: StrategyType): ParsedStrategyType {
+  const type = parseEnum<ParsedStrategyType>(strategyType);
+
+  let parsedStrategyType: ParsedStrategyType;
+
+  switch (type) {
+    case "jupiterSwap":
+      parsedStrategyType = {
+        jupiterSwap: {
+          targetMint: parsePublicKey(strategyType.jupiterSwap.targetMint),
+        },
+      };
+      break;
+
+    case "kaminoLend":
+      parsedStrategyType = {
+        kaminoLend: {
+          obligation: parsePublicKey(strategyType.kaminoLend.obligation),
+          lendingMarket: parsePublicKey(strategyType.kaminoLend.lendingMarket),
+        },
+      };
+      break;
+
+    default:
+      throw new Error(`Unknown strategy type: ${type}`);
+  }
+
+  return parsedStrategyType;
+}
+
+function parseWrappedI80F48(field: { value: number[] }): number {
+  return wrappedI80F48toBigNumber(field).toNumber();
+}
+
 // Denotes a bigint serialized as a string
 export type BigIntString = string;
 type Pubkey = string;
@@ -35,6 +70,7 @@ type u32 = number;
 type u64 = BigIntString;
 type i32 = number;
 type i64 = BigIntString;
+type WrappedI80F48 = number;
 
 type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];
@@ -46,6 +82,7 @@ type StrategyType = IdlTypes<Mirrorfi>["strategyType"];
 type VaultStatus = IdlTypes<Mirrorfi>["vaultStatus"];
 
 type ParsedProtocolStatus = ExtractDefinedKeys<ProtocolStatus>;
+// TODO: define custom ParsedStrategyType
 type ParsedStrategyType = ExtractDefinedKeys<StrategyType>;
 type ParsedVaultStatus = ExtractDefinedKeys<VaultStatus>;
 
@@ -59,8 +96,8 @@ export interface ParsedConfig extends ParsedProgramAccount {
   nextVaultId: u64;
   platformPerformanceFeeBps: u16;
   platformDepositFeeBps: u16;
-  platformReferralFeeBps: u16;
   platformWithdrawalFeeBps: u16;
+  platformReferralFeeBps: u16;
   status: ParsedProtocolStatus;
 }
 
@@ -70,7 +107,6 @@ export interface ParsedVault extends ParsedProgramAccount {
   name: string;
   description: string;
   depositMint: Pubkey;
-  //_unused0: u8[];
   depositCap: u64;
   userDeposits: u64;
   realizedPnl: i64;
@@ -83,9 +119,8 @@ export interface ParsedVault extends ParsedProgramAccount {
   performanceFeeBps: u16;
   status: ParsedVaultStatus;
   nextStrategyId: u8;
-  // Wrapped Decimal Not used:
-  // assetPerShare: WrappedDecimal;
-  // highWaterMark: WrappedDecimal;
+  assetPerShare: WrappedI80F48;
+  highWaterMark: WrappedI80F48;
 }
 
 export interface ParsedStrategy extends ParsedProgramAccount {
@@ -103,8 +138,7 @@ export interface ParsedVaultDepositor extends ParsedProgramAccount {
   authority: Pubkey;
   vault: Pubkey;
   shares: u64;
-  // Wrapped Decimal Not used:
-  // lastVaultAssetPerShare: WrappedDecimal;
+  lastVaultAssetPerShare: WrappedI80F48;
   lastDepositTs: i64;
 }
 
@@ -148,13 +182,14 @@ export function parseVault({
   status,
   nextStrategyId,
   id,
+  assetPerShare,
+  highWaterMark,
 }: Vault): Omit<ParsedVault, "publicKey"> {
   return {
     authority: parsePublicKey(authority),
     name: byteArrayToString(name),
     description: byteArrayToString(description),
     depositMint: parsePublicKey(depositMint),
-    //unused0: parseByteArray(unused0),
     depositCap: parseBN(depositCap),
     userDeposits: parseBN(userDeposits),
     realizedPnl: parseBN(realizedPnl),
@@ -168,48 +203,22 @@ export function parseVault({
     status: parseEnum<ParsedVaultStatus>(status),
     nextStrategyId,
     id: parseBN(id),
+    assetPerShare: parseWrappedI80F48(assetPerShare),
+    highWaterMark: parseWrappedI80F48(highWaterMark),
   };
 }
 
-export function parseStrategy(
-  {
-    vault,
-    depositsDeployed,
-    id,
-    strategyType,
-  }: Strategy
-): Omit<ParsedStrategy, "publicKey"> {
-  const type = parseEnum<ParsedStrategyType>(strategyType);
-
-  let parsedStrategyType: ParsedStrategyType;
-
-  switch (type) {
-    case "jupiterSwap":
-      parsedStrategyType = {
-        jupiterSwap: {
-          targetMint: parsePublicKey(strategyType.jupiterSwap.targetMint),
-        },
-      };
-      break;
-    
-    case "kaminoLend":
-      parsedStrategyType = {
-        kaminoLend: {
-          obligation: parsePublicKey(strategyType.kaminoLend.obligation),
-          lendingMarket: parsePublicKey(strategyType.kaminoLend.lendingMarket),
-        },
-      };
-      break;
-    
-    default:
-      throw new Error(`Unknown strategy type: ${type}`);
-  }
-
+export function parseStrategy({
+  vault,
+  depositsDeployed,
+  id,
+  strategyType,
+}: Strategy): Omit<ParsedStrategy, "publicKey"> {
   return {
     vault: parsePublicKey(vault),
     depositsDeployed: parseBN(depositsDeployed),
     id,
-    strategyType: parsedStrategyType,
+    strategyType: parseStrategyType(strategyType),
   };
 };
 
@@ -225,13 +234,14 @@ export function parseVaultDepositor({
   authority,
   vault,
   shares,
-  //lastVaultAssetPerShare,
+  lastVaultAssetPerShare,
   lastDepositTs,
 }: VaultDepositor): Omit<ParsedVaultDepositor, "publicKey"> {
   return {
     authority: parsePublicKey(authority),
     vault: parsePublicKey(vault),
     shares: parseBN(shares),
+    lastVaultAssetPerShare: parseWrappedI80F48(lastVaultAssetPerShare),
     lastDepositTs: parseBN(lastDepositTs),
   };
 }
