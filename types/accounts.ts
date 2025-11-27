@@ -27,14 +27,14 @@ function parseBN(field: BN): string {
 }
 
 // Denotes a bigint serialized as a string
-export type bigIntString = string;
-type pubkey = string;
+export type BigIntString = string;
+type Pubkey = string;
 type u8 = number;
 type u16 = number;
 type u32 = number;
-type u64 = bigIntString;
+type u64 = BigIntString;
 type i32 = number;
-type i64 = bigIntString;
+type i64 = BigIntString;
 
 type Config = IdlAccounts<Mirrorfi>["config"];
 type Vault = IdlAccounts<Mirrorfi>["vault"];
@@ -54,8 +54,8 @@ export interface ParsedProgramAccount {
 }
 
 export interface ParsedConfig extends ParsedProgramAccount {
-  admin: pubkey;
-  treasuryAuthority: pubkey;
+  admin: Pubkey;
+  treasuryAuthority: Pubkey;
   nextVaultId: u64;
   platformPerformanceFeeBps: u16;
   platformDepositFeeBps: u16;
@@ -66,10 +66,10 @@ export interface ParsedConfig extends ParsedProgramAccount {
 
 export interface ParsedVault extends ParsedProgramAccount {
   id: u64;
-  authority: pubkey;
+  authority: Pubkey;
   name: string;
   description: string;
-  depositMint: pubkey;
+  depositMint: Pubkey;
   //_unused0: u8[];
   depositCap: u64;
   userDeposits: u64;
@@ -89,19 +89,19 @@ export interface ParsedVault extends ParsedProgramAccount {
 }
 
 export interface ParsedStrategy extends ParsedProgramAccount {
-  vault: pubkey;
+  vault: Pubkey;
   depositsDeployed: u64;
   id: u8;
   strategyType: ParsedStrategyType;
 }
 
 export interface ParsedUser extends ParsedProgramAccount {
-  authority: pubkey;
+  authority: Pubkey;
 }
 
 export interface ParsedVaultDepositor extends ParsedProgramAccount {
-  authority: pubkey;
-  vault: pubkey;
+  authority: Pubkey;
+  vault: Pubkey;
   shares: u64;
   // Wrapped Decimal Not used:
   // lastVaultAssetPerShare: WrappedDecimal;
