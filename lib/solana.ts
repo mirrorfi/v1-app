@@ -1,15 +1,6 @@
-
 import { AnchorProvider } from "@coral-xyz/anchor";
 import { TransactionInstruction, VersionedTransaction, TransactionMessage, Connection, AddressLookupTableAccount } from "@solana/web3.js";
 import bs58 from "bs58";
-
-export function getConnection() {
-  if (!process.env.NEXT_PUBLIC_SOLANA_RPC_URL) {
-    throw new Error("Solana RPC Not Provided");
-  }
-  const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL);
-  return connection;
-}
 
 export async function createTransaction(provider: AnchorProvider, instructions: TransactionInstruction[], luts: AddressLookupTableAccount[] = []): Promise<VersionedTransaction> {
   const messageV0 = new TransactionMessage({

@@ -10,16 +10,14 @@ import { Navbar } from "@/components/Navbar"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { ChevronDown } from "lucide-react"
 import { getInitializeVaultTx, sendTx } from "@/lib/api/transaction"
-import { useWallet } from "@solana/wallet-adapter-react"
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { useNotification } from "@/contexts/NotificationContext"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
-import { getConnection } from "@/lib/solana"
 import { mirrorfiClient } from "@/lib/client/solana"
 import { BN } from "@coral-xyz/anchor"
 import { useRouter } from "next/navigation";
 import { createVault } from "@/lib/utils/vault-manager"
 
-const connection = getConnection();
 const tokenOptions = [
     { 
         symbol: 'USDC', 
@@ -42,6 +40,7 @@ export default function CreatePage() {
     const router = useRouter();
     const {showNotification} = useNotification();
     const {publicKey, signTransaction} = useWallet();
+    const { connection } = useConnection();
     const dropdownRef = useRef<HTMLDivElement>(null)
     const [isLoading, setIsLoading] = useState(false)
     

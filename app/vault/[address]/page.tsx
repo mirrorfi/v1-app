@@ -10,16 +10,15 @@ import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token"
 import { mirrorfiClient } from '@/lib/client/solana';
 import { getPrices, getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
-import { getConnection } from "@/lib/solana"
-import { useWallet } from "@solana/wallet-adapter-react"
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
   const {address: vault } = useParams<{ address: string }>();
 
-  const connection = getConnection();
   const { publicKey } = useWallet();
+  const { connection } = useConnection();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(false);

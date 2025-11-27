@@ -9,10 +9,7 @@ import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
 import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap, getExitStrategyJupiterSwap, sendTx } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton";
 import { useNotification } from "@/contexts/NotificationContext"
-import { useWallet } from "@solana/wallet-adapter-react"
-import { getConnection } from "@/lib/solana"
-
-const connection = getConnection();
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 
 interface TokenOption {
   mint:string;
@@ -202,6 +199,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   const toToken = activeTab === 'add' ? strategyToken : depositToken;
   const { showNotification } = useNotification()
   const { publicKey, signTransaction } = useWallet();
+  const { connection } = useConnection();
 
   useEffect(() => {
     if(strategyData) {

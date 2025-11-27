@@ -4,23 +4,21 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
 import { getDepositVaultTx, getWithdrawVaultTx, sendTx } from "@/lib/api"
-import { useWallet } from "@solana/wallet-adapter-react"
-import { getConnection } from "@/lib/solana"
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { formatNumber, formatAddress } from "@/lib/display"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ArrowUpRight } from "lucide-react"
 import { logActivity, LogActivityParams } from '@/lib/utils/activity-logger';
 
-const connection = getConnection();
-
-export function VaultDashboardExecuteCard({vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance}: {vault: string, vaultData: any, depositData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number}) {
+export function VaultDashboardExecuteCard({ vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance }: { vault: string, vaultData: any, depositData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number }) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
 
   const router = useRouter();
   const { publicKey, signTransaction } = useWallet()
+  const { connection } = useConnection();
   const { showNotification } = useNotification()
 
   // Check if current user has managing authority

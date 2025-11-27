@@ -13,12 +13,9 @@ import { StrategyCreateModal } from "@/components/StrategyCreateModal";
 import { StrategyJupiterModal } from "@/components/StrategyJupiterModal"
 import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getCloseVaultTx } from "@/lib/api/transaction";
-import { getConnection } from "@/lib/solana";
 import { useNotification } from "@/contexts/NotificationContext";
-
-const connection = getConnection();
 
 interface VaultDashboardBalancesProps {
   depositData: any;
@@ -145,6 +142,7 @@ function EmptyState({vault}: {vault?: string}) {
 
 export function VaultDashboardBalances({ depositData, strategiesData, isLoading, isManager=false, vaultData }: VaultDashboardBalancesProps) {
   const { publicKey, signTransaction } = useWallet();
+  const { connection } = useConnection();
   const { showNotification } = useNotification();
   const [totalValue, setTotalValue] = useState<number>(0);
   const [hasError, setHasError] = useState<boolean>(false);

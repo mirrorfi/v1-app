@@ -19,7 +19,6 @@ import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
 import { VaultDashboardPNLCard } from "@/components/VaultDashboardPNLCard"
-import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 
@@ -36,8 +35,6 @@ interface StrategyDashboardProps {
   depositData: any;
   strategiesData: any[];
 }
-
-const connection = getConnection();
 
 const strategy = {
   name: "My Super Hyped Strategy",

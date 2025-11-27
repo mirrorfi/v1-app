@@ -12,7 +12,6 @@ import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardPNLCard } from "@/components/VaultDashboardPNLCard"
 import { VaultDashboardExecuteCard } from "@/components/VaultDashboardExecuteCard"
 import { MobileExecuteCard } from "./MobileExecuteCard"
-import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { formatNumber } from "@/lib/display"
 
@@ -29,8 +28,6 @@ interface MobileVaultDashboardProps {
   depositData: any;
   strategiesData: any[];
 }
-const connection = getConnection();
-
 
 export function MobileVaultDashboard({ vault, vaultData, positionBalance, sharePrice, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
   const { publicKey } = useWallet();

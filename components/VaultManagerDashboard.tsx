@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation"
 import { Skeleton } from "./ui/skeleton"
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
-import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 
 interface StrategyDashboardProps {
@@ -22,8 +21,6 @@ interface StrategyDashboardProps {
   depositData: any;
   strategiesData: any[];
 }
-
-const connection = getConnection();
 
 const strategy = {
   icon: "🚀",

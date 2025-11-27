@@ -3,12 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/contexts/NotificationContext"
 import { getDepositVaultTx, getWithdrawVaultTx, sendTx } from "@/lib/api"
-import { useWallet } from "@solana/wallet-adapter-react"
-import { getConnection } from "@/lib/solana"
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { formatAddress, formatNumber } from "@/lib/display"
 import Image from "next/image"
-
-const connection = getConnection();
 
 interface MobileExecuteCardProps {
   vault: string,
@@ -28,6 +25,7 @@ export function MobileExecuteCard({vault, vaultData, depositData, positionBalanc
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">(initialMode)
 
   const { publicKey, signTransaction } = useWallet()
+  const { connection } = useConnection();
   const { showNotification } = useNotification()
 
   // Mock data - replace with real data
