@@ -226,10 +226,6 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": []
@@ -468,60 +464,7 @@
         },
         {
           "name": "vault_source_token_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vault"
-              },
-              {
-                "kind": "account",
-                "path": "token_program"
-              },
-              {
-                "kind": "account",
-                "path": "source_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "writable": true
         },
         {
           "name": "vault_destination_token_account",
@@ -1385,6 +1328,171 @@
           }
         }
       ]
+    },
+    {
+      "name": "migrate_receipt_to_depositor",
+      "discriminator": [
+        169,
+        158,
+        117,
+        194,
+        166,
+        144,
+        116,
+        14
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "vault_depositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receipt_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receipt_mint_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "receipt_mint_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "receipt_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "receipt_mint_token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": []
     },
     {
       "name": "update_config",
@@ -2471,7 +2579,7 @@
             ],
             "type": {
               "defined": {
-                "name": "WrappedDecimal"
+                "name": "WrappedI80F48"
               }
             }
           },
@@ -2484,7 +2592,7 @@
             ],
             "type": {
               "defined": {
-                "name": "WrappedDecimal"
+                "name": "WrappedI80F48"
               }
             }
           },
@@ -2531,7 +2639,7 @@
             ],
             "type": {
               "defined": {
-                "name": "WrappedDecimal"
+                "name": "WrappedI80F48"
               }
             }
           },
@@ -2576,30 +2684,26 @@
       }
     },
     {
-      "name": "WrappedDecimal",
+      "name": "WrappedI80F48",
       "docs": [
-        "Borsh serializable wrapper for [`Decimal`].",
+        "Borsh serializable wrapper for [`fixed::types::I80F48`].",
         "Calculations are never performed on this type directly as Solana's runtime has limited support for floating operations."
       ],
+      "repr": {
+        "kind": "c",
+        "align": 8
+      },
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "scale",
-            "type": "u32"
-          },
-          {
-            "name": "padding0",
+            "name": "value",
             "type": {
               "array": [
                 "u8",
-                4
+                16
               ]
             }
-          },
-          {
-            "name": "mantissa",
-            "type": "i64"
           }
         ]
       }

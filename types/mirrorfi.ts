@@ -232,10 +232,6 @@ export type Mirrorfi = {
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": []
@@ -474,60 +470,7 @@ export type Mirrorfi = {
         },
         {
           "name": "vaultSourceTokenAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vault"
-              },
-              {
-                "kind": "account",
-                "path": "tokenProgram"
-              },
-              {
-                "kind": "account",
-                "path": "sourceMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "writable": true
         },
         {
           "name": "vaultDestinationTokenAccount",
@@ -1391,6 +1334,171 @@ export type Mirrorfi = {
           }
         }
       ]
+    },
+    {
+      "name": "migrateReceiptToDepositor",
+      "discriminator": [
+        169,
+        158,
+        117,
+        194,
+        166,
+        144,
+        116,
+        14
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "vaultDepositor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiptMint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiptMintTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "receiptMintTokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "receiptMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "receiptMintTokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": []
     },
     {
       "name": "updateConfig",
@@ -2477,7 +2585,7 @@ export type Mirrorfi = {
             ],
             "type": {
               "defined": {
-                "name": "wrappedDecimal"
+                "name": "wrappedI80f48"
               }
             }
           },
@@ -2490,7 +2598,7 @@ export type Mirrorfi = {
             ],
             "type": {
               "defined": {
-                "name": "wrappedDecimal"
+                "name": "wrappedI80f48"
               }
             }
           },
@@ -2537,7 +2645,7 @@ export type Mirrorfi = {
             ],
             "type": {
               "defined": {
-                "name": "wrappedDecimal"
+                "name": "wrappedI80f48"
               }
             }
           },
@@ -2582,30 +2690,26 @@ export type Mirrorfi = {
       }
     },
     {
-      "name": "wrappedDecimal",
+      "name": "wrappedI80f48",
       "docs": [
-        "Borsh serializable wrapper for [`Decimal`].",
+        "Borsh serializable wrapper for [`fixed::types::I80F48`].",
         "Calculations are never performed on this type directly as Solana's runtime has limited support for floating operations."
       ],
+      "repr": {
+        "kind": "c",
+        "align": 8
+      },
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "scale",
-            "type": "u32"
-          },
-          {
-            "name": "padding0",
+            "name": "value",
             "type": {
               "array": [
                 "u8",
-                4
+                16
               ]
             }
-          },
-          {
-            "name": "mantissa",
-            "type": "i64"
           }
         ]
       }
