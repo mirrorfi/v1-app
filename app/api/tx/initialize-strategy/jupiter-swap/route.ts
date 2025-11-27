@@ -35,8 +35,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const id = await mirrorfiClient.getNextStrategyId(vault);
-    const strategy = mirrorfiClient.getStrategyPda(new PublicKey(vault), new BN(id));
+    const strategy = mirrorfiClient.getStrategyPda(new PublicKey(vault), new PublicKey(destinationMint));
 
     const ix = await mirrorfiClient.program.methods
       .initializeStrategyJupiterSwap()
