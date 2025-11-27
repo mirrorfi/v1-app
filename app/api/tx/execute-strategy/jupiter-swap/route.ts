@@ -1,8 +1,7 @@
 import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
-import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiter-swap";
+import { swap } from "@/lib/client/jupiter";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
@@ -84,19 +83,15 @@ export async function POST(req: NextRequest) {
 
     const depositMint = new PublicKey(vaultAcc.depositMint);
     const targetMint = new PublicKey(strategyType.jupiterSwap.targetMint);
-    const executeSwapResult = await swap(
-      depositMint,
-      targetMint,
+    const executeSwapResult = await swap({
+      inputMint: depositMint,
+      outputMint: targetMint,
       amount,
       slippageBps,
-      false,
-      true,
-      new PublicKey(vault),
-      SERVER_CONNECTION,
-    );
-    const remainingAccounts = extractRemainingAccountsForSwap(
-      executeSwapResult.swapInstruction,
-    ).remainingAccounts;
+      exactOutRoute: false,
+      onlyDirectRoutes: true,
+      userPublicKey: vault,
+    });
     const tokenMintAccountInfos = (await SERVER_CONNECTION.getMultipleAccountsInfo([depositMint, targetMint]));
     const depositMintTokenProgram = tokenMintAccountInfos[0]!.owner;
     const targetMintTokenProgram = tokenMintAccountInfos[1]!.owner;
@@ -123,7 +118,7 @@ export async function POST(req: NextRequest) {
         tokenProgram: targetMintTokenProgram,
         vaultSourceTokenAccount: vaultDepositMintTokenAccount,
       })
-      .remainingAccounts(remainingAccounts)
+      .remainingAccounts(executeSwapResult.remainingAccounts)
       .instruction();
 
     const tx = await buildTx([ix], new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);

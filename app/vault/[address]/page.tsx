@@ -8,7 +8,7 @@ import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token"
 import { mirrorfiClient } from '@/lib/client/solana';
-import { getPrices, getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
+import { getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"

@@ -5,6 +5,10 @@ import {
   PublicKey,
   TransactionInstruction,
 } from "@solana/web3.js";
+import { getSwapInstructions } from "../api/swap";
+import { Address } from "@coral-xyz/anchor";
+import { BigIntString } from "@/types/accounts";
+import { CLIENT_CONNECTION } from "./solana";
 
 const EXACT_OUT_ROUTE_DISCRIMINATOR = [208, 51, 239, 151, 123, 43, 237, 92];
 const ROUTE_DISCRIMINATOR = [229, 23, 203, 151, 122, 227, 173, 42];
@@ -15,7 +19,7 @@ const SHARED_ACCOUNTS_ROUTE_DISCRIMINATOR = [
   193, 32, 155, 51, 65, 214, 156, 129,
 ];
 
-export function deserializeInstruction(
+function deserializeInstruction(
   instruction: any,
 ): TransactionInstruction {
   return new TransactionInstruction({
@@ -29,7 +33,7 @@ export function deserializeInstruction(
   });
 }
 
-export async function getAddressLookupTableAccounts(
+async function getAddressLookupTableAccounts(
   keys: string[],
   connection: Connection,
 ): Promise<AddressLookupTableAccount[]> {
@@ -52,45 +56,38 @@ export async function getAddressLookupTableAccounts(
   }, new Array<AddressLookupTableAccount>());
 }
 
-export async function swap(
-  inputMint: PublicKey,
-  outputMint: PublicKey,
-  amount: number,
+export async function swap({
+  inputMint,
+  outputMint,
+  amount,
+  slippageBps,
+  exactOutRoute,
+  onlyDirectRoutes,
+  userPublicKey,
+}: {
+  inputMint: Address,
+  outputMint: Address,
+  amount: BigIntString,
   slippageBps: number,
   exactOutRoute: boolean,
   onlyDirectRoutes: boolean,
-  userPublicKey: PublicKey,
-  connection: Connection,
-): Promise<{
-  quoteResponse: any;
+  userPublicKey: Address,
+}): Promise<{
   swapInstruction: TransactionInstruction;
   computeBudgetInstructions: TransactionInstruction[];
   setupInstructions: TransactionInstruction[];
   addressLookupTableAccounts: AddressLookupTableAccount[];
+  remainingAccounts: AccountMeta[];
 }> {
-  const quoteResponse = await (
-    await fetch(
-      `https://lite-api.jup.ag/swap/v1/quote?inputMint=${inputMint.toString()}&outputMint=${outputMint.toString()}&amount=${amount}&slippageBps=${slippageBps}&onlyDirectRoutes=${onlyDirectRoutes}&swapMode=${exactOutRoute ? "ExactOut" : "ExactIn"}`,
-    )
-  ).json();
-
-  const instructions: any = await (
-    await fetch("https://lite-api.jup.ag/swap/v1/swap-instructions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        quoteResponse,
-        userPublicKey: userPublicKey.toString(),
-        dynamicSlippage: true,
-      }),
-    })
-  ).json();
-
-  if (instructions.error) {
-    throw new Error("Failed to get swap instructions: " + instructions.error);
-  }
+  const instructions = await getSwapInstructions({
+    inputMint,
+    outputMint,
+    amount,
+    slippageBps,
+    exactOutRoute,
+    onlyDirectRoutes,
+    userPublicKey: userPublicKey.toString(),
+  })
 
   const {
     swapInstruction: swapInstructionPayload, // The actual swap instruction.
@@ -99,17 +96,21 @@ export async function swap(
     addressLookupTableAddresses, // The lookup table addresses that you can use if you are using versioned transaction.
   } = instructions;
 
+  const swapInstruction = deserializeInstruction(swapInstructionPayload);
+
   return {
-    quoteResponse,
-    swapInstruction: deserializeInstruction(swapInstructionPayload),
+    swapInstruction,
     computeBudgetInstructions: computeBudgetInstructions.map(
       deserializeInstruction,
     ),
     setupInstructions: setupInstructions.map(deserializeInstruction),
     addressLookupTableAccounts: await getAddressLookupTableAccounts(
       addressLookupTableAddresses,
-      connection,
+      CLIENT_CONNECTION,
     ),
+    remainingAccounts: extractRemainingAccountsForSwap(
+      swapInstruction,
+    ).remainingAccounts
   };
 }
 
