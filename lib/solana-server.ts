@@ -1,24 +1,17 @@
 import { AddressLookupTableAccount, clusterApiUrl, Connection, PublicKey, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { Cluster } from '@solana/web3.js';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { Mirrorfi } from '@/types/mirrorfi';
-import mirrorfiIdl from '@/idl/mirrorfi.json';
-import { MirrorFiClient } from './utils/mirrorfi-client';
-import { v0TxToBase64 } from './utils';
+import { MirrorFiClient } from '@/lib/mirrorfi-client';
+import { v0TxToBase64 } from '@/lib/utils';
 import { randomUUID } from 'crypto';
 import { BuildGatewayTransactionResponse, DeliveryResult } from '@/types/gateway';
 
 const SERVER_CLUSTER: Cluster = (process.env.SERVER_SOLANA_RPC_CLUSTER ??
   'mainnet-beta') as Cluster;
 export const SERVER_CONNECTION = new Connection(
-  process.env.SERVER_SOLANA_RPC_URL ??
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ??
-  clusterApiUrl(SERVER_CLUSTER),
+  process.env.SERVER_SOLANA_RPC_URL ?? clusterApiUrl(SERVER_CLUSTER),
   'confirmed'
 );
-const provider = { connection: SERVER_CONNECTION } as AnchorProvider;
-const mirrorfiProgram = new Program<Mirrorfi>(mirrorfiIdl, provider);
-export const mirrorfiClient = new MirrorFiClient(mirrorfiProgram);
+export const mirrorfiClient = new MirrorFiClient(SERVER_CONNECTION);
 
 export async function getALTs(
   addresses: PublicKey[]
