@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          vault: await mirrorfiClient.fetchProgramAccount(pdas[0], "vault", parseVault),
+          vaults: await mirrorfiClient.fetchProgramAccount(pdas[0], "vault", parseVault),
         },
         {
           status: 200,
