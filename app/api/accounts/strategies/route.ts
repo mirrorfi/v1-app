@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
           memcmp: {
             offset: DISCRIMINATOR_SIZE,
             bytes: vault,
+            encoding: "base58",
           },
         });
       }
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
           memcmp: {
             offset: DISCRIMINATOR_SIZE + 32 + 8,
             bytes: BNtoBase64(new BN(id), 1),
+            encoding: "base64",
           },
         });
       }

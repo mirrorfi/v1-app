@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
           memcmp: {
             offset: DISCRIMINATOR_SIZE + 32,
             bytes: vault,
+            encoding: "base58",
           },
         });
       }
@@ -29,6 +30,7 @@ export async function GET(req: NextRequest) {
           memcmp: {
             offset: DISCRIMINATOR_SIZE,
             bytes: authority,
+            encoding: "base58",
           },
         });
       }
