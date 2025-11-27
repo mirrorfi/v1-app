@@ -1,4 +1,4 @@
-import { buildTx, mirrorfiClient } from "@/lib/solana-server";
+import { buildTx, mirrorfiClient } from "@/lib/server/solana";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";

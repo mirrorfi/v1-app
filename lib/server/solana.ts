@@ -1,22 +1,17 @@
 import { AddressLookupTableAccount, clusterApiUrl, Connection, PublicKey, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { Cluster } from '@solana/web3.js';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { Mirrorfi } from '@/types/mirrorfi';
-import mirrorfiIdl from '@/idl/mirrorfi.json';
 import { MirrorFiClient } from '@/lib/mirrorfi-client';
 import { v0TxToBase64 } from '@/lib/utils';
 import { randomUUID } from 'crypto';
 import { BuildGatewayTransactionResponse, DeliveryResult } from '@/types/gateway';
 
-const cluster: Cluster = (process.env.SERVER_SOLANA_RPC_CLUSTER ??
+const SERVER_CLUSTER: Cluster = (process.env.SERVER_SOLANA_RPC_CLUSTER ??
   'mainnet-beta') as Cluster;
-export const connection = new Connection(
-  process.env.SERVER_SOLANA_RPC_URL ?? clusterApiUrl(cluster),
+export const SERVER_CONNECTION = new Connection(
+  process.env.SERVER_SOLANA_RPC_URL ?? clusterApiUrl(SERVER_CLUSTER),
   'confirmed'
 );
-const provider = { connection: connection } as AnchorProvider;
-const mirrorfiProgram = new Program<Mirrorfi>(mirrorfiIdl, provider);
-export const mirrorfiClient = new MirrorFiClient(mirrorfiProgram);
+export const mirrorfiClient = new MirrorFiClient(SERVER_CONNECTION);
 
 export async function getALTs(
   addresses: PublicKey[]
@@ -24,7 +19,7 @@ export async function getALTs(
   const lookupTableAccounts: AddressLookupTableAccount[] = [];
 
   for (const address of addresses) {
-    const account = await connection.getAddressLookupTable(address);
+    const account = await SERVER_CONNECTION.getAddressLookupTable(address);
 
     if (account.value) {
       lookupTableAccounts.push(account.value);
@@ -43,7 +38,7 @@ export async function buildTx(
 ): Promise<string> {
   const messageV0 = new TransactionMessage({
     payerKey: payer,
-    recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+    recentBlockhash: (await SERVER_CONNECTION.getLatestBlockhash()).blockhash,
     instructions,
   }).compileToV0Message(lookupTables);
 

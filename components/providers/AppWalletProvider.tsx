@@ -3,7 +3,7 @@
 import React from "react";
 import {ConnectionProvider,WalletProvider,} from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { CLIENT_CONNECTION } from "@/lib/solana-client";
+import { CLIENT_CONNECTION } from "@/lib/client/solana";
  
 // Default styles that can be overridden by your app
 require("@solana/wallet-adapter-react-ui/styles.css");

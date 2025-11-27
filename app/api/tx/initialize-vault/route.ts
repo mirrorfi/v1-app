@@ -1,4 +1,4 @@
-import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
 import { stringToByteArray } from "@/lib/utils";
 import { parseConfig } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";

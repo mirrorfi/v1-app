@@ -2,7 +2,7 @@ import { GetProgramAccountsFilter } from '@solana/web3.js';
 import { NextRequest, NextResponse } from 'next/server';
 import { DISCRIMINATOR_SIZE } from '@/lib/constants';
 import { BN } from '@coral-xyz/anchor';
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/server/solana';
 import { parseStrategy } from '@/types/accounts';
 
 export async function GET(req: NextRequest) {

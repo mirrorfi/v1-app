@@ -1,6 +1,6 @@
 import { getTokenInfos } from "@/lib/api/jupiter";
 import { DISCRIMINATOR_SIZE } from "@/lib/constants";
-import { mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";

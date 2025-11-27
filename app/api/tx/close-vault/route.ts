@@ -1,4 +1,4 @@
-import { buildTx, mirrorfiClient, SERVER_CONNECTION} from "@/lib/solana-server";
+import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
 import { parseVault } from "@/types/accounts";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const depositMint = new PublicKey(vaultAcc.depositMint);
     const depositMintTokenProgram = (await SERVER_CONNECTION.getAccountInfo(depositMint))!.owner;
-    
+
     const ix = await mirrorfiClient.program.methods
       .closeVault()
       .accounts({

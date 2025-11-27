@@ -1,4 +1,4 @@
-import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
 import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiter-swap";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       false,
       true,
       new PublicKey(vault),
-      mirrorfiClient.program.provider.connection,
+      SERVER_CONNECTION,
     );
     const remainingAccounts = extractRemainingAccountsForSwap(
       executeSwapResult.swapInstruction,

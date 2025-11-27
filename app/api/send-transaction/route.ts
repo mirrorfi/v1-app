@@ -1,4 +1,4 @@
-import { sendTx } from "@/lib/solana-server";
+import { sendTx } from "@/lib/server/solana";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {

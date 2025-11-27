@@ -1,4 +1,4 @@
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/server/solana';
 import { parseUser } from '@/types/accounts';
 import { NextRequest, NextResponse } from 'next/server';
 import { GetProgramAccountsFilter } from '@solana/web3.js';

@@ -1,4 +1,4 @@
-import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
 import { parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
 import { createAssociatedTokenAccountIdempotentInstruction, createSyncNativeInstruction, getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
