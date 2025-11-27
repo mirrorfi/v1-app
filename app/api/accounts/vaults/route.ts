@@ -4,8 +4,7 @@ import { DISCRIMINATOR_SIZE } from '@/lib/constants';
 import { BN } from '@coral-xyz/anchor';
 import { mirrorfiClient } from '@/lib/server/solana';
 import { parseVault } from '@/types/accounts';
-import { connectToDatabase } from '@/lib/database';
-import Vault from '@/lib/database/models/vault';
+import { BNtoBase64 } from '@/lib/utils';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -22,7 +21,7 @@ export async function GET(req: NextRequest) {
         filters.push({
           memcmp: {
             offset: DISCRIMINATOR_SIZE,
-            bytes: new BN(id).toArrayLike(Buffer, 'le', 8).toString('base64'),
+            bytes: BNtoBase64(new BN(id), 8),
           },
         });
       }

@@ -1,6 +1,7 @@
 import { VersionedTransaction } from "@solana/web3.js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { BN } from "@coral-xyz/anchor";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -63,4 +64,8 @@ export async function wrappedFetch(url: string, method: string = 'GET', body: an
   } catch (err) {
     throw new Error(`Fetch error: ${err instanceof Error ? err.message : String(err)}`);
   }
+}
+
+export function BNtoBase64(bn: BN, bytes: 1 | 2 | 4 | 8 | 16): string {
+  return bn.toArrayLike(Buffer, "le", bytes).toString("base64");
 }
