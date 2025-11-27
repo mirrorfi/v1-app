@@ -7,7 +7,7 @@ import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token"
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/client/solana';
 import { getPrices, getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
@@ -58,7 +58,7 @@ export default function VaultPage() {
     if(!vaultData.publicKey){ throw new Error("Invalid vault data: missing publicKey"); }
     if(!vaultData.depositMint){ throw new Error("Invalid vault data: missing depositMint"); }
     // Fetch Vault Depositor Account
-    const vaultDepositorPda = mirrorfiClient.getVaultDepositorPda(new PublicKey(vaultData.publicKey), user);
+    const vaultDepositorPda = mirrorfiClient.getVaultDepositorPda(user, new PublicKey(vaultData.publicKey));
     const vaultDepositor = await mirrorfiClient.fetchProgramAccount(vaultDepositorPda.toBase58(), "vaultDepositor", parseVaultDepositor);
     const userShares = vaultDepositor ? vaultDepositor.shares : "0";
     // Calculate Share Price

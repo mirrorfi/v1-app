@@ -14,7 +14,7 @@ import { useWallet } from "@solana/wallet-adapter-react"
 import { useNotification } from "@/contexts/NotificationContext"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { getConnection } from "@/lib/solana"
-import { mirrorfiClient } from "@/lib/solana-server"
+import { mirrorfiClient } from "@/lib/client/solana"
 import { BN } from "@coral-xyz/anchor"
 import { useRouter } from "next/navigation";
 import { createVault } from "@/lib/utils/vault-manager"

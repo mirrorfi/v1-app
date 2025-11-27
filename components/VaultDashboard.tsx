@@ -9,7 +9,7 @@ import { getVaultBalances } from "@/lib/api/vault"
 import { ArrowLeft, AlertCircle, RefreshCw, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Skeleton } from "./ui/skeleton"
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/client/solana';
 import { fetchJupiterPrices } from "@/lib/utils/jupiter"
 import { parseVault } from '@/types/accounts';
 

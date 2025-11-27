@@ -7,7 +7,7 @@ import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey, Keypair } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync } from "@solana/spl-token"
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/client/solana';
 import { getVaultBalance, ParsedVaultBalanceData, parseVaultBalanceData} from "@/lib/api";
 import { parseVault, ParsedVault } from '@/types/accounts';
 import { getConnection } from "@/lib/solana"
