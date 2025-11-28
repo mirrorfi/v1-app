@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     const strategyType = strategyAcc.strategyType;
 
-    if (!strategyType.jupiterSwap) {
+    if (!('jupiterSwap' in strategyType)) {
       return NextResponse.json(
         { error: 'Strategy is not a JupiterSwap strategy.' },
         { status: 400 }

@@ -28,7 +28,7 @@ function parseBN(field: BN): string {
 }
 
 function parseStrategyType(strategyType: StrategyType): ParsedStrategyType {
-  const type = parseEnum<ParsedStrategyType>(strategyType);
+  const type = Object.keys(strategyType)[0];
 
   let parsedStrategyType: ParsedStrategyType;
 
@@ -45,7 +45,7 @@ function parseStrategyType(strategyType: StrategyType): ParsedStrategyType {
       parsedStrategyType = {
         kaminoLend: {
           obligation: parsePublicKey(strategyType.kaminoLend.obligation),
-          lendingMarket: parsePublicKey(strategyType.kaminoLend.lendingMarket),
+          reserve: parsePublicKey(strategyType.kaminoLend.lendingMarket),
         },
       };
       break;
@@ -82,8 +82,17 @@ type StrategyType = IdlTypes<Mirrorfi>["strategyType"];
 type VaultStatus = IdlTypes<Mirrorfi>["vaultStatus"];
 
 type ParsedProtocolStatus = ExtractDefinedKeys<ProtocolStatus>;
-// TODO: define custom ParsedStrategyType
-type ParsedStrategyType = ExtractDefinedKeys<StrategyType>;
+type ParsedStrategyType = {
+  jupiterSwap: {
+    targetMint: Pubkey;
+  };
+}
+| {
+  kaminoLend: {
+    obligation: Pubkey;
+    reserve: Pubkey;
+  };
+};
 type ParsedVaultStatus = ExtractDefinedKeys<VaultStatus>;
 
 export interface ParsedProgramAccount {
