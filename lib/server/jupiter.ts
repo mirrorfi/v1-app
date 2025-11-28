@@ -1,5 +1,8 @@
 import { JupiterPrice, JupiterTokenInfo } from "@/types/jupiter";
 import { Address } from "@coral-xyz/anchor";
+import { createJupiterApiClient, QuoteGetRequest, QuoteResponse, SwapInstructionsResponse } from '@jup-ag/api';
+
+const jupiterClient = createJupiterApiClient();
 
 type Price = Record<string, { usdPrice: number }>;
 type TokenInfo = {
@@ -69,25 +72,19 @@ export async function getJupiterSwapQuote({
   outputMint,
   amount,
   slippageBps,
-  exactOutRoute,
+  swapMode,
   onlyDirectRoutes,
-}: {
-  inputMint: Address,
-  outputMint: Address,
-  amount: number,
-  slippageBps: number,
-  exactOutRoute: boolean,
-  onlyDirectRoutes: boolean,
-}) {
-  const res = await fetch(`${process.env.JUPITER_API_URL}/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}&onlyDirectRoutes=${onlyDirectRoutes}&swapMode=${exactOutRoute ? "ExactOut" : "ExactIn"}`);
+}: QuoteGetRequest): Promise<QuoteResponse> {
+  const quote = await jupiterClient.quoteGet({
+    inputMint: inputMint.toString(),
+    outputMint: outputMint.toString(),
+    amount,
+    slippageBps,
+    onlyDirectRoutes,
+    swapMode,
+  })
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.error || 'Unable to fetch swap quote from Jupiter API.');
-  }
-
-  return data;
+  return quote;
 }
 
 export async function getJupiterSwapInstructions({
@@ -95,27 +92,17 @@ export async function getJupiterSwapInstructions({
   userPublicKey,
   dynamicSlippage = true
 }: {
-  quoteResponse: any,
+  quoteResponse: QuoteResponse,
   userPublicKey: Address,
   dynamicSlippage?: boolean,
-}) {
-  const res = await fetch(`${process.env.JUPITER_API_URL}/swap/v1/swap-instructions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+}): Promise<SwapInstructionsResponse> {
+  const instructions = await jupiterClient.swapInstructionsPost({
+    swapRequest: {
       quoteResponse,
-      userPublicKey,
+      userPublicKey: userPublicKey.toString(),
       dynamicSlippage,
-    }),
+    }
   })
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.error || 'Unable to fetch swap instructions from Jupiter API.');
-  }
-
-  return data;
+  return instructions;
 }

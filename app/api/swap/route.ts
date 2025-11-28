@@ -1,4 +1,5 @@
 import { getJupiterSwapInstructions, getJupiterSwapQuote } from "@/lib/server/jupiter";
+import { QuoteGetSwapModeEnum } from "@jup-ag/api";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -100,17 +101,17 @@ export async function GET(req: NextRequest) {
       inputMint,
       outputMint,
       onlyDirectRoutes: onlyDirectRoutes === 'true',
-      exactOutRoute: exactOutRoute === 'true',
-    })
+      swapMode: exactOutRoute === 'true' ? QuoteGetSwapModeEnum.ExactOut : QuoteGetSwapModeEnum.ExactIn,
+    });
 
     const instructions = await getJupiterSwapInstructions({
       quoteResponse,
       userPublicKey,
       dynamicSlippage: true,
-    })
+    });
 
     return NextResponse.json({
-      instructions,
+      instructions
     });
   } catch (err) {
     console.error(err);
