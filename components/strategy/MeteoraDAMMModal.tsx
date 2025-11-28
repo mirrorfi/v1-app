@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, Search, ExternalLink, Copy } from "lucide-react"
-import { getTokenInfos, getDAMMV2PoolsByMints } from "@/lib/api"
-import { MeteoraDAMMV2PoolData } from "@/types/api"
+import { getTokenInfos } from "@/lib/api";
+import { getDAMMV2PoolsByMints } from "@/lib/client/meteora";
+import { MeteoraDAMMV2PoolData } from "@/types/meteora";
 import { Skeleton } from "@/components/ui/skeleton"
 import { MeteoraDAMMModalExecute } from "./MeteoraDAMMModalExecute"
 
