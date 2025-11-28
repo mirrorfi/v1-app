@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
-import { getVaultBalances } from "@/lib/api/vault"
+import { getVaultBalance } from "@/lib/api/vault"
 import { ArrowLeft, AlertCircle, RefreshCw, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Skeleton } from "./ui/skeleton"
 import { mirrorfiClient } from '@/lib/client/solana';
-import { fetchJupiterPrices } from "@/lib/utils/jupiter"
+import { getPrices } from "@/lib/api/metadata"
 import { parseVault } from '@/types/accounts';
 
 import { VaultDashboardExecuteCard, VaultDashboardExecuteCardSkeleton } from "@/components/VaultDashboardExecuteCard"
