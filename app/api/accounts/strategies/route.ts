@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          strategies: await mirrorfiClient.fetchProgramAccount(pdas[0], "strategy", parseStrategy),
+          strategies: [await mirrorfiClient.fetchProgramAccount(pdas[0], "strategy", parseStrategy)],
         },
         {
           status: 200,

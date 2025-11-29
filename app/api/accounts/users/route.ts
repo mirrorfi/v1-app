@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          users: await mirrorfiClient.fetchProgramAccount(pdas[0], 'user', parseUser),
+          users: [await mirrorfiClient.fetchProgramAccount(pdas[0], 'user', parseUser)],
         },
         {
           status: 200,
