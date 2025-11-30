@@ -9,6 +9,7 @@ export interface LogActivityParams {
   amountInUsd?: string;
   txHash: string;
   metadata?: Record<string, any>;
+  decimals?: number;
 }
 
 /**

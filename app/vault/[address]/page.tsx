@@ -12,6 +12,8 @@ import { getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
+import { getUserActivitiesByVault } from "@/lib/utils/get-user-activity"
+import { Transaction } from "@/components/VaultDashboardTransactionHistory"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
@@ -30,6 +32,7 @@ export default function VaultPage() {
   const [vaultData, setVaultData] = useState<ParsedVault | null>(null);
   const [depositData, setDepositData] = useState<ParsedVaultBalanceData | null>(null);
   const [strategiesData, setStrategiesData] = useState<ParsedVaultBalanceData[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const handleReload = () => {
     setReload(!reload);
@@ -114,6 +117,30 @@ export default function VaultPage() {
   useEffect(() => {
     setIsLoading(true);
     setError(null); // Reset error state
+
+    async function getTransactions(){
+      // Fetch transactions from the current user in the current vault
+      try {
+        if(!publicKey){ return; }
+
+        const activitiesResponse = await getUserActivitiesByVault({
+          wallet: publicKey.toBase58(),
+          vault: vault,
+          page: 1,
+          limit: 10,
+        });
+
+        if(activitiesResponse.success){
+          console.log("User Activities in Vault:", activitiesResponse.transactions);
+          setTransactions(activitiesResponse.transactions);
+        }
+
+        
+
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    }
     
     async function loadVault(){
       // Try Loading vault key and check if it's valid
@@ -133,6 +160,10 @@ export default function VaultPage() {
           fetchUserBalance(depositData, publicKey); // Fetch User's Deposit Token Balance
           fetchUserReceiptBalance(vaultData, depositData, publicKey); // Fetch User's Share Token Balance
         }
+
+        getTransactions(); // Fetch User Transactions in the Vault
+
+
       } catch (error: any) {
         console.error("Error loading vault:", error);
         // Handle specific errors
@@ -185,6 +216,7 @@ export default function VaultPage() {
           handleReload={handleReload}
           depositData={depositData}
           strategiesData={strategiesData}
+          transactions={transactions}
         />
       )}
     </main>

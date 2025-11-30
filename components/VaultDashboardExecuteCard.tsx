@@ -114,6 +114,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
         amount: activeAction === "deposit" ? (Number.parseFloat(amount) * 10 ** depositData.tokenInfo.decimals).toString() : (positionBalance * 10 ** depositData.tokenInfo.decimals).toString(),
         amountInUsd: Number.parseFloat(usdValue).toString(),
         txHash: txid,
+        decimals: depositData.tokenInfo.decimals,
       })
 
       handleReload();

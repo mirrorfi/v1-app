@@ -19,6 +19,7 @@ export interface IActivity {
   txHash: string;
   timestamp: Date;
   metadata?: Record<string, any>; // For additional data
+  decimals: number;
 }
 
 const ActivitySchema = new Schema<IActivity>({
@@ -35,6 +36,7 @@ const ActivitySchema = new Schema<IActivity>({
   txHash: { type: String, required: true, unique: true },
   timestamp: { type: Date, default: Date.now, index: true },
   metadata: { type: Schema.Types.Mixed, required: false },
+  decimals : { type: Number, required: true},
 }, {
   timestamps: true,
 });
