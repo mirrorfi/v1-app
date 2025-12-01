@@ -209,6 +209,74 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
       .instruction();
   }
 
+  async executeStrategyMeteoraDammV2Ix({
+    liquidityDelta,
+    tokenAAmountThreshold,
+    tokenBAmountThreshold,
+    eventAuthority,
+    pool,
+    poolTokenAAccount,
+    poolTokenBAccount,
+    position,
+    positionNftAccount,
+    strategy,
+    tokenAMint,
+    tokenAProgram,
+    tokenBMint,
+    tokenBProgram,
+    vault,
+    vaultTokenAAccount,
+    vaultTokenBAccount,
+    authority,
+  }: {
+    liquidityDelta: BigIntString;
+    tokenAAmountThreshold: BigIntString;
+    tokenBAmountThreshold: BigIntString;
+    eventAuthority: Address;
+    pool: Address;
+    poolTokenAAccount: Address;
+    poolTokenBAccount: Address;
+    position: Address;
+    positionNftAccount: Address;
+    strategy: Address;
+    tokenAMint: Address;
+    tokenAProgram: Address;
+    tokenBMint: Address;
+    tokenBProgram: Address;
+    vault: Address;
+    vaultTokenAAccount: Address;
+    vaultTokenBAccount: Address;
+    authority: Address;
+  }): Promise<TransactionInstruction> {
+    return await this.program.methods
+      .executeStrategyMeteoraDammV2({
+        params: {
+          liquidityDelta: new BN(liquidityDelta),
+          tokenAAmountThreshold: new BN(tokenAAmountThreshold),
+          tokenBAmountThreshold: new BN(tokenBAmountThreshold),
+        }
+      })
+      .accounts({
+        config: this.configPda,
+        eventAuthority,
+        pool,
+        poolTokenAAccount,
+        poolTokenBAccount,
+        position,
+        positionNftAccount,
+        strategy,
+        tokenAMint,
+        tokenAProgram,
+        tokenBMint,
+        tokenBProgram,
+        vault,
+        vaultTokenAAccount,
+        vaultTokenBAccount,
+        authority,
+      })
+      .instruction();
+  }
+
   async exitStrategyJupiterSwapIx({
     swapData,
     amount,
@@ -263,6 +331,78 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
       .instruction()
   }
 
+  async exitStrategyMeteoraDammV2Ix({
+    liquidityDelta,
+    tokenAAmountThreshold,
+    tokenBAmountThreshold,
+    eventAuthority,
+    pool,
+    poolTokenAAccount,
+    poolTokenBAccount,
+    poolAuthority,
+    position,
+    positionNftAccount,
+    strategy,
+    tokenAMint,
+    tokenAProgram,
+    tokenBMint,
+    tokenBProgram,
+    treasuryTokenAccount,
+    vault,
+    vaultTokenAAccount,
+    vaultTokenBAccount,
+    authority,
+  }: {
+    liquidityDelta: BigIntString;
+    tokenAAmountThreshold: BigIntString;
+    tokenBAmountThreshold: BigIntString;
+    eventAuthority: Address;
+    pool: Address;
+    poolTokenAAccount: Address;
+    poolTokenBAccount: Address;
+    poolAuthority: Address;
+    position: Address;
+    positionNftAccount: Address;
+    strategy: Address;
+    tokenAMint: Address;
+    tokenAProgram: Address;
+    tokenBMint: Address;
+    tokenBProgram: Address;
+    treasuryTokenAccount: Address;
+    vault: Address;
+    vaultTokenAAccount: Address;
+    vaultTokenBAccount: Address;
+    authority: Address;
+  }): Promise<TransactionInstruction> {
+    return await this.program.methods
+      .exitStrategyMeteoraDammV2(
+        new BN(liquidityDelta),
+        new BN(tokenAAmountThreshold),
+        new BN(tokenBAmountThreshold),
+      )
+      .accounts({
+        config: this.configPda,
+        eventAuthority,
+        pool,
+        poolTokenAAccount,
+        poolTokenBAccount,
+        poolAuthority,
+        position,
+        positionNftAccount,
+        strategy,
+        tokenAMint,
+        tokenAProgram,
+        tokenBMint,
+        tokenBProgram,
+        treasuryTokenAccount,
+        vault,
+        vaultTokenAAccount,
+        vaultTokenBAccount,
+        authority,
+      })
+      .instruction();
+  }
+
   async initializeStrategyJupiterSwapIx({
     destinationMint,
     vault,
@@ -281,6 +421,40 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
         vault,
         authority,
         strategy,
+      })
+      .instruction();
+  }
+
+  async initializeStrategyMeteoraDammV2Ix({
+    eventAuthority,
+    pool,
+    poolAuthority,
+    position,
+    positionNftAccount,
+    positionNftMint,
+    vault,
+    authority,
+  }: {
+    eventAuthority: Address;
+    pool: Address;
+    poolAuthority: Address;
+    position: Address;
+    positionNftAccount: Address;
+    positionNftMint: Address;
+    vault: Address;
+    authority: Address;
+  }): Promise<TransactionInstruction> {
+    return this.program.methods
+      .initializeStrategyMeteoraDammV2()
+      .accounts({
+        eventAuthority,
+        pool,
+        poolAuthority,
+        position,
+        positionNftAccount,
+        positionNftMint,
+        vault,
+        authority,
       })
       .instruction();
   }
