@@ -1,5 +1,4 @@
 import { DataType, TimeFrame } from "@/components/VaultDashboardChart";
-import { time } from "console";
 
 // Types for chart data
 export interface ChartDataItem {
@@ -10,11 +9,9 @@ export interface ChartDataItem {
 
 export interface HistoricalDataPoint {
   timestamp: string;
-  totalNAV: number;
-  balance: string;
-  decimals: number;
-  // shareTokenSupply: number;
-  // depositTokenPrice: number;
+  tokenNav: number;     // Vault valuation in USDC
+  usdNav: number;       // Vault valuation in USD
+  userDeposits: number; // User deposits adjusted by decimals
 }
 
 export interface HistoricalDataResponse {
@@ -47,18 +44,23 @@ export const transformHistoricalData = (
     
     switch (dataType) {
         
-      case "Balance":
-        // Convert balance from string to number and adjust for decimals
-        value = parseFloat(dataPoint?.balance || "0") / Math.pow(10, dataPoint?.decimals || 0)
+      case "TokenNav":
+        // Vault valuation in USDC (already calculated by indexer)
+        value = dataPoint.tokenNav || 0;
         break;
         
-      case "NAV":
-        // Use total NAV directly
-        value = dataPoint.totalNAV;
+      case "UsdNav":
+        // Vault valuation in USD
+        value = dataPoint.usdNav || 0;
+        break;
+        
+      case "UserDeposits":
+        // User deposits adjusted by decimals
+        value = dataPoint.userDeposits || 0;
         break;
         
       default:
-        value = dataPoint.totalNAV;
+        value = dataPoint.usdNav || 0;
     }
     
     return {

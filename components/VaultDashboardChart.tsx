@@ -9,7 +9,7 @@ import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianG
 import { getChartData, ChartDataItem } from "@/lib/utils/chartData"
 
 // Define types for data selection
-export type DataType = "Balance" | "NAV"
+export type DataType = "TokenNav" | "UsdNav" | "UserDeposits"
 export type TimeFrame = "24H" | "7D" | "30D" | "90D"
 
 interface CustomTooltipProps {
@@ -29,15 +29,21 @@ const CustomTooltip = ({ active, payload, label, dataType }: CustomTooltipProps)
     // Format value based on data type
     const formattedValue = (() => {
       switch(dataType) {
-        case "Balance":
-          // Balance is already calculated as balance * 10^-decimals
+        case "TokenNav":
+          // Token NAV in USDC
+          return `${value.toLocaleString('en-US', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 6
+          })} USDC`
+        case "UsdNav":
+          // USD NAV as dollar value
           return `$${value.toLocaleString('en-US', { 
             minimumFractionDigits: 2, 
-            maximumFractionDigits: 9
+            maximumFractionDigits: 6
           })}`
-        case "NAV":
-          // NAV is shown as dollar value
-          return `$${value.toLocaleString('en-US', { 
+        case "UserDeposits":
+          // User deposits (token amount)
+          return `${value.toLocaleString('en-US', { 
             minimumFractionDigits: 2, 
             maximumFractionDigits: 6
           })}`
@@ -75,7 +81,7 @@ interface VaultDashboardChartProps {
 
 export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [selectedDataType, setSelectedDataType] = useState<DataType>("Balance")
+  const [selectedDataType, setSelectedDataType] = useState<DataType>("TokenNav")
   const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("24H")
   const [data, setData] = useState<ChartDataItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -158,26 +164,37 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   // Get appropriate unit formatter based on data type
   const getYAxisFormatter = (dataType: DataType) => {
     switch(dataType) {
-      case "Balance":
-        // Format balance with appropriate scale
+      case "TokenNav":
+        // Format token NAV with appropriate scale (USDC)
         return (value: number) => {
           if (value >= 1000000) {
-            return `$${(value / 1000000).toFixed(1)}M`
+            return `${(value / 1000000).toFixed(1)}M`
           } else if (value >= 1000) {
-            return `$${(value / 1000).toFixed(0)}k`
+            return `${(value / 1000).toFixed(0)}k`
           } else {
-            return `$${value.toFixed(4)}`
+            return `${value.toFixed(2)}`
           }
         }
-      case "NAV":
-        // Format NAV as dollar value with appropriate scale
+      case "UsdNav":
+        // Format USD NAV as dollar value with appropriate scale
         return (value: number) => {
           if (value >= 1000000) {
             return `$${(value / 1000000).toFixed(1)}M`
           } else if (value >= 1000) {
             return `$${(value / 1000).toFixed(0)}k`
           } else {
-            return `$${value.toFixed(4)}`
+            return `$${value.toFixed(2)}`
+          }
+        }
+      case "UserDeposits":
+        // Format user deposits (token amount)
+        return (value: number) => {
+          if (value >= 1000000) {
+            return `${(value / 1000000).toFixed(1)}M`
+          } else if (value >= 1000) {
+            return `${(value / 1000).toFixed(0)}k`
+          } else {
+            return `${value.toFixed(2)}`
           }
         }
       default:
@@ -194,27 +211,10 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
     const min = Math.min(...values);
     const max = Math.max(...values);
     const range = max - min;
-    const avgValue = (max + min) / 2;
     
-    // Calculate the percentage change from min to max
-    const percentageChange = avgValue > 0 ? (range / avgValue) : 0;
-    
-    // If the fluctuation is very small (< 5% of average), zoom in to emphasize changes
-    if (percentageChange < 0.05 && range > 0) {
-      // Zoom in: set domain close to min/max with small padding
-      const padding = range * 0.15; // 15% padding on each side
-      return [Math.max(0, min - padding), max + padding];
-    }
-    // If fluctuation is moderate (5-20%), show from slightly below min
-    else if (percentageChange < 0.2) {
-      const padding = range * 0.1;
-      return [Math.max(0, min - padding), max + padding];
-    }
-    // If there's significant variation (>20%), maximize height by starting from 0
-    else {
-      const topPadding = max * 0.05;
-      return [0, max + topPadding];
-    }
+    // Add 20% padding on both sides for a centered, stable view
+    const padding = range > 0 ? range * 0.2 : max * 0.1;
+    return [Math.max(0, min - padding), max + padding];
   }
   
   // Calculate the y-axis domain based on current data
@@ -224,10 +224,12 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   // Get appropriate icon based on data type
   const getDataTypeIcon = (dataType: DataType) => {
     switch(dataType) {
-      case "Balance":
-        return <DollarSign className="h-4 w-4" />
-      case "NAV":
+      case "TokenNav":
         return <BarChart3 className="h-4 w-4" />
+      case "UsdNav":
+        return <DollarSign className="h-4 w-4" />
+      case "UserDeposits":
+        return <TrendingUp className="h-4 w-4" />
       default:
         return <TrendingUp className="h-4 w-4" />
     }
@@ -236,10 +238,12 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   // Get title based on data type
   const getChartTitle = (dataType: DataType) => {
     switch(dataType) {
-      case "Balance":
-        return "Token Balance"
-      case "NAV":
-        return "Net Asset Value"
+      case "TokenNav":
+        return "Token NAV (USDC)"
+      case "UsdNav":
+        return "USD NAV"
+      case "UserDeposits":
+        return "User Deposits (USDC)"
       default:
         return "Statistics"
     }
@@ -252,7 +256,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
         <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2">
           {/* Data type selector */}
           <div className="flex gap-1 overflow-x-auto">
-            {(["Balance", "NAV"] as const).map((dataType) => (
+            {(["TokenNav", "UsdNav", "UserDeposits"] as const).map((dataType) => (
               <Button
                 key={dataType}
                 variant={selectedDataType === dataType ? "default" : "outline"}
@@ -261,7 +265,9 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 className={`text-xs whitespace-nowrap ${selectedDataType === dataType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
               >
                 <span className="hidden sm:inline">{getDataTypeIcon(dataType)}</span>
-                <span className={selectedDataType === dataType ? "ml-1" : ""}>{dataType}</span>
+                <span className={selectedDataType === dataType ? "ml-1" : ""}>
+                  {dataType === "TokenNav" ? "Token NAV" : dataType === "UsdNav" ? "USD NAV" : "Deposits"}
+                </span>
               </Button>
             ))}
           </div>
