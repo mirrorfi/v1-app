@@ -671,6 +671,93 @@
       ]
     },
     {
+      "name": "execute_strategy_meteora_damm_v2",
+      "discriminator": [
+        202,
+        101,
+        186,
+        114,
+        96,
+        43,
+        138,
+        69
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "strategy",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true
+        },
+        {
+          "name": "event_authority"
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "vault_token_a_account",
+          "writable": true
+        },
+        {
+          "name": "vault_token_b_account",
+          "writable": true
+        },
+        {
+          "name": "pool_token_a_account",
+          "writable": true
+        },
+        {
+          "name": "pool_token_b_account",
+          "writable": true
+        },
+        {
+          "name": "token_a_mint"
+        },
+        {
+          "name": "token_b_mint"
+        },
+        {
+          "name": "position_nft_account"
+        },
+        {
+          "name": "token_a_program"
+        },
+        {
+          "name": "token_b_program"
+        },
+        {
+          "name": "cp_amm_program",
+          "address": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "AddLiquidityParameters"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "exit_strategy_jupiter_swap",
       "discriminator": [
         38,
@@ -863,6 +950,105 @@
         {
           "name": "has_farm",
           "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "exit_strategy_meteora_damm_v2",
+      "discriminator": [
+        252,
+        113,
+        233,
+        217,
+        228,
+        59,
+        121,
+        32
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "strategy",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true
+        },
+        {
+          "name": "event_authority"
+        },
+        {
+          "name": "pool_authority"
+        },
+        {
+          "name": "pool"
+        },
+        {
+          "name": "vault_token_a_account",
+          "writable": true
+        },
+        {
+          "name": "vault_token_b_account",
+          "writable": true
+        },
+        {
+          "name": "pool_token_a_account",
+          "writable": true
+        },
+        {
+          "name": "pool_token_b_account",
+          "writable": true
+        },
+        {
+          "name": "token_a_mint"
+        },
+        {
+          "name": "token_b_mint"
+        },
+        {
+          "name": "position_nft_account"
+        },
+        {
+          "name": "token_a_program"
+        },
+        {
+          "name": "token_b_program"
+        },
+        {
+          "name": "treasury_token_account",
+          "writable": true
+        },
+        {
+          "name": "cp_amm_program",
+          "address": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+        }
+      ],
+      "args": [
+        {
+          "name": "liquidity_delta",
+          "type": {
+            "option": "u128"
+          }
+        },
+        {
+          "name": "token_a_amount_threshold",
+          "type": "u64"
+        },
+        {
+          "name": "token_b_amount_threshold",
+          "type": "u64"
         }
       ]
     },
@@ -1091,6 +1277,90 @@
           "type": "pubkey"
         }
       ]
+    },
+    {
+      "name": "initialize_strategy_meteora_damm_v2",
+      "discriminator": [
+        78,
+        203,
+        104,
+        179,
+        112,
+        0,
+        39,
+        169
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "strategy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "position"
+              }
+            ]
+          }
+        },
+        {
+          "name": "position"
+        },
+        {
+          "name": "event_authority"
+        },
+        {
+          "name": "pool"
+        },
+        {
+          "name": "pool_authority"
+        },
+        {
+          "name": "position_nft_account"
+        },
+        {
+          "name": "position_nft_mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "cp_amm_program",
+          "address": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initialize_user",
@@ -1929,156 +2199,186 @@
     },
     {
       "code": 6006,
+      "name": "InvalidRemainingAccounts",
+      "msg": "Invalid amount of remaining accounts passed"
+    },
+    {
+      "code": 6007,
       "name": "InvalidConfig",
       "msg": "Config address does not match"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "InvalidTreasury",
       "msg": "Treasury address does not match"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "InvalidAdmin",
       "msg": "Admin does not match"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "InvalidTreasuryAuthority",
       "msg": "Treasury authority does not match"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "ProtocolNotOperational",
       "msg": "Protocol is paused or in reduce-only status"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "ProtocolNotWithdrawable",
       "msg": "Protocol is not in a withdrawable status"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "InvalidVault",
       "msg": "Vault address does not match"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "InvalidVaultDepositor",
       "msg": "Vault depositor does not match"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "InvalidVaultAuthority",
       "msg": "Vault authority does not match"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "InvalidStrategyType",
       "msg": "Strategy type is invalid for this operation"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "VaultNotOperational",
       "msg": "Vault is paused or in reduce-only status"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "VaultNotWithdrawable",
       "msg": "Vault is not in a withdrawable status"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "DepositCapReached",
       "msg": "Deposit cap for the vault has been reached"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "InvalidVaultDestinationTokenAccount",
       "msg": "Vault destination token account does not match"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "InvalidDepositMint",
       "msg": "Deposit mint does not match"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "VaultHasDepositsInStrategies",
       "msg": "Vault cannot be closed until all deposits in strategies are withdrawn"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InvalidSharesAmount",
       "msg": "Shares amount must be greater than zero"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "ExceedsMaxRemovableShares",
       "msg": "Shares to remove exceeds max removable shares"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "ManagerFeeBpsTooHigh",
       "msg": "Sum of manager fee BPS and platform fee BPS cannot exceed 10,000"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "InvalidVaultDepositorAuthority",
       "msg": "Vault depositor authority does not match"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "InvalidVaultDepositorVault",
       "msg": "Vault depositor vault does not match"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "InsufficientShares",
       "msg": "Vault depositor does not have enough shares"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "InvalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "StrategyHasDepositsDeployed",
       "msg": "Strategy cannot be closed until all deposits deployed are withdrawn"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "InvalidDestinationMint",
       "msg": "Destination mint does not match"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "InvalidSourceMint",
       "msg": "Source mint does not match strategy destination mint"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "InvalidUser",
       "msg": "User address does not match"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "InvalidObligationCollateral",
       "msg": "Reserve not found in obligation"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "InvalidObligation",
       "msg": "Obligation address does not match"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "InvalidReserve",
       "msg": "Reserve address does not match"
+    },
+    {
+      "code": 6037,
+      "name": "InvalidPosition",
+      "msg": "Position address does not match"
     }
   ],
   "types": [
+    {
+      "name": "AddLiquidityParameters",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "liquidity_delta",
+            "type": "u128"
+          },
+          {
+            "name": "token_a_amount_threshold",
+            "type": "u64"
+          },
+          {
+            "name": "token_b_amount_threshold",
+            "type": "u64"
+          }
+        ]
+      }
+    },
     {
       "name": "Config",
       "serialization": "bytemuck",
@@ -2300,6 +2600,15 @@
               },
               {
                 "name": "reserve",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "MeteoraDammV2",
+            "fields": [
+              {
+                "name": "position",
                 "type": "pubkey"
               }
             ]
@@ -2707,6 +3016,13 @@
           }
         ]
       }
+    }
+  ],
+  "constants": [
+    {
+      "name": "MAX_BPS",
+      "type": "u16",
+      "value": "10000"
     }
   ]
 }
