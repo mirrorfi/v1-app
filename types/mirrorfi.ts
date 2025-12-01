@@ -428,7 +428,7 @@ export type Mirrorfi = {
       ],
       "args": [
         {
-          "name": "depositMintAmount",
+          "name": "depositAmount",
           "type": "u64"
         }
       ]
@@ -645,10 +645,6 @@ export type Mirrorfi = {
           "name": "collateralTokenProgram"
         },
         {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
           "name": "instructionsSysvar",
           "address": "Sysvar1nstructions1111111111111111111111111"
         },
@@ -839,7 +835,7 @@ export type Mirrorfi = {
           "type": "bytes"
         },
         {
-          "name": "swapInAmount",
+          "name": "amount",
           "type": "u64"
         },
         {
@@ -923,18 +919,10 @@ export type Mirrorfi = {
           "writable": true
         },
         {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
           "name": "liquidityTokenProgram"
         },
         {
           "name": "collateralTokenProgram"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "instructionsSysvar"
@@ -2099,7 +2087,7 @@ export type Mirrorfi = {
       ],
       "args": [
         {
-          "name": "receiptMintAmount",
+          "name": "sharesToRemove",
           "type": "u64"
         }
       ]
@@ -2396,10 +2384,16 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "admin",
+            "docs": [
+              "Authority allowed to update config parameters."
+            ],
             "type": "pubkey"
           },
           {
             "name": "treasuryAuthority",
+            "docs": [
+              "Authority allowed to withdraw from treasury token accounts."
+            ],
             "type": "pubkey"
           },
           {
@@ -2412,24 +2406,36 @@ export type Mirrorfi = {
           {
             "name": "platformPerformanceFeeBps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark in basis points."
+              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
             ],
             "type": "u16"
           },
           {
             "name": "platformDepositFeeBps",
+            "docs": [
+              "Fee taken on deposits into vaults, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platformWithdrawalFeeBps",
+            "docs": [
+              "Fee taken on withdrawals from vaults, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platformReferralFeeBps",
+            "docs": [
+              "INACTIVE - Fee taken on platform fees that will go to referrers, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "status",
+            "docs": [
+              "Determines operational status of the protocol."
+            ],
             "type": {
               "defined": {
                 "name": "protocolStatus"
@@ -2462,7 +2468,7 @@ export type Mirrorfi = {
         "kind": "struct",
         "fields": [
           {
-            "name": "platformComissionFeeBps",
+            "name": "platformPerformanceFeeBps",
             "type": "u16"
           },
           {
@@ -2546,17 +2552,23 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "vault",
+            "docs": [
+              "The vault this strategy belongs to."
+            ],
             "type": "pubkey"
           },
           {
             "name": "depositsDeployed",
             "docs": [
-              "Total deposits deployed to the strategy."
+              "Total deposits deployed to the strategy, denoted in the vault's deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "id",
+            "docs": [
+              "ID unique to the strategy within the vault."
+            ],
             "type": "u8"
           },
           {
@@ -2574,6 +2586,9 @@ export type Mirrorfi = {
           },
           {
             "name": "strategyType",
+            "docs": [
+              "Details about the underlying protocol and action of the strategy."
+            ],
             "type": {
               "defined": {
                 "name": "strategyType"
@@ -2722,6 +2737,9 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "authority",
+            "docs": [
+              "Authority of the user account."
+            ],
             "type": "pubkey"
           },
           {
@@ -2742,14 +2760,23 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "id",
+            "docs": [
+              "Unique vault ID."
+            ],
             "type": "u64"
           },
           {
             "name": "authority",
+            "docs": [
+              "Authority allowed to manage the vault."
+            ],
             "type": "pubkey"
           },
           {
             "name": "name",
+            "docs": [
+              "Name of the vault (utf8 bytes, padded with 0s)."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -2759,6 +2786,9 @@ export type Mirrorfi = {
           },
           {
             "name": "description",
+            "docs": [
+              "Description of the vault (utf8 bytes, padded with 0s)."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -2788,37 +2818,37 @@ export type Mirrorfi = {
           {
             "name": "depositCap",
             "docs": [
-              "Max deposits accepted."
+              "Max deposits accepted, denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "userDeposits",
             "docs": [
-              "Total user deposits, changes on user deposit/withdraw."
+              "Total user deposits, changes on user deposit/withdraw. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "realizedPnl",
             "docs": [
-              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, deducted on user withdrawals, excluding fees.",
+              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, deducted on user withdrawals, excluding fees. Denoted in deposit mint.",
               "",
-              "Profit is only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
+              "Profit and losses are only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
             ],
             "type": "i64"
           },
           {
             "name": "depositsInStrategies",
             "docs": [
-              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed."
+              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "lockedProfit",
             "docs": [
-              "Currently locked profit amount."
+              "Currently locked profit amount, denoted in deposit mint."
             ],
             "type": "u64"
           },
@@ -2827,7 +2857,7 @@ export type Mirrorfi = {
             "docs": [
               "Duration over which depositor's share of vault profit cannot be fully withdrawn.",
               "",
-              "A longer duration punishes late depositors attempting to front-run vault profit by depositing late and withdrawing at the earliest."
+              "A longer duration punishes late depositors attempting to front-run vault profits by depositing late and withdrawing at the earliest possible time."
             ],
             "type": "u64"
           },
@@ -2841,26 +2871,29 @@ export type Mirrorfi = {
           {
             "name": "totalShares",
             "docs": [
-              "Total deposit shares, changes on user deposit."
+              "Total deposit shares, changes on user deposits and withdrawals."
             ],
             "type": "u64"
           },
           {
             "name": "unclaimedManagerFee",
             "docs": [
-              "Claimable manager fees, accrues on profitable strategy exits."
+              "Claimable manager fees, accrues on profitable strategy exits. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "performanceFeeBps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark in basis points."
+              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
             ],
             "type": "u16"
           },
           {
             "name": "status",
+            "docs": [
+              "Determines operational status of the vault."
+            ],
             "type": {
               "defined": {
                 "name": "vaultStatus"
@@ -2870,7 +2903,7 @@ export type Mirrorfi = {
           {
             "name": "nextStrategyId",
             "docs": [
-              "Strategy ID, increments with each new strategy."
+              "Next strategy ID, increments with each new strategy."
             ],
             "type": "u8"
           },
@@ -2890,7 +2923,7 @@ export type Mirrorfi = {
           {
             "name": "assetPerShare",
             "docs": [
-              "Last recorded asset per share."
+              "Last recorded asset (deposit mint) per share."
             ],
             "type": {
               "defined": {
@@ -2934,16 +2967,22 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "authority",
+            "docs": [
+              "Authority of the depositor."
+            ],
             "type": "pubkey"
           },
           {
             "name": "vault",
+            "docs": [
+              "The vault this depositor is associated with."
+            ],
             "type": "pubkey"
           },
           {
             "name": "shares",
             "docs": [
-              "Total shares of the vault owned by the depositor."
+              "Total shares of the vault owned by the depositor, denoted in the vault's deposit mint."
             ],
             "type": "u64"
           },

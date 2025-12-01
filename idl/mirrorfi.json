@@ -422,7 +422,7 @@
       ],
       "args": [
         {
-          "name": "deposit_mint_amount",
+          "name": "deposit_amount",
           "type": "u64"
         }
       ]
@@ -639,10 +639,6 @@
           "name": "collateral_token_program"
         },
         {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
           "name": "instructions_sysvar",
           "address": "Sysvar1nstructions1111111111111111111111111"
         },
@@ -833,7 +829,7 @@
           "type": "bytes"
         },
         {
-          "name": "swap_in_amount",
+          "name": "amount",
           "type": "u64"
         },
         {
@@ -917,18 +913,10 @@
           "writable": true
         },
         {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        },
-        {
           "name": "liquidity_token_program"
         },
         {
           "name": "collateral_token_program"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "instructions_sysvar"
@@ -2093,7 +2081,7 @@
       ],
       "args": [
         {
-          "name": "receipt_mint_amount",
+          "name": "shares_to_remove",
           "type": "u64"
         }
       ]
@@ -2390,10 +2378,16 @@
         "fields": [
           {
             "name": "admin",
+            "docs": [
+              "Authority allowed to update config parameters."
+            ],
             "type": "pubkey"
           },
           {
             "name": "treasury_authority",
+            "docs": [
+              "Authority allowed to withdraw from treasury token accounts."
+            ],
             "type": "pubkey"
           },
           {
@@ -2406,24 +2400,36 @@
           {
             "name": "platform_performance_fee_bps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark in basis points."
+              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
             ],
             "type": "u16"
           },
           {
             "name": "platform_deposit_fee_bps",
+            "docs": [
+              "Fee taken on deposits into vaults, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platform_withdrawal_fee_bps",
+            "docs": [
+              "Fee taken on withdrawals from vaults, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platform_referral_fee_bps",
+            "docs": [
+              "INACTIVE - Fee taken on platform fees that will go to referrers, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "status",
+            "docs": [
+              "Determines operational status of the protocol."
+            ],
             "type": {
               "defined": {
                 "name": "ProtocolStatus"
@@ -2456,7 +2462,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "platform_comission_fee_bps",
+            "name": "platform_performance_fee_bps",
             "type": "u16"
           },
           {
@@ -2540,17 +2546,23 @@
         "fields": [
           {
             "name": "vault",
+            "docs": [
+              "The vault this strategy belongs to."
+            ],
             "type": "pubkey"
           },
           {
             "name": "deposits_deployed",
             "docs": [
-              "Total deposits deployed to the strategy."
+              "Total deposits deployed to the strategy, denoted in the vault's deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "id",
+            "docs": [
+              "ID unique to the strategy within the vault."
+            ],
             "type": "u8"
           },
           {
@@ -2568,6 +2580,9 @@
           },
           {
             "name": "strategy_type",
+            "docs": [
+              "Details about the underlying protocol and action of the strategy."
+            ],
             "type": {
               "defined": {
                 "name": "StrategyType"
@@ -2716,6 +2731,9 @@
         "fields": [
           {
             "name": "authority",
+            "docs": [
+              "Authority of the user account."
+            ],
             "type": "pubkey"
           },
           {
@@ -2736,14 +2754,23 @@
         "fields": [
           {
             "name": "id",
+            "docs": [
+              "Unique vault ID."
+            ],
             "type": "u64"
           },
           {
             "name": "authority",
+            "docs": [
+              "Authority allowed to manage the vault."
+            ],
             "type": "pubkey"
           },
           {
             "name": "name",
+            "docs": [
+              "Name of the vault (utf8 bytes, padded with 0s)."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -2753,6 +2780,9 @@
           },
           {
             "name": "description",
+            "docs": [
+              "Description of the vault (utf8 bytes, padded with 0s)."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -2782,37 +2812,37 @@
           {
             "name": "deposit_cap",
             "docs": [
-              "Max deposits accepted."
+              "Max deposits accepted, denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "user_deposits",
             "docs": [
-              "Total user deposits, changes on user deposit/withdraw."
+              "Total user deposits, changes on user deposit/withdraw. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "realized_pnl",
             "docs": [
-              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, deducted on user withdrawals, excluding fees.",
+              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, deducted on user withdrawals, excluding fees. Denoted in deposit mint.",
               "",
-              "Profit is only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
+              "Profit and losses are only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
             ],
             "type": "i64"
           },
           {
             "name": "deposits_in_strategies",
             "docs": [
-              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed."
+              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "locked_profit",
             "docs": [
-              "Currently locked profit amount."
+              "Currently locked profit amount, denoted in deposit mint."
             ],
             "type": "u64"
           },
@@ -2821,7 +2851,7 @@
             "docs": [
               "Duration over which depositor's share of vault profit cannot be fully withdrawn.",
               "",
-              "A longer duration punishes late depositors attempting to front-run vault profit by depositing late and withdrawing at the earliest."
+              "A longer duration punishes late depositors attempting to front-run vault profits by depositing late and withdrawing at the earliest possible time."
             ],
             "type": "u64"
           },
@@ -2835,26 +2865,29 @@
           {
             "name": "total_shares",
             "docs": [
-              "Total deposit shares, changes on user deposit."
+              "Total deposit shares, changes on user deposits and withdrawals."
             ],
             "type": "u64"
           },
           {
             "name": "unclaimed_manager_fee",
             "docs": [
-              "Claimable manager fees, accrues on profitable strategy exits."
+              "Claimable manager fees, accrues on profitable strategy exits. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "performance_fee_bps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark in basis points."
+              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
             ],
             "type": "u16"
           },
           {
             "name": "status",
+            "docs": [
+              "Determines operational status of the vault."
+            ],
             "type": {
               "defined": {
                 "name": "VaultStatus"
@@ -2864,7 +2897,7 @@
           {
             "name": "next_strategy_id",
             "docs": [
-              "Strategy ID, increments with each new strategy."
+              "Next strategy ID, increments with each new strategy."
             ],
             "type": "u8"
           },
@@ -2884,7 +2917,7 @@
           {
             "name": "asset_per_share",
             "docs": [
-              "Last recorded asset per share."
+              "Last recorded asset (deposit mint) per share."
             ],
             "type": {
               "defined": {
@@ -2928,16 +2961,22 @@
         "fields": [
           {
             "name": "authority",
+            "docs": [
+              "Authority of the depositor."
+            ],
             "type": "pubkey"
           },
           {
             "name": "vault",
+            "docs": [
+              "The vault this depositor is associated with."
+            ],
             "type": "pubkey"
           },
           {
             "name": "shares",
             "docs": [
-              "Total shares of the vault owned by the depositor."
+              "Total shares of the vault owned by the depositor, denoted in the vault's deposit mint."
             ],
             "type": "u64"
           },
