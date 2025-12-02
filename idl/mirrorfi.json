@@ -2649,6 +2649,12 @@
             }
           },
           {
+            "name": "platform_deposit_fee_bps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
             "name": "platform_withdrawal_fee_bps",
             "type": {
               "option": "u16"
@@ -2877,9 +2883,9 @@
             "type": "u64"
           },
           {
-            "name": "performance_fee_bps",
+            "name": "manager_fee_bps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
+              "Fee taken from eligble profits above previous high water mark that goes to vault managers, denoted in basis points."
             ],
             "type": "u16"
           },

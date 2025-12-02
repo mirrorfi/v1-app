@@ -125,7 +125,7 @@ export interface ParsedVault extends ParsedProgramAccount {
   lastProfitLockTs: i64;
   totalShares: i64;
   unclaimedManagerFee: u64;
-  performanceFeeBps: u16;
+  managerFeeBps: u16;
   status: ParsedVaultStatus;
   nextStrategyId: u8;
   assetPerShare: WrappedI80F48;
@@ -187,7 +187,7 @@ export function parseVault({
   lastProfitLockTs,
   totalShares,
   unclaimedManagerFee,
-  performanceFeeBps,
+  managerFeeBps,
   status,
   nextStrategyId,
   id,
@@ -208,7 +208,7 @@ export function parseVault({
     lastProfitLockTs: parseBN(lastProfitLockTs),
     totalShares: parseBN(totalShares),
     unclaimedManagerFee: parseBN(unclaimedManagerFee),
-    performanceFeeBps,
+    managerFeeBps,
     status: parseEnum<ParsedVaultStatus>(status),
     nextStrategyId,
     id: parseBN(id),

@@ -2655,6 +2655,12 @@ export type Mirrorfi = {
             }
           },
           {
+            "name": "platformDepositFeeBps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
             "name": "platformWithdrawalFeeBps",
             "type": {
               "option": "u16"
@@ -2883,9 +2889,9 @@ export type Mirrorfi = {
             "type": "u64"
           },
           {
-            "name": "performanceFeeBps",
+            "name": "managerFeeBps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
+              "Fee taken from eligble profits above previous high water mark that goes to vault managers, denoted in basis points."
             ],
             "type": "u16"
           },

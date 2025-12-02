@@ -63,7 +63,7 @@ export default function VaultPage() {
       lastProfitLockTs: vaultBalanceData.lastProfitLockTs,
       totalShares: vaultBalanceData.totalShares,
       unclaimedManagerFee: vaultBalanceData.unclaimedManagerFee,
-      performanceFeeBps: vaultBalanceData.performanceFeeBps,
+      managerFeeBps: vaultBalanceData.performanceFeeBps,
       status: vaultBalanceData.status,
       nextStrategyId: vaultBalanceData.nextStrategyId,
       publicKey: vaultKey.toBase58(),
