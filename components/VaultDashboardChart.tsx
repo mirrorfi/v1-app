@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TrendingUp, DollarSign, BarChart3, ChartNoAxesCombined } from "lucide-react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 
-import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Dot, ReferenceLine } from "recharts"
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
 import { getChartData, ChartDataItem } from "@/lib/utils/chartData"
 
 // Define types for data selection
-type DataType = "APY History" | "Share Price" | "Vault NAV"
-type TimeFrame = "24H" | "7D" | "30D" | "90D"
+export type DataType = "TokenNav" | "UsdNav" | "UserDeposits"
+export type TimeFrame = "24H" | "7D" | "30D" | "90D"
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -24,41 +24,53 @@ const CustomTooltip = ({ active, payload, label, dataType }: CustomTooltipProps)
     const data = payload[0].payload
     const value = payload[0].value
     
+    console.log("Tooltip data:", data, value);
+
     // Format value based on data type
     const formattedValue = (() => {
       switch(dataType) {
-        case "APY History":
-          return `${value.toFixed(2)}%`
-        case "Share Price":
-          return `$${value.toFixed(3)}`
-        case "Vault NAV":
-          if (value >= 1000000) {
-            return `$${(value / 1000000).toFixed(2)}M`
-          } else if (value >= 1000) {
-            return `$${(value / 1000).toFixed(1)}k`
-          } else {
-            return `$${value.toFixed(0)}`
-          }
+        case "TokenNav":
+          // Token NAV in USDC
+          return `${value.toLocaleString('en-US', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 6
+          })} USDC`
+        case "UsdNav":
+          // USD NAV as dollar value
+          return `$${value.toLocaleString('en-US', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 6
+          })}`
+        case "UserDeposits":
+          // User deposits (token amount)
+          return `${value.toLocaleString('en-US', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 6
+          })}`
         default:
           return `${value}`
       }
     })()
     
+    const formattedTimestamp = (() => {
+      return new Date(data.timestamp).toLocaleString('en-US', { 
+        year: 'numeric', 
+        month: 'short',
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: 'numeric',
+        hour12: true 
+      })
+    })()
+
+
+
     return (
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-lg">
-        <div className="text-sm text-slate-400">{data.fullDate}</div>
+        <div>{formattedTimestamp}</div>
         <div className="text-emerald-400 font-semibold">{formattedValue}</div>
       </div>
     )
-  }
-  return null
-}
-
-const CustomDot = (props: any) => {
-  const { cx, cy, payload } = props
-  // Check if payload exists and has isActive property
-  if (payload && payload.isActive) {
-    return <Dot cx={cx} cy={cy} r={4} fill="#10b981" stroke="#1e293b" strokeWidth={2} />
   }
   return null
 }
@@ -69,80 +81,120 @@ interface VaultDashboardChartProps {
 
 export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [selectedDataType, setSelectedDataType] = useState<DataType>("Share Price")
+  const [selectedDataType, setSelectedDataType] = useState<DataType>("TokenNav")
   const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("24H")
   const [data, setData] = useState<ChartDataItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Fetch real data when vault address, data type, or timeframe changes
+  // Memoize fetchData to prevent recreation on every render
+  const fetchData = useCallback(async ({
+    vaultAddress,
+    selectedDataType,
+    selectedTimeframe,
+    updateData = false
+  }: {
+    vaultAddress: string;
+    selectedDataType: DataType;
+    selectedTimeframe: TimeFrame;
+    updateData?: boolean;
+  }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const chartData = await getChartData(vaultAddress, selectedDataType, selectedTimeframe, updateData);
+      setData(chartData);
+    } catch (err) {
+      console.error('Error fetching chart data:', err);
+      setError('Failed to load chart data');
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []); // No dependencies needed since we pass all values as parameters
+
+  // Track previous values to detect what changed
+  const prevVaultRef = useRef(vaultAddress);
+  const prevTimeframeRef = useRef(selectedTimeframe);
+  const prevDataTypeRef = useRef(selectedDataType);
+
+  // Single unified useEffect for all data fetching logic
   useEffect(() => {
     if (!vaultAddress) {
-      // Clear data when no vault address is provided
-      setData([])
+      setData([]);
       return;
     }
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const chartData = await getChartData(vaultAddress, selectedDataType, selectedTimeframe);
-        setData(chartData);
-      } catch (err) {
-        console.error('Error fetching chart data:', err);
-        setError('Failed to load chart data');
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Determine if we need to fetch fresh data from API
+    const vaultChanged = prevVaultRef.current !== vaultAddress;
+    const timeframeChanged = prevTimeframeRef.current !== selectedTimeframe;
+    const dataTypeChanged = prevDataTypeRef.current !== selectedDataType;
 
-    fetchData();
-  }, [vaultAddress, selectedDataType, selectedTimeframe])
-  
-  // Determine stroke and fill colors based on final value
-  const getChartColors = () => {
-    if (data.length === 0) {
-      return {
-        stroke: "#10b981", 
-        fill: "url(#colorValuePositive)"
-      }
-    }
+    // Update refs for next render
+    prevVaultRef.current = vaultAddress;
+    prevTimeframeRef.current = selectedTimeframe;
+    prevDataTypeRef.current = selectedDataType;
+
+    // Fetch fresh data if vault or timeframe changed
+    // Use cached data if only data type changed
+    const shouldFetchFresh = vaultChanged || timeframeChanged;
     
-    // Get the final (last) value in the dataset
-    const finalValue = data[data.length - 1].value
-    
-    if (finalValue < 0) {
-      return {
-        stroke: "#ef4444",
-        fill: "url(#colorValueNegative)"
-      }
-    }
-    
-    return {
-      stroke: "#10b981", 
-      fill: "url(#colorValuePositive)"
-    }
-  }
-  
-  const chartColors = getChartColors()
+    fetchData({
+      vaultAddress,
+      selectedDataType,
+      selectedTimeframe,
+      updateData: shouldFetchFresh
+    });
+
+    // Set up interval for auto-refresh (only refetches, doesn't change selection)
+    const interval = setInterval(() => {
+      fetchData({
+        vaultAddress,
+        selectedDataType,
+        selectedTimeframe,
+        updateData: true
+      });
+    }, 60000); // 60,000 ms = 1 minute
+
+    // Cleanup interval when dependencies change or component unmounts
+    return () => clearInterval(interval);
+  }, [vaultAddress, selectedDataType, selectedTimeframe, fetchData]);
 
   // Get appropriate unit formatter based on data type
   const getYAxisFormatter = (dataType: DataType) => {
     switch(dataType) {
-      case "APY History":
-        return (value: number) => `${value}%`
-      case "Share Price":
-        return (value: number) => `$${value.toFixed(3)}`
-      case "Vault NAV":
+      case "TokenNav":
+        // Format token NAV with appropriate scale (USDC)
+        return (value: number) => {
+          if (value >= 1000000) {
+            return `${(value / 1000000).toFixed(1)}M`
+          } else if (value >= 1000) {
+            return `${(value / 1000).toFixed(0)}k`
+          } else {
+            return `${value.toFixed(2)}`
+          }
+        }
+      case "UsdNav":
+        // Format USD NAV as dollar value with appropriate scale
         return (value: number) => {
           if (value >= 1000000) {
             return `$${(value / 1000000).toFixed(1)}M`
           } else if (value >= 1000) {
             return `$${(value / 1000).toFixed(0)}k`
           } else {
-            return `$${value.toFixed(0)}`
+            return `$${value.toFixed(2)}`
+          }
+        }
+      case "UserDeposits":
+        // Format user deposits (token amount)
+        return (value: number) => {
+          if (value >= 1000000) {
+            return `${(value / 1000000).toFixed(1)}M`
+          } else if (value >= 1000) {
+            return `${(value / 1000).toFixed(0)}k`
+          } else {
+            return `${value.toFixed(2)}`
           }
         }
       default:
@@ -158,25 +210,11 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
     const values = data.map(item => item.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
-    
-    // For Share Price and Vault NAV, start from 0 (not normalized)
-    if (dataType === "Vault NAV") {
-      return [0, max]; // Always start from 0 to show full scale
-    }
-    
-    // For APY History, use normalized range to emphasize fluctuations
     const range = max - min;
-    const avgValue = (max + min) / 2;
     
-    if (range < Math.abs(avgValue) * 0.05) { // If range is less than 5% of average value
-      // Create a domain that's centered on the average with at least ±2.5% range
-      const buffer = Math.max(Math.abs(avgValue) * 0.025, range);
-      return [min - buffer, max + buffer];
-    }
-    
-    // Add a small buffer on top and bottom for better visualization
-    const buffer = range * 0.1;
-    return [min, max + buffer];
+    // Add 20% padding on both sides for a centered, stable view
+    const padding = range > 0 ? range * 0.2 : max * 0.1;
+    return [Math.max(0, min - padding), max + padding];
   }
   
   // Calculate the y-axis domain based on current data
@@ -186,12 +224,12 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   // Get appropriate icon based on data type
   const getDataTypeIcon = (dataType: DataType) => {
     switch(dataType) {
-      case "APY History":
-        return <TrendingUp className="h-4 w-4" />
-      case "Share Price":
-        return <DollarSign className="h-4 w-4" />
-      case "Vault NAV":
+      case "TokenNav":
         return <BarChart3 className="h-4 w-4" />
+      case "UsdNav":
+        return <DollarSign className="h-4 w-4" />
+      case "UserDeposits":
+        return <TrendingUp className="h-4 w-4" />
       default:
         return <TrendingUp className="h-4 w-4" />
     }
@@ -200,25 +238,25 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   // Get title based on data type
   const getChartTitle = (dataType: DataType) => {
     switch(dataType) {
-      case "APY History":
-        return "Yield Performance"
-      case "Share Price":
-        return "Share Value"
-      case "Vault NAV":
-        return "Total Value"
+      case "TokenNav":
+        return "Token NAV (USDC)"
+      case "UsdNav":
+        return "USD NAV"
+      case "UserDeposits":
+        return "User Deposits (USDC)"
       default:
         return "Statistics"
     }
   }
 
   return (
-    <Card className={`bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
+    <Card className={`bg-linear-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
       <CardHeader className="pb-2">
         {/* Data type and timeframe selector row */}
         <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2">
           {/* Data type selector */}
           <div className="flex gap-1 overflow-x-auto">
-            {(["Share Price", "Vault NAV"] as const).map((dataType) => (
+            {(["TokenNav", "UsdNav", "UserDeposits"] as const).map((dataType) => (
               <Button
                 key={dataType}
                 variant={selectedDataType === dataType ? "default" : "outline"}
@@ -227,7 +265,9 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 className={`text-xs whitespace-nowrap ${selectedDataType === dataType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
               >
                 <span className="hidden sm:inline">{getDataTypeIcon(dataType)}</span>
-                <span className={selectedDataType === dataType ? "ml-1" : ""}>{dataType}</span>
+                <span className={selectedDataType === dataType ? "ml-1" : ""}>
+                  {dataType === "TokenNav" ? "Token NAV" : dataType === "UsdNav" ? "USD NAV" : "Deposits"}
+                </span>
               </Button>
             ))}
           </div>
@@ -263,7 +303,6 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              {selectedDataType === "APY History" ? (
               <AreaChart
                 data={data}
                 onMouseMove={(e: any) => {
@@ -274,17 +313,21 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 onMouseLeave={() => setActiveIndex(null)}
               >
                 <defs>
-                  <linearGradient id="colorValuePositive" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorValueNegative" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="50%" stopColor="#10b981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
+                <CartesianGrid 
+                  strokeDasharray="3 3" 
+                  stroke="#334155" 
+                  opacity={0.3}
+                  horizontal={true}
+                  vertical={false}
+                />
                 <XAxis 
-                  dataKey="date" 
+                  dataKey="X-Axis" 
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: "#64748b", fontSize: 12 }} 
@@ -296,9 +339,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                   tickFormatter={getYAxisFormatter(selectedDataType)}
                   domain={yAxisDomain}
                   allowDataOverflow={false}
-                  padding={{ bottom: 10 }}
                 />
-                <ReferenceLine y={0} stroke="#64748b" strokeDasharray="2 2" strokeOpacity={0.5} />
                 <Tooltip
                   content={(props) => <CustomTooltip {...props} dataType={selectedDataType} />}
                   cursor={{
@@ -310,65 +351,19 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke={chartColors.stroke}
-                  strokeWidth={2}
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  fill="url(#colorValue)"
                   fillOpacity={1}
-                  fill={chartColors.fill}
+                  dot={false}
                   activeDot={{
-                    r: 4,
-                    fill: chartColors.stroke,
+                    r: 5,
+                    fill: "#10b981",
                     stroke: "#1e293b",
                     strokeWidth: 2,
                   }}
                 />
               </AreaChart>
-            ) : (
-              <LineChart
-                data={data}
-                onMouseMove={(e: any) => {
-                  if (e && e.activeTooltipIndex !== undefined) {
-                    setActiveIndex(e.activeTooltipIndex)
-                  }
-                }}
-                onMouseLeave={() => setActiveIndex(null)}
-              >
-                <XAxis 
-                  dataKey="date" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: "#64748b", fontSize: 12 }} 
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  tickFormatter={getYAxisFormatter(selectedDataType)}
-                  domain={yAxisDomain}
-                  allowDataOverflow={false}
-                />
-                <Tooltip
-                  content={(props) => <CustomTooltip {...props} dataType={selectedDataType} />}
-                  cursor={{
-                    stroke: "#64748b",
-                    strokeWidth: 1,
-                    strokeDasharray: "4 4",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke={chartColors.stroke}
-                  strokeWidth={3}
-                  dot={false}
-                  activeDot={{
-                    r: 5,
-                    fill: chartColors.stroke,
-                    stroke: "#1e293b",
-                    strokeWidth: 2,
-                  }}
-                />
-              </LineChart>
-            )}
             </ResponsiveContainer>
           )}
         </div>
