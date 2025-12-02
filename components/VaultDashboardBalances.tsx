@@ -82,16 +82,16 @@ function SkeletonCategorySection() {
 }
 
 // KPI Card component
-function KPICard({ title, value, icon: Icon, color = "blue" }: { 
-  title: string; 
-  value: string; 
-  icon: any; 
-  color?: "blue" | "green" | "purple" 
+function KPICard({ title, value, icon: Icon, color = "blue" }: {
+  title: string;
+  value: string;
+  icon: any;
+  color?: "blue" | "green" | "purple"
 }) {
   const isMobile = useIsMobile();
   const colorClasses = {
     blue: "from-blue-900/20 to-blue-800/10 border-blue-700/30 text-blue-400",
-    green: "from-green-900/20 to-green-800/10 border-green-700/30 text-green-400", 
+    green: "from-green-900/20 to-green-800/10 border-green-700/30 text-green-400",
     purple: "from-purple-900/20 to-purple-800/10 border-purple-700/30 text-purple-400"
   };
 
@@ -123,7 +123,7 @@ function ErrorState() {
   );
 }
 
-function EmptyState({vault}: {vault?: string}) {
+function EmptyState({ vault }: { vault?: string }) {
   const router = useRouter();
   const openDepositPage = () => {
     router.push(`/vault/${vault}`);
@@ -134,15 +134,15 @@ function EmptyState({vault}: {vault?: string}) {
       <h3 className="text-lg font-medium text-white mb-1">No balance data available</h3>
       <p className="text-sm text-slate-400 max-w-xs">There are no active positions in this vault. Create a position or deposit to vault to see balance data.</p>
       {vault &&
-      <Button onClick={openDepositPage} variant="outline" className="mt-4 bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm">
-        Deposit to Vault
-      </Button>}
+        <Button onClick={openDepositPage} variant="outline" className="mt-4 bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm">
+          Deposit to Vault
+        </Button>}
     </div>
   );
 }
 
-export function VaultDashboardBalances({ depositData, strategiesData, isLoading, isManager=false, vaultData }: VaultDashboardBalancesProps) {
-  const { publicKey, signTransaction } = useWallet();
+export function VaultDashboardBalances({ depositData, strategiesData, isLoading, isManager = false, vaultData }: VaultDashboardBalancesProps) {
+  const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const { showNotification } = useNotification();
   const [totalValue, setTotalValue] = useState<number>(0);
@@ -185,12 +185,12 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
     setIsCreateStrategy(true);
   };
 
-  const handleOpenJupiter = (action:string, strategyData:any) => {
+  const handleOpenJupiter = (action: string, strategyData: any) => {
     setIsOpenJupiter(action);
     setOpenStrategyData(strategyData);
   };
-  const handleCloseJupiter = () => {setIsOpenJupiter("");}
-  const handleCloseDAMM = () => {setIsOpenDAMM("");}
+  const handleCloseJupiter = () => { setIsOpenJupiter(""); }
+  const handleCloseDAMM = () => { setIsOpenDAMM(""); }
 
   const handleCloseCreateStrategy = () => {
     setIsCreateStrategy(false);
@@ -203,13 +203,13 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
     }
   }
 
-  const handleCloseVault = async() => {
+  const handleCloseVault = async () => {
     if (!vaultData) return;
-    if (!publicKey || !signTransaction) {
+    if (!publicKey || !sendTransaction) {
       alert("Please connect your wallet")
       return
     }
-    if(publicKey.toBase58() !== vaultData.authority) {
+    if (publicKey.toBase58() !== vaultData.authority) {
       alert("Only the vault manager can close the vault.")
       return
     }
@@ -217,18 +217,10 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
       authority: publicKey.toBase58(),
       vault: vaultData.publicKey,
     });
-    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+    const { blockhash } = await connection.getLatestBlockhash();
     versionedTx.message.recentBlockhash = blockhash;
-    const signedTx = await signTransaction(versionedTx);
-    const txid = await connection.sendRawTransaction(signedTx.serialize());
-    await connection.confirmTransaction(
-      {
-        signature: txid,
-        blockhash: blockhash,
-        lastValidBlockHeight: lastValidBlockHeight,
-      },
-      "confirmed"
-    );
+    const txid = await sendTransaction(versionedTx, connection);
+    await connection.confirmTransaction(txid);
     console.log("Transaction ID:", txid);
 
     showNotification({
@@ -266,84 +258,84 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
         ) : (
           /* Data Loaded State */
           <>
-          {isMobile?<div className="py-1">Vault Positions</div>:""}
-          {/* KPI Cards Row */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
-            <KPICard 
-              title={isMobile? "NAV" : "Total NAV:"} 
-              value={`$${totalValue.toFixed(2)}`} 
-              icon={DollarSign} 
-              color="blue" 
-            />
-            <KPICard 
-              title={isMobile? "Strategies" : "Total Strategies:"} 
-              value={strategiesData.length.toString()} 
-              icon={Target} 
-              color="purple" 
-            />
-            <KPICard 
-              title={isMobile? "Est. APY" : "Estimated Yield:"} 
-              value={`${estimatedYield.toFixed(2)}%`} 
-              icon={TrendingUp} 
-              color="green" 
-            />
-          </div>
-          
-          {/* Add New Strategy Button - Only for Managers */}
-          {isManager && (
-            vaultData.userDeposits > 0 ?
-            <div className="flex justify-end mb-4">
-              <Button 
-                variant="outline" 
-                onClick={handleOpenCreateModal}
-                className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add New Strategy
-              </Button>
+            {isMobile ? <div className="py-1">Vault Positions</div> : ""}
+            {/* KPI Cards Row */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+              <KPICard
+                title={isMobile ? "NAV" : "Total NAV:"}
+                value={`$${totalValue.toFixed(2)}`}
+                icon={DollarSign}
+                color="blue"
+              />
+              <KPICard
+                title={isMobile ? "Strategies" : "Total Strategies:"}
+                value={strategiesData.length.toString()}
+                icon={Target}
+                color="purple"
+              />
+              <KPICard
+                title={isMobile ? "Est. APY" : "Estimated Yield:"}
+                value={`${estimatedYield.toFixed(2)}%`}
+                icon={TrendingUp}
+                color="green"
+              />
             </div>
-            :
-            <div className="flex justify-between mb-4">
-              <Button 
-                variant="outline" 
-                onClick={handleCloseVault}
-                className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Close Vault
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleOpenCreateModal}
-                className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add New Strategy
-              </Button>
-            </div>
-          )}
-          
-          {/* Strategy Cards */}
-          <div className="space-y-4">
-            {depositData && (
-              <div>
-              {isManager ? 
-                <StrategyCardManager strategyData={depositData} handleOpenStrategy={handleOpenStrategy} />
-               : (
-                <StrategyCard strategyData={depositData} />
-              )}
-              </div>
+
+            {/* Add New Strategy Button - Only for Managers */}
+            {isManager && (
+              vaultData.userDeposits > 0 ?
+                <div className="flex justify-end mb-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenCreateModal}
+                    className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Strategy
+                  </Button>
+                </div>
+                :
+                <div className="flex justify-between mb-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleCloseVault}
+                    className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Close Vault
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenCreateModal}
+                    className="bg-transparent border-slate-600/30 text-slate-300 hover:bg-white/10 hover:text-white hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-lg backdrop-blur-sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Strategy
+                  </Button>
+                </div>
             )}
-            {strategiesData.map((strategy, idx) => (
-              <div key={`strategy-${idx}`}>
-                {isManager ? (
-                  <StrategyCardManager key={`strategy-${idx}`} strategyData={strategy} handleOpenStrategy={handleOpenStrategy} />
-                ) : (
-                  <StrategyCard key={`strategy-${idx}`} strategyData={strategy} />
-                )}
-              </div>
-            ))}
-          </div>
+
+            {/* Strategy Cards */}
+            <div className="space-y-4">
+              {depositData && (
+                <div>
+                  {isManager ?
+                    <StrategyCardManager strategyData={depositData} handleOpenStrategy={handleOpenStrategy} />
+                    : (
+                      <StrategyCard strategyData={depositData} />
+                    )}
+                </div>
+              )}
+              {strategiesData.map((strategy, idx) => (
+                <div key={`strategy-${idx}`}>
+                  {isManager ? (
+                    <StrategyCardManager key={`strategy-${idx}`} strategyData={strategy} handleOpenStrategy={handleOpenStrategy} />
+                  ) : (
+                    <StrategyCard key={`strategy-${idx}`} strategyData={strategy} />
+                  )}
+                </div>
+              ))}
+            </div>
           </>
         )}
       </CardContent>
@@ -359,7 +351,7 @@ export function VaultDashboardBalances({ depositData, strategiesData, isLoading,
         action={isOpenJupiter}
         onClose={handleCloseJupiter}
         strategyData={openStrategyData}
-        depositData={depositData} 
+        depositData={depositData}
         vaultData={vaultData}
       />
       <MeteoraDAMMModal

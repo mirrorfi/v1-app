@@ -1,16 +1,6 @@
 import { VersionedTransaction } from "@solana/web3.js";
-import { base64ToV0Tx, v0TxToBase64, wrappedFetch } from "../utils"
+import { base64ToV0Tx, wrappedFetch } from "../utils"
 import { BigIntString } from "@/types/accounts";
-
-export async function sendTx(
-  transaction: VersionedTransaction
-): Promise<string> {
-  const { signature } = await wrappedFetch("/api/send-transaction", "POST", {
-    transaction: v0TxToBase64(transaction),
-  });
-
-  return signature;
-}
 
 export async function getCloseStrategyTx({
   authority,
