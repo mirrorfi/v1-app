@@ -104,6 +104,8 @@ export default function VaultPage() {
       status: vaultBalanceData.status,
       nextStrategyId: vaultBalanceData.nextStrategyId,
       publicKey: vaultKey.toBase58(),
+      assetPerShare: vaultBalanceData.assetPerShare,
+      highWaterMark: vaultBalanceData.highWaterMark,
     }
     setVaultData(vaultData);
     setDepositData(depositData);
