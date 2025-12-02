@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
 
         const strategiesWithNav = await Promise.all(
           strategies.map(async (strategy) => {
-            if (strategy.strategyType.jupiterSwap) {
+            if ("jupiterSwap" in strategy.strategyType) {
               const index = strategy.strategyType.jupiterSwap.targetMint;
               const tokenInfo = (await getJupiterTokenInfos([index]))[index];
               const tokenProgram = new PublicKey(tokenInfo.tokenProgram);
