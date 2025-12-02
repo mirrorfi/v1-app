@@ -428,7 +428,7 @@ export type Mirrorfi = {
       ],
       "args": [
         {
-          "name": "depositMintAmount",
+          "name": "depositAmount",
           "type": "u64"
         }
       ]
@@ -645,10 +645,6 @@ export type Mirrorfi = {
           "name": "collateralTokenProgram"
         },
         {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
           "name": "instructionsSysvar",
           "address": "Sysvar1nstructions1111111111111111111111111"
         },
@@ -673,6 +669,93 @@ export type Mirrorfi = {
         {
           "name": "initFarm",
           "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "executeStrategyMeteoraDammV2",
+      "discriminator": [
+        202,
+        101,
+        186,
+        114,
+        96,
+        43,
+        138,
+        69
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "strategy",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true
+        },
+        {
+          "name": "eventAuthority"
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "vaultTokenAAccount",
+          "writable": true
+        },
+        {
+          "name": "vaultTokenBAccount",
+          "writable": true
+        },
+        {
+          "name": "poolTokenAAccount",
+          "writable": true
+        },
+        {
+          "name": "poolTokenBAccount",
+          "writable": true
+        },
+        {
+          "name": "tokenAMint"
+        },
+        {
+          "name": "tokenBMint"
+        },
+        {
+          "name": "positionNftAccount"
+        },
+        {
+          "name": "tokenAProgram"
+        },
+        {
+          "name": "tokenBProgram"
+        },
+        {
+          "name": "cpAmmProgram",
+          "address": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "addLiquidityParameters"
+            }
+          }
         }
       ]
     },
@@ -752,7 +835,7 @@ export type Mirrorfi = {
           "type": "bytes"
         },
         {
-          "name": "swapInAmount",
+          "name": "amount",
           "type": "u64"
         },
         {
@@ -836,18 +919,10 @@ export type Mirrorfi = {
           "writable": true
         },
         {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
           "name": "liquidityTokenProgram"
         },
         {
           "name": "collateralTokenProgram"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "instructionsSysvar"
@@ -869,6 +944,105 @@ export type Mirrorfi = {
         {
           "name": "hasFarm",
           "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "exitStrategyMeteoraDammV2",
+      "discriminator": [
+        252,
+        113,
+        233,
+        217,
+        228,
+        59,
+        121,
+        32
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "strategy",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true
+        },
+        {
+          "name": "eventAuthority"
+        },
+        {
+          "name": "poolAuthority"
+        },
+        {
+          "name": "pool"
+        },
+        {
+          "name": "vaultTokenAAccount",
+          "writable": true
+        },
+        {
+          "name": "vaultTokenBAccount",
+          "writable": true
+        },
+        {
+          "name": "poolTokenAAccount",
+          "writable": true
+        },
+        {
+          "name": "poolTokenBAccount",
+          "writable": true
+        },
+        {
+          "name": "tokenAMint"
+        },
+        {
+          "name": "tokenBMint"
+        },
+        {
+          "name": "positionNftAccount"
+        },
+        {
+          "name": "tokenAProgram"
+        },
+        {
+          "name": "tokenBProgram"
+        },
+        {
+          "name": "treasuryTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "cpAmmProgram",
+          "address": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+        }
+      ],
+      "args": [
+        {
+          "name": "liquidityDelta",
+          "type": {
+            "option": "u128"
+          }
+        },
+        {
+          "name": "tokenAAmountThreshold",
+          "type": "u64"
+        },
+        {
+          "name": "tokenBAmountThreshold",
+          "type": "u64"
         }
       ]
     },
@@ -1097,6 +1271,90 @@ export type Mirrorfi = {
           "type": "pubkey"
         }
       ]
+    },
+    {
+      "name": "initializeStrategyMeteoraDammV2",
+      "discriminator": [
+        78,
+        203,
+        104,
+        179,
+        112,
+        0,
+        39,
+        169
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "strategy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              },
+              {
+                "kind": "account",
+                "path": "position"
+              }
+            ]
+          }
+        },
+        {
+          "name": "position"
+        },
+        {
+          "name": "eventAuthority"
+        },
+        {
+          "name": "pool"
+        },
+        {
+          "name": "poolAuthority"
+        },
+        {
+          "name": "positionNftAccount"
+        },
+        {
+          "name": "positionNftMint"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "cpAmmProgram",
+          "address": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initializeUser",
@@ -1829,7 +2087,7 @@ export type Mirrorfi = {
       ],
       "args": [
         {
-          "name": "receiptMintAmount",
+          "name": "sharesToRemove",
           "type": "u64"
         }
       ]
@@ -1935,156 +2193,186 @@ export type Mirrorfi = {
     },
     {
       "code": 6006,
+      "name": "invalidRemainingAccounts",
+      "msg": "Invalid amount of remaining accounts passed"
+    },
+    {
+      "code": 6007,
       "name": "invalidConfig",
       "msg": "Config address does not match"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "invalidTreasury",
       "msg": "Treasury address does not match"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "invalidAdmin",
       "msg": "Admin does not match"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "invalidTreasuryAuthority",
       "msg": "Treasury authority does not match"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "protocolNotOperational",
       "msg": "Protocol is paused or in reduce-only status"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "protocolNotWithdrawable",
       "msg": "Protocol is not in a withdrawable status"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "invalidVault",
       "msg": "Vault address does not match"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "invalidVaultDepositor",
       "msg": "Vault depositor does not match"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "invalidVaultAuthority",
       "msg": "Vault authority does not match"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "invalidStrategyType",
       "msg": "Strategy type is invalid for this operation"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "vaultNotOperational",
       "msg": "Vault is paused or in reduce-only status"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "vaultNotWithdrawable",
       "msg": "Vault is not in a withdrawable status"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "depositCapReached",
       "msg": "Deposit cap for the vault has been reached"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "invalidVaultDestinationTokenAccount",
       "msg": "Vault destination token account does not match"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "invalidDepositMint",
       "msg": "Deposit mint does not match"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "vaultHasDepositsInStrategies",
       "msg": "Vault cannot be closed until all deposits in strategies are withdrawn"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "invalidSharesAmount",
       "msg": "Shares amount must be greater than zero"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "exceedsMaxRemovableShares",
       "msg": "Shares to remove exceeds max removable shares"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "managerFeeBpsTooHigh",
       "msg": "Sum of manager fee BPS and platform fee BPS cannot exceed 10,000"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "invalidVaultDepositorAuthority",
       "msg": "Vault depositor authority does not match"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "invalidVaultDepositorVault",
       "msg": "Vault depositor vault does not match"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "insufficientShares",
       "msg": "Vault depositor does not have enough shares"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "invalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "strategyHasDepositsDeployed",
       "msg": "Strategy cannot be closed until all deposits deployed are withdrawn"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "invalidDestinationMint",
       "msg": "Destination mint does not match"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "invalidSourceMint",
       "msg": "Source mint does not match strategy destination mint"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "invalidUser",
       "msg": "User address does not match"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "invalidObligationCollateral",
       "msg": "Reserve not found in obligation"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "invalidObligation",
       "msg": "Obligation address does not match"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "invalidReserve",
       "msg": "Reserve address does not match"
+    },
+    {
+      "code": 6037,
+      "name": "invalidPosition",
+      "msg": "Position address does not match"
     }
   ],
   "types": [
+    {
+      "name": "addLiquidityParameters",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "liquidityDelta",
+            "type": "u128"
+          },
+          {
+            "name": "tokenAAmountThreshold",
+            "type": "u64"
+          },
+          {
+            "name": "tokenBAmountThreshold",
+            "type": "u64"
+          }
+        ]
+      }
+    },
     {
       "name": "config",
       "serialization": "bytemuck",
@@ -2096,10 +2384,16 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "admin",
+            "docs": [
+              "Authority allowed to update config parameters."
+            ],
             "type": "pubkey"
           },
           {
             "name": "treasuryAuthority",
+            "docs": [
+              "Authority allowed to withdraw from treasury token accounts."
+            ],
             "type": "pubkey"
           },
           {
@@ -2112,24 +2406,36 @@ export type Mirrorfi = {
           {
             "name": "platformPerformanceFeeBps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark in basis points."
+              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
             ],
             "type": "u16"
           },
           {
             "name": "platformDepositFeeBps",
+            "docs": [
+              "Fee taken on deposits into vaults, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platformWithdrawalFeeBps",
+            "docs": [
+              "Fee taken on withdrawals from vaults, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "platformReferralFeeBps",
+            "docs": [
+              "INACTIVE - Fee taken on platform fees that will go to referrers, denoted in basis points."
+            ],
             "type": "u16"
           },
           {
             "name": "status",
+            "docs": [
+              "Determines operational status of the protocol."
+            ],
             "type": {
               "defined": {
                 "name": "protocolStatus"
@@ -2162,7 +2468,7 @@ export type Mirrorfi = {
         "kind": "struct",
         "fields": [
           {
-            "name": "platformComissionFeeBps",
+            "name": "platformPerformanceFeeBps",
             "type": "u16"
           },
           {
@@ -2246,17 +2552,23 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "vault",
+            "docs": [
+              "The vault this strategy belongs to."
+            ],
             "type": "pubkey"
           },
           {
             "name": "depositsDeployed",
             "docs": [
-              "Total deposits deployed to the strategy."
+              "Total deposits deployed to the strategy, denoted in the vault's deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "id",
+            "docs": [
+              "ID unique to the strategy within the vault."
+            ],
             "type": "u8"
           },
           {
@@ -2274,6 +2586,9 @@ export type Mirrorfi = {
           },
           {
             "name": "strategyType",
+            "docs": [
+              "Details about the underlying protocol and action of the strategy."
+            ],
             "type": {
               "defined": {
                 "name": "strategyType"
@@ -2306,6 +2621,15 @@ export type Mirrorfi = {
               },
               {
                 "name": "reserve",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "meteoraDammV2",
+            "fields": [
+              {
+                "name": "position",
                 "type": "pubkey"
               }
             ]
@@ -2413,6 +2737,9 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "authority",
+            "docs": [
+              "Authority of the user account."
+            ],
             "type": "pubkey"
           },
           {
@@ -2433,14 +2760,23 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "id",
+            "docs": [
+              "Unique vault ID."
+            ],
             "type": "u64"
           },
           {
             "name": "authority",
+            "docs": [
+              "Authority allowed to manage the vault."
+            ],
             "type": "pubkey"
           },
           {
             "name": "name",
+            "docs": [
+              "Name of the vault (utf8 bytes, padded with 0s)."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -2450,6 +2786,9 @@ export type Mirrorfi = {
           },
           {
             "name": "description",
+            "docs": [
+              "Description of the vault (utf8 bytes, padded with 0s)."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -2479,37 +2818,37 @@ export type Mirrorfi = {
           {
             "name": "depositCap",
             "docs": [
-              "Max deposits accepted."
+              "Max deposits accepted, denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "userDeposits",
             "docs": [
-              "Total user deposits, changes on user deposit/withdraw."
+              "Total user deposits, changes on user deposit/withdraw. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "realizedPnl",
             "docs": [
-              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, deducted on user withdrawals, excluding fees.",
+              "Total realized profit and loss across all strategies, accumulated on strategy execute/exit, deducted on user withdrawals, excluding fees. Denoted in deposit mint.",
               "",
-              "Profit is only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
+              "Profit and losses are only realized when exiting from strategies and deposits are withdrawn back to vault token accounts."
             ],
             "type": "i64"
           },
           {
             "name": "depositsInStrategies",
             "docs": [
-              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed."
+              "Total deposits currently allocated in strategies, equals to sum of all Strategy deposits_deployed. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "lockedProfit",
             "docs": [
-              "Currently locked profit amount."
+              "Currently locked profit amount, denoted in deposit mint."
             ],
             "type": "u64"
           },
@@ -2518,7 +2857,7 @@ export type Mirrorfi = {
             "docs": [
               "Duration over which depositor's share of vault profit cannot be fully withdrawn.",
               "",
-              "A longer duration punishes late depositors attempting to front-run vault profit by depositing late and withdrawing at the earliest."
+              "A longer duration punishes late depositors attempting to front-run vault profits by depositing late and withdrawing at the earliest possible time."
             ],
             "type": "u64"
           },
@@ -2532,26 +2871,29 @@ export type Mirrorfi = {
           {
             "name": "totalShares",
             "docs": [
-              "Total deposit shares, changes on user deposit."
+              "Total deposit shares, changes on user deposits and withdrawals."
             ],
             "type": "u64"
           },
           {
             "name": "unclaimedManagerFee",
             "docs": [
-              "Claimable manager fees, accrues on profitable strategy exits."
+              "Claimable manager fees, accrues on profitable strategy exits. Denoted in deposit mint."
             ],
             "type": "u64"
           },
           {
             "name": "performanceFeeBps",
             "docs": [
-              "Fee taken from eligble profits above previous high water mark in basis points."
+              "Fee taken from eligble profits above previous high water mark, denoted in basis points."
             ],
             "type": "u16"
           },
           {
             "name": "status",
+            "docs": [
+              "Determines operational status of the vault."
+            ],
             "type": {
               "defined": {
                 "name": "vaultStatus"
@@ -2561,7 +2903,7 @@ export type Mirrorfi = {
           {
             "name": "nextStrategyId",
             "docs": [
-              "Strategy ID, increments with each new strategy."
+              "Next strategy ID, increments with each new strategy."
             ],
             "type": "u8"
           },
@@ -2581,7 +2923,7 @@ export type Mirrorfi = {
           {
             "name": "assetPerShare",
             "docs": [
-              "Last recorded asset per share."
+              "Last recorded asset (deposit mint) per share."
             ],
             "type": {
               "defined": {
@@ -2625,16 +2967,22 @@ export type Mirrorfi = {
         "fields": [
           {
             "name": "authority",
+            "docs": [
+              "Authority of the depositor."
+            ],
             "type": "pubkey"
           },
           {
             "name": "vault",
+            "docs": [
+              "The vault this depositor is associated with."
+            ],
             "type": "pubkey"
           },
           {
             "name": "shares",
             "docs": [
-              "Total shares of the vault owned by the depositor."
+              "Total shares of the vault owned by the depositor, denoted in the vault's deposit mint."
             ],
             "type": "u64"
           },
@@ -2713,6 +3061,13 @@ export type Mirrorfi = {
           }
         ]
       }
+    }
+  ],
+  "constants": [
+    {
+      "name": "maxBps",
+      "type": "u16",
+      "value": "10000"
     }
   ]
 };
