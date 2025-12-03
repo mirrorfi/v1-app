@@ -4,6 +4,7 @@ import { Address, BN } from "@coral-xyz/anchor";
 import { BigIntString, parseConfig } from "@/types/accounts";
 import mirrorfiIdl from "@/idl/mirrorfi.json";
 import { ProgramClient } from "./program-client";
+import { stringToByteArray } from "./utils";
 
 export class MirrorFiClient extends ProgramClient<Mirrorfi> {
   constructor(connection: Connection) {
@@ -250,11 +251,9 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
   }): Promise<TransactionInstruction> {
     return await this.program.methods
       .executeStrategyMeteoraDammV2({
-        params: {
-          liquidityDelta: new BN(liquidityDelta),
-          tokenAAmountThreshold: new BN(tokenAAmountThreshold),
-          tokenBAmountThreshold: new BN(tokenBAmountThreshold),
-        }
+        liquidityDelta: new BN(liquidityDelta),
+        tokenAAmountThreshold: new BN(tokenAAmountThreshold),
+        tokenBAmountThreshold: new BN(tokenBAmountThreshold),
       })
       .accounts({
         config: this.configPda,
@@ -481,6 +480,7 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     authority,
     depositMint,
     depositMintTokenProgram,
+    vault,
   }: {
     name: string;
     description: string;
@@ -490,21 +490,23 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     authority: Address;
     depositMint: Address;
     depositMintTokenProgram: Address;
+    vault: Address;
   }): Promise<TransactionInstruction> {
     return await this.program.methods
       .initializeVault({
-        name,
-        description,
+        name: stringToByteArray(name, 32),
+        description: stringToByteArray(description, 64),
         managerFeeBps,
         depositCap: new BN(depositCap),
         lockedProfitDuration: new BN(lockedProfitDuration),
       })
-      .accounts({
+      .accountsPartial({
         authority,
         treasury: this.treasuryPda,
         config: this.configPda,
         depositMint,
         depositMintTokenProgram,
+        vault,
       })
       .instruction();
   }
