@@ -2293,61 +2293,66 @@ export type Mirrorfi = {
     },
     {
       "code": 6026,
+      "name": "noManagerFeeToClaim",
+      "msg": "Unclaimed manager fee is 0"
+    },
+    {
+      "code": 6027,
       "name": "invalidVaultDepositorAuthority",
       "msg": "Vault depositor authority does not match"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "invalidVaultDepositorVault",
       "msg": "Vault depositor vault does not match"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "insufficientShares",
       "msg": "Vault depositor does not have enough shares"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "invalidStrategy",
       "msg": "Strategy address does not match"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "strategyHasDepositsDeployed",
       "msg": "Strategy cannot be closed until all deposits deployed are withdrawn"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "invalidDestinationMint",
       "msg": "Destination mint does not match"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "invalidSourceMint",
       "msg": "Source mint does not match strategy destination mint"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "invalidUser",
       "msg": "User address does not match"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "invalidObligationCollateral",
       "msg": "Reserve not found in obligation"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "invalidObligation",
       "msg": "Obligation address does not match"
     },
     {
-      "code": 6036,
+      "code": 6037,
       "name": "invalidReserve",
       "msg": "Reserve address does not match"
     },
     {
-      "code": 6037,
+      "code": 6038,
       "name": "invalidPosition",
       "msg": "Position address does not match"
     }
