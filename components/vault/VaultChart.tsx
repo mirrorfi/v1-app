@@ -75,11 +75,11 @@ const CustomTooltip = ({ active, payload, label, dataType }: CustomTooltipProps)
   return null
 }
 
-interface VaultDashboardChartProps {
+interface VaultChartProps {
   vaultAddress?: string;
 }
 
-export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) {
+export function VaultChart({ vaultAddress }: VaultChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [selectedDataType, setSelectedDataType] = useState<DataType>("TokenNav")
   const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("24H")
@@ -250,7 +250,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
   }
 
   return (
-    <Card className={`bg-linear-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
+    <Card className={`bg-[#101018] border border-[#16161f] rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
       <CardHeader className="pb-2">
         {/* Data type and timeframe selector row */}
         <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2">
@@ -262,7 +262,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 variant={selectedDataType === dataType ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedDataType(dataType)}
-                className={`text-xs whitespace-nowrap ${selectedDataType === dataType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+                className={`text-xs whitespace-nowrap ${selectedDataType === dataType ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
               >
                 <span className="hidden sm:inline">{getDataTypeIcon(dataType)}</span>
                 <span className={selectedDataType === dataType ? "ml-1" : ""}>
@@ -280,7 +280,7 @@ export function VaultDashboardChart({ vaultAddress }: VaultDashboardChartProps) 
                 variant={selectedTimeframe === timeframe ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedTimeframe(timeframe)}
-                className={`text-xs ${selectedTimeframe === timeframe ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+                className={`text-xs ${selectedTimeframe === timeframe ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
               >
                 {timeframe}
               </Button>

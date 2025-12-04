@@ -8,13 +8,11 @@ import { useEffect, useState } from "react"
 import { getVaultBalance } from "@/lib/api/vault"
 import { ArrowLeft, AlertCircle, RefreshCw, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Skeleton } from "./ui/skeleton"
-import { mirrorfiClient } from '@/lib/client/solana';
-import { getPrices } from "@/lib/api/metadata"
-import { parseVault } from '@/types/accounts';
 
 import { VaultDashboardExecuteCard, VaultDashboardExecuteCardSkeleton } from "@/components/VaultDashboardExecuteCard"
-import { VaultDashboardChart } from "@/components/VaultDashboardChart";
+import { VaultData } from "@/components/vault/VaultData"
+import { VaultChart } from "@/components/vault/VaultChart";
+import { VaultBalances } from "@/components/vault/VaultBalances"
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
@@ -144,17 +142,19 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
 
       <div className="space-y-4">
         {/* Mobile: Stack all content vertically */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
           {/* Main Content */}
           {activeTab == "vault-stats" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardFlow vaultData={vaultData} depositData={depositData} strategyData={strategiesData} />
-              <VaultDashboardChart vaultAddress={vault} />
-              <VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} />
+            <div className="xl:col-span-3 space-y-4 order-2 xl:order-1">
+              {/*<VaultDashboardFlow vaultData={vaultData} depositData={depositData} strategyData={strategiesData} />*/}
+              <VaultChart vaultAddress={vault} />
+              <VaultData depositData={depositData} vaultData={vaultData}/>
+              <VaultBalances  depositData={depositData} vaultData={vaultData} strategiesData={strategiesData}/>
+              {/*<VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} />*/}
             </div>
           )}
           {activeTab == "your-position" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
+            <div className="xl:col-span-3 space-y-4 order-2 xl:order-1">
               <VaultDashboardPNLCard 
                 positionBalance={positionBalance} 
                 tokenPrice={tokenPrice}
@@ -164,13 +164,13 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
             </div>
           )}
           {activeTab == "overview" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
+            <div className="xl:col-span-3 space-y-4 order-2 xl:order-1">
               {/*<VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />*/}
             </div>
           )}
 
           {/* Execute Card - Show first on mobile */}
-          <div className="xl:col-span-1 order-1 xl:order-2">
+          <div className="xl:col-span-2 order-1 xl:order-1">
             {vaultData ? <VaultDashboardExecuteCard 
               vault={vault} 
               vaultData={vaultData} 
