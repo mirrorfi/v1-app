@@ -4,6 +4,32 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function PositionCardSkeleton() {
     return (
         <div className="space-y-8 mt-12">
+            {/* Profile Card Skeleton */}
+            <Card className="bg-slate-800/30 border-slate-600/20 rounded-xl">
+                <CardContent className="p-6">
+                    <div className="flex items-center gap-6">
+                        {/* Profile Picture Skeleton */}
+                        <Skeleton className="w-20 h-20 rounded-full shrink-0" />
+                        
+                        {/* User Info Skeleton */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Skeleton className="h-6 w-32" />
+                                <Skeleton className="h-5 w-20 rounded-full" />
+                            </div>
+                            <Skeleton className="h-4 w-24 mb-2" />
+                            <Skeleton className="h-4 w-40" />
+                        </div>
+                        
+                        {/* Action Buttons Skeleton */}
+                        <div className="shrink-0 flex gap-2">
+                            <Skeleton className="h-10 w-10 rounded-lg" />
+                            <Skeleton className="h-10 w-10 rounded-lg" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             {/* Stats Skeleton */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
