@@ -269,10 +269,10 @@ button:hover::after,
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.card[data-slot="card"]:hover::before,
+/* .card[data-slot="card"]:hover::before,
 [class*="card"][data-slot="card"]:hover::before {
   opacity: 1;
-}
+} */
 
 /* Glowing text */
 h1,

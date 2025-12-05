@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { ArrowUpRight } from "lucide-react"
 import { logActivity, LogActivityParams } from '@/lib/utils/activity-logger';
 
-export function VaultDashboardExecuteCard({ vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance }: { vault: string, vaultData: any, depositData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number }) {
+export function VaultExecuteCard({ vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance }: { vault: string, vaultData: any, depositData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number }) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
@@ -149,25 +149,25 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
           </div>
         </div>
       )}
-      <Card className="bg-[#0a0a0a] border border-gray-700/50 rounded-lg shadow-lg py-0 hover:bg-[#0a0a0a]">
+      <Card className="bg-[#101018] border border-[#16161f] rounded-xl py-0">
         {/* Deposit/Withdraw Toggle - Top Section */}
-        <div className="flex w-full border-b border-gray-700/50">
+        <div className="flex w-full">
           <button
             onClick={() => setActiveAction("deposit")}
-            className={`flex-1 py-4 text-xl font-semibold transition-colors ${
+            className={`flex-1 py-4 text-xl font-semibold transition-all relative ${
               activeAction === "deposit"
-                ? "text-white bg-[#0a0a0a]"
-                : "text-gray-500 bg-[#0F0F0F]"
+                ? "text-white bg-[#101018] border-b-2 border-blue-500"
+                : "text-gray-500 bg-[#05050a] border-b-2 border-[#16161f]"
             }`}
           >
             Deposit
           </button>
           <button
             onClick={() => setActiveAction("withdraw")}
-            className={`flex-1 py-4 text-xl font-semibold transition-colors ${
+            className={`flex-1 py-4 text-xl font-semibold transition-all relative ${
               activeAction === "withdraw"
-                ? "text-white bg-[#0a0a0a]"
-                : "text-gray-500 bg-[#0F0F0F]"
+                ? "text-white bg-[#101018] border-b-2 border-blue-500"
+                : "text-gray-500 bg-[#05050a] border-b-2 border-[#16161f]"
             }`}
           >
             Withdraw
@@ -189,7 +189,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
             </div>
           </div>}
           <div className="space-y-5">
-            <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
+            <div className="bg-[#0d0d14] rounded-lg border border-[#16161f] p-4">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <img src={depositData ? depositData.tokenInfo.icon : `/PNG/usdc-logo.png`} alt="Deposit Mint Logo" className="w-8 h-8 rounded-full" />
@@ -207,7 +207,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(0.25)}
-                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 text-xs bg-[#1a1a2e] border-[#16161f] text-gray-300 hover:bg-[#2a2a3e] hover:text-white"
                   >
                     25%
                   </Button>
@@ -215,7 +215,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(0.5)}
-                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 text-xs bg-[#1a1a2e] border-[#16161f] text-gray-300 hover:bg-[#2a2a3e] hover:text-white"
                   >
                     50%
                   </Button>
@@ -223,7 +223,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(1)}
-                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 text-xs bg-[#1a1a2e] border-[#16161f] text-gray-300 hover:bg-[#2a2a3e] hover:text-white"
                   >
                     100%
                   </Button>
@@ -258,13 +258,15 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
 
 export function VaultDashboardExecuteCardSkeleton() {
   return <>
-    <Card className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 border-slate-700/50 backdrop-blur-sm rounded-xl shadow-2xl p-6">
-      <Skeleton className="h-38 w-full" />
-      <Skeleton className="h-28 w-full" />
-      <div className="grid grid-cols-2 gap-4">
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
+    <Card className="bg-[#101018] border border-[#16161f] rounded-xl py-0">
+      <div className="flex w-full border-b border-[#16161f]">
+        <Skeleton className="h-14 flex-1" />
+        <Skeleton className="h-14 flex-1" />
       </div>
+      <CardContent className="space-y-4 pb-6">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </CardContent>
     </Card>
   </>
 }

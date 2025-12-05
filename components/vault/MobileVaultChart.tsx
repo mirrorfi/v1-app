@@ -1,10 +1,7 @@
 "use client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Button } from "@/components/ui/button"
-import { TrendingUp, DollarSign, BarChart3, ChartNoAxesCombined } from "lucide-react"
-
 import { useState, useEffect, useCallback, useRef } from "react"
-
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
 import { getChartData, ChartDataItem } from "@/lib/utils/chartData"
 
@@ -75,11 +72,11 @@ const CustomTooltip = ({ active, payload, label, dataType }: CustomTooltipProps)
   return null
 }
 
-interface VaultChartProps {
-  vaultAddress?: string;
+interface MobileVaultChartProps {
+  vaultAddress: string;
 }
 
-export function VaultChart({ vaultAddress }: VaultChartProps) {
+export function MobileVaultChart({ vaultAddress }: MobileVaultChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [selectedDataType, setSelectedDataType] = useState<DataType>("TokenNav")
   const [selectedTimeframe, setSelectedTimeframe] = useState<TimeFrame>("24H")
@@ -219,77 +216,30 @@ export function VaultChart({ vaultAddress }: VaultChartProps) {
   
   // Calculate the y-axis domain based on current data
   const yAxisDomain = calculateYAxisDomain(data, selectedDataType);
-
-
-  // Get appropriate icon based on data type
-  const getDataTypeIcon = (dataType: DataType) => {
-    switch(dataType) {
-      case "TokenNav":
-        return <BarChart3 className="h-4 w-4" />
-      case "UsdNav":
-        return <DollarSign className="h-4 w-4" />
-      case "UserDeposits":
-        return <TrendingUp className="h-4 w-4" />
-      default:
-        return <TrendingUp className="h-4 w-4" />
-    }
-  }
-
-  // Get title based on data type
-  const getChartTitle = (dataType: DataType) => {
-    switch(dataType) {
-      case "TokenNav":
-        return "Token NAV (USDC)"
-      case "UsdNav":
-        return "USD NAV"
-      case "UserDeposits":
-        return "User Deposits (USDC)"
-      default:
-        return "Statistics"
-    }
-  }
-
+  
   return (
-    <Card className={`bg-[#101018] border border-[#16161f] rounded-lg shadow-lg py-0 ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
-      <CardHeader className="p-4">
-        {/* Data type and timeframe selector row */}
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2">
-          {/* Data type selector */}
-          <div className="flex gap-1 overflow-x-auto">
-            {(["TokenNav", "UsdNav", "UserDeposits"] as const).map((dataType) => (
-              <Button
-                key={dataType}
-                variant={selectedDataType === dataType ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedDataType(dataType)}
-                className={`text-xs whitespace-nowrap ${selectedDataType === dataType ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
-              >
-                <span className="hidden sm:inline">{getDataTypeIcon(dataType)}</span>
-                <span className={selectedDataType === dataType ? "ml-1" : ""}>
-                  {dataType === "TokenNav" ? "Token NAV" : dataType === "UsdNav" ? "USD NAV" : "Deposits"}
-                </span>
-              </Button>
-            ))}
-          </div>
-          
-          {/* Timeframe selector */}
-          <div className="flex gap-1 justify-center sm:justify-end">
-            {(["24H", "7D", "30D", "90D"] as const).map((timeframe) => (
-              <Button
-                key={timeframe}
-                variant={selectedTimeframe === timeframe ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedTimeframe(timeframe)}
-                className={`text-xs ${selectedTimeframe === timeframe ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
-              >
-                {timeframe}
-              </Button>
-            ))}
-          </div>
+    <div className="bg-[#101018]/50 border-y border-[#16161f] py-3 px-3 space-y-2">
+      {/* Header */}
+      <div className="flex items-center justify-between ml-2">
+        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Performance</span>
+        {/* Timeframe selector */}
+        <div className="flex gap-1 justify-center sm:justify-end">
+          {(["24H", "7D", "30D", "90D"] as const).map((timeframe) => (
+            <Button
+              key={timeframe}
+              variant={selectedTimeframe === timeframe ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedTimeframe(timeframe)}
+              className={`text-xs ${selectedTimeframe === timeframe ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+            >
+              {timeframe}
+            </Button>
+          ))}
         </div>
-      </CardHeader>
-      
-      <CardContent className="pb-4 -ml-6">
+      </div>
+
+      {/* Chart */}
+      <div className="w-full h-[180px] -mx-4">
         <div className="h-48 sm:h-64 w-full relative">
           {data.length === 0 && !loading ? (
             <div className="flex items-center justify-center h-full">
@@ -367,7 +317,7 @@ export function VaultChart({ vaultAddress }: VaultChartProps) {
             </ResponsiveContainer>
           )}
         </div>
-      </CardContent>
-    </Card>
-  )
+      </div>
+    </div>
+  );
 }

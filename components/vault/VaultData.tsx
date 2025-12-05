@@ -39,7 +39,7 @@ export function VaultData({depositData, vaultData}: VaultDataProps) {
     return (
         <>
         <Card className="rounded-xl bg-[#101018] border border-[#16161f] overflow-hidden z-50 py-0 gap-0">
-            <div className="flex items-center justify-between px-6 py-6 border-b border-[#16161f]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#16161f]">
                 <div className="flex items-center gap-3">
                     <Coins className="h-4 w-4 text-[#4a4a5a]" />
                     <span className="text-sm text-[#6b6b7b]">Deposit Asset</span>
@@ -49,7 +49,7 @@ export function VaultData({depositData, vaultData}: VaultDataProps) {
                     <span className="text-sm font-medium text-[#ffffff]">{depositData? depositData.tokenInfo.symbol : ""}</span>
                 </div>
             </div>
-            <div className="flex items-center justify-between px-6 py-6 border-b border-[#16161f]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#16161f]">
                 <div className="flex items-center gap-3">
                     <BanknoteArrowUp className="h-4 w-4 text-[#4a4a5a]" />
                     <span className="text-sm text-[#6b6b7b]">Max Deposit</span>
@@ -58,14 +58,14 @@ export function VaultData({depositData, vaultData}: VaultDataProps) {
                     <span className="text-sm font-medium text-[#ffffff]">{maxDeposit} {depositData? depositData.tokenInfo.symbol : ""}</span>
                 </div>
             </div>
-            <div className="flex items-center justify-between px-6 py-6 border-b border-[#16161f]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#16161f]">
                 <div className="flex items-center gap-3">
                     <Percent className="h-4 w-4 text-[#4a4a5a]" />
                     <span className="text-sm text-[#6b6b7b]">Management Fee</span>
                 </div>
                 <span className="text-sm font-medium text-[#ffffff]">{vaultData ? (vaultData.managerFeeBps / 100).toFixed(2) + " %" : "Loading..."}</span>
             </div>
-            <div className="flex items-center justify-between px-6 py-6 border-b border-[#16161f]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#16161f]">
                 <div className="flex items-center gap-3">
                     <Link2 className="h-4 w-4 text-[#4a4a5a]" />
                     <span className="text-sm text-[#6b6b7b]">Vault Address</span>
@@ -75,7 +75,7 @@ export function VaultData({depositData, vaultData}: VaultDataProps) {
                     {/*<ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />*/}
                 </button>
             </div>
-            <div className="flex items-center justify-between px-6 py-6">
+            <div className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-3">
                     <UserRound className="h-4 w-4 text-[#4a4a5a]" />
                     <span className="text-sm text-[#6b6b7b]">Creator Address</span>
