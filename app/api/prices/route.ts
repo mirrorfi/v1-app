@@ -1,4 +1,4 @@
-import { getPrices } from "@/lib/api/jupiter";
+import { getJupiterPrices } from "@/lib/server/jupiter";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const mints = ids.split(',');
 
     return NextResponse.json({
-      prices: getPrices(mints),
+      prices: await getJupiterPrices(mints),
     })
   } catch (err) {
     console.error(err);

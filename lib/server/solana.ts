@@ -1,22 +1,16 @@
 import { AddressLookupTableAccount, clusterApiUrl, ComputeBudgetProgram, Connection, PublicKey, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { Cluster } from '@solana/web3.js';
-// import { getSimulationComputeUnits } from '@solana-developers/helpers';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { Mirrorfi } from '@/types/mirrorfi';
-import mirrorfiIdl from '@/idl/mirrorfi.json';
-import { MirrorFiClient } from './utils/mirrorfi-client';
+import { MirrorFiClient } from '@/lib/mirrorfi-client';
+import { getSimulationComputeUnits } from '@solana-developers/helpers';
+import { v0TxToBase64 } from '../utils';
 
 const SERVER_CLUSTER: Cluster = (process.env.SERVER_SOLANA_RPC_CLUSTER ??
   'mainnet-beta') as Cluster;
 export const SERVER_CONNECTION = new Connection(
-  process.env.SERVER_SOLANA_RPC_URL ?? 
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? 
-  clusterApiUrl(SERVER_CLUSTER),
+  process.env.SERVER_SOLANA_RPC_URL ?? clusterApiUrl(SERVER_CLUSTER),
   'confirmed'
 );
-const provider = { connection: SERVER_CONNECTION } as AnchorProvider;
-const mirrorfiProgram = new Program<Mirrorfi>(mirrorfiIdl, provider);
-export const mirrorfiClient = new MirrorFiClient(mirrorfiProgram);
+export const mirrorfiClient = new MirrorFiClient(SERVER_CONNECTION);
 
 export async function getPriorityFee(): Promise<number> {
   const recentFees = await SERVER_CONNECTION.getRecentPrioritizationFees();
@@ -47,17 +41,16 @@ export async function getALTs(
 }
 
 export async function buildTx(
-  ixs: TransactionInstruction[],
+  instructions: TransactionInstruction[],
   payer: PublicKey,
   lookupTables: AddressLookupTableAccount[] = []
-) {
-  // const units = await getSimulationComputeUnits(
-  //   SERVER_CONNECTION,
-  //   ixs,
-  //   payer,
-  //   lookupTables
-  // );
-  const units = 200_000;
+): Promise<string> {
+  const units = await getSimulationComputeUnits(
+    SERVER_CONNECTION,
+    instructions,
+    payer,
+    lookupTables
+  );
 
   if (!units) {
     throw new Error('Unable to get compute limits.');
@@ -70,7 +63,7 @@ export async function buildTx(
     ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: await getPriorityFee(),
     }),
-    ...ixs,
+    ...instructions,
   ];
 
   const messageV0 = new TransactionMessage({
@@ -79,5 +72,5 @@ export async function buildTx(
     instructions: ixsWithCompute,
   }).compileToV0Message(lookupTables);
 
-  return new VersionedTransaction(messageV0);
+  return v0TxToBase64(new VersionedTransaction(messageV0));
 }

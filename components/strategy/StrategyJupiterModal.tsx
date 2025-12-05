@@ -7,15 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ArrowUpDown, Search } from "lucide-react"
 import { getTokenInfos, getExecuteStrategyJupiterSwap, getInitializeAndExecuteStrategyJupiterSwap, getExitStrategyJupiterSwap } from "@/lib/api";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNotification } from "@/contexts/NotificationContext"
-import { useWallet } from "@solana/wallet-adapter-react"
-import { getConnection } from "@/lib/solana"
-
-const connection = getConnection();
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 
 interface TokenOption {
-  mint:string;
+  mint: string;
   symbol: string;
   icon: string;
   balance?: number;
@@ -61,13 +58,13 @@ const TOKEN_OPTIONS: TokenOption[] = [
   }
 ];
 
-function TokenSelector({ 
-  selectedToken, 
-  setToken, 
+function TokenSelector({
+  selectedToken,
+  setToken,
   disabled = false,
-  label 
-}: { 
-  selectedToken: TokenOption | null; 
+  label
+}: {
+  selectedToken: TokenOption | null;
   setToken: (token: TokenOption) => void;
   disabled?: boolean;
   label: string;
@@ -79,13 +76,13 @@ function TokenSelector({
 
   const validateToken = async (mint: string) => {
     if (!mint.trim()) return;
-    
+
     setIsValidating(true);
     setValidationError('');
-    
+
     try {
       const tokenInfo = await getTokenInfos([mint]);
-      
+
       if (!tokenInfo || Object.keys(tokenInfo).length === 0 || !tokenInfo[mint] || !tokenInfo[mint].icon) {
         setValidationError('Invalid token or not allowed');
         setIsValidating(false);
@@ -108,7 +105,7 @@ function TokenSelector({
     } catch (error) {
       setValidationError('Failed to validate token');
     }
-    
+
     setIsValidating(false);
   };
 
@@ -119,13 +116,12 @@ function TokenSelector({
         {selectedToken || !disabled ?
           <Button
             variant="outline"
-            className={`w-full h-12 justify-between bg-slate-800/50 border-slate-600/30 text-white hover:bg-slate-700/50 ${
-              disabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full h-12 justify-between bg-slate-800/50 border-slate-600/30 text-white hover:bg-slate-700/50 ${disabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             onClick={() => !disabled && setIsOpen(!isOpen)}
             disabled={disabled}
           >
-            {selectedToken ? 
+            {selectedToken ?
               <div className="flex items-center gap-3">
                 <img src={selectedToken.icon} alt={selectedToken.symbol} className="w-7 h-7 rounded-full" />
                 <span>{selectedToken.symbol}</span>
@@ -136,7 +132,7 @@ function TokenSelector({
           </Button>
           : <Skeleton className="w-full h-10 rounded-lg" />
         }
-        
+
         {isOpen && !disabled && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600/30 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
             {/* Manual Token Input Section */}
@@ -173,7 +169,7 @@ function TokenSelector({
               <button
                 key={token.symbol}
                 className="w-full flex items-center gap-3 p-3 hover:bg-slate-700/50 text-left"
-                onClick={() => {validateToken(token.mint)}}
+                onClick={() => { validateToken(token.mint) }}
               >
                 <img src={token.icon} alt={token.symbol} className="w-6 h-6 rounded-full" />
                 <div className="flex-1">
@@ -189,11 +185,11 @@ function TokenSelector({
   );
 }
 
-export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, depositData, vaultData}: StrategyJupiterModalProps) {
+export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, depositData, vaultData }: StrategyJupiterModalProps) {
   const [activeTab, setActiveTab] = useState<'add' | 'reduce'>('add');
   const [amount, setAmount] = useState<string>('100');
   const [selectDisabled, setSelectDisabled] = useState<boolean>(false);
-  const [strategyToken, setStrategyToken] = useState<TokenOption | null>(null); 
+  const [strategyToken, setStrategyToken] = useState<TokenOption | null>(null);
   const [depositToken, setDepositToken] = useState<TokenOption | null>(null);
   const [strategyPosition, setStrategyPosition] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -201,14 +197,15 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   const fromToken = activeTab === 'add' ? depositToken : strategyToken;
   const toToken = activeTab === 'add' ? strategyToken : depositToken;
   const { showNotification } = useNotification()
-  const { publicKey, signTransaction } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
+  const { connection } = useConnection();
 
   useEffect(() => {
-    if(strategyData) {
+    if (strategyData) {
       setSelectDisabled(true);
-      if(action === "reduce") {setActiveTab('reduce')}
-      else {setActiveTab('add')}
-      console.log("Strategy Data:", strategyData);  
+      if (action === "reduce") { setActiveTab('reduce') }
+      else { setActiveTab('add') }
+      console.log("Strategy Data:", strategyData);
 
       setStrategyToken({
         mint: strategyData.targetMint as string,
@@ -227,14 +224,14 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
       });
       console.log("Strategy Token:", strategyToken);
     }
-    else{
+    else {
       setStrategyToken(null);
       setDepositToken(null);
       setStrategyPosition(null);
       setAmount('');
       setSelectDisabled(false);
     }
-    if(depositData) {
+    if (depositData) {
       setDepositToken({
         mint: depositData.tokenInfo.mint,
         symbol: depositData.tokenInfo.symbol,
@@ -257,7 +254,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   const handleExecuteStrategy = async () => {
     setIsLoading(true);
     try {
-      if(!publicKey || !signTransaction){
+      if (!publicKey || !sendTransaction) {
         showNotification({
           title: `Wallet Not Connected!`,
           message: `Please connect your wallet to continue.`,
@@ -266,7 +263,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         setIsLoading(false);
         return;
       }
-      if(!fromToken || !toToken || !fromToken.decimals || !vaultData){
+      if (!fromToken || !toToken || !fromToken.decimals || !vaultData) {
         showNotification({
           title: `Execute Strategy Failed!`,
           message: `Data has not been successfully loaded.`,
@@ -276,7 +273,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         return;
       }
       const numAmount = parseFloat(amount);
-      if(!numAmount || numAmount <= 0){
+      if (!numAmount || numAmount <= 0) {
         showNotification({
           title: `Execute Strategy Failed!`,
           message: `Invalid amount.`,
@@ -286,7 +283,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         return;
       }
       let res;
-      if( action === "new" || action === "newYield" ) {
+      if (action === "new" || action === "newYield") {
         res = await getInitializeAndExecuteStrategyJupiterSwap({
           strategyType: "JupiterSwap",
           authority: publicKey.toString(),
@@ -303,7 +300,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
           authority: publicKey.toString(),
           strategy: strategyPosition.strategyPda,
         });
-      }else {
+      } else {
         res = await getExitStrategyJupiterSwap({
           amount: (Number.parseFloat(amount) * 10 ** fromToken.decimals).toFixed(0).toString(),
           slippageBps: 100,
@@ -314,19 +311,10 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
       }
       const versionedTx = res;
       // Prompt user to sign and send transaction
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+      const { blockhash } = await connection.getLatestBlockhash();
       versionedTx.message.recentBlockhash = blockhash;
-      const signedTx = await signTransaction(versionedTx);
-      const txid = await connection.sendRawTransaction(signedTx.serialize());
-      const latest = await connection.getLatestBlockhash();
-      await connection.confirmTransaction(
-        {
-          signature: txid,
-          blockhash: latest.blockhash,
-          lastValidBlockHeight: latest.lastValidBlockHeight,
-        },
-        "confirmed"
-      );
+      const txid = await sendTransaction(versionedTx, connection);
+      await connection.confirmTransaction(txid);
       console.log("Transaction ID:", txid);
 
       showNotification({
@@ -335,7 +323,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
         txId: txid,
         type: "success"
       });
-      
+
       // Close Modal
       onClose();
     } catch (error: any) {
@@ -350,7 +338,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   };
 
   const handleTabChange = (tab: 'add' | 'reduce') => {
-    if(action === "newYield" || action === 'new' || action === '') return;
+    if (action === "newYield" || action === 'new' || action === '') return;
     setActiveTab(tab);
     setAmount('');
   };
@@ -360,7 +348,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
   }
 
   const getQuickAmountPercentage = (percentage: number) => {
-    if(!fromToken || !fromToken.balance) return "0";
+    if (!fromToken || !fromToken.balance) return "0";
     const baseAmount = activeTab === 'add' ? fromToken.balance : fromToken.balance;
     if (percentage === 100) { return baseAmount.toString(); }
     return ((baseAmount * percentage) / 100).toString();
@@ -394,8 +382,8 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
                 label=""
               />
             </div>
-            {strategyToken ? 
-              <div className="text-slate-400 text-sm">1 {strategyToken.symbol} = {strategyToken.price.toFixed(2)} USDC</div>:
+            {strategyToken ?
+              <div className="text-slate-400 text-sm">1 {strategyToken.symbol} = {strategyToken.price.toFixed(2)} USDC</div> :
               <Skeleton className="w-24 h-6 rounded-lg" />
             }
           </div>
@@ -405,7 +393,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <div className="text-slate-400 text-sm font-medium mb-1">Initial Capital</div>
-                {strategyPosition&&strategyToken&&depositToken?
+                {strategyPosition && strategyToken && depositToken ?
                   <div className="flex items-start gap-2">
                     <div className="text-white font-semibold text-md md:text-lg">{strategyPosition.initialCapital} {depositToken.symbol}</div>
                     <div className="text-slate-400 text-sm">(${strategyPosition.initialCapitalValue})</div>
@@ -415,7 +403,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
               </div>
               <div>
                 <div className="text-slate-400 text-sm font-medium mb-1">Current Position</div>
-                {strategyPosition&&strategyToken?
+                {strategyPosition && strategyToken ?
                   <div className="flex items-start gap-2">
                     <div className="text-white font-semibold text-md md:text-lg">{strategyToken.balance} {strategyToken.symbol}</div>
                     <div className="text-slate-400 text-sm">(${strategyToken.value})</div>
@@ -428,63 +416,61 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             {/* Add/Reduce Tabs */}
             <div className="flex bg-slate-800/50 rounded-lg p-1">
               <button
-                className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-                  activeTab === 'add' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}
+                className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}
                 `}
                 onClick={() => handleTabChange('add')}
               >
                 Add
               </button>
               <button
-                className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-                  activeTab === 'reduce' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                }`}
+                className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${activeTab === 'reduce' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                  }`}
                 onClick={() => handleTabChange('reduce')}
               >
                 Reduce
               </button>
             </div>
-          </>:null}
+          </> : null}
 
           {/* Swap Interface */}
           <div className="relative">
             {/* From Token with Amount Input */}
             {fromToken ?
-            <div className="bg-slate-800/50 border border-slate-600/30 rounded-lg p-4">
-             
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3"> 
-                  <img src={fromToken.icon} alt={fromToken.symbol} className="w-8 h-8 rounded-full" />
-                  <div>
-                    <div className="text-white font-medium">{fromToken.symbol}</div>
-                    <div className="text-slate-400 text-sm">Balance: {fromToken.balance}</div>
+              <div className="bg-slate-800/50 border border-slate-600/30 rounded-lg p-4">
+
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <img src={fromToken.icon} alt={fromToken.symbol} className="w-8 h-8 rounded-full" />
+                    <div>
+                      <div className="text-white font-medium">{fromToken.symbol}</div>
+                      <div className="text-slate-400 text-sm">Balance: {fromToken.balance}</div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {[25, 50, 100].map((percentage) => (
+                      <button
+                        key={percentage}
+                        className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-700/50"
+                        onClick={() => setAmount(getQuickAmountPercentage(percentage))}
+                      >
+                        {percentage}%
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  {[25, 50, 100].map((percentage) => (
-                    <button
-                      key={percentage}
-                      className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-700/50"
-                      onClick={() => setAmount(getQuickAmountPercentage(percentage))}
-                    >
-                      {percentage}%
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between relative z-10">
+                  <input
+                    type="text"
+                    value={amount}
+                    onChange={(e) => handleAmountChange(e.target.value)}
+                    placeholder={fromToken.symbol}
+                    className="bg-transparent text-white text-lg font-medium outline-none flex-1 placeholder-gray-500 cursor-text relative z-20"
+                    style={{ pointerEvents: 'auto' }}
+                  />
+                  <span className="text-gray-400 text-sm pointer-events-none">${(Number(amount) * fromToken.price).toFixed(2)}</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between relative z-10">
-                <input
-                  type="text"
-                  value={amount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  placeholder={fromToken.symbol}
-                  className="bg-transparent text-white text-lg font-medium outline-none flex-1 placeholder-gray-500 cursor-text relative z-20"
-                  style={{ pointerEvents: 'auto' }}
-                />
-                <span className="text-gray-400 text-sm pointer-events-none">${(Number(amount) * fromToken.price).toFixed(2)}</span>
-              </div>
-            </div>
-            : <Skeleton className="w-full h-20 rounded-lg" />
+              : <Skeleton className="w-full h-20 rounded-lg" />
             }
 
             {/* Arrow in the middle */}
@@ -495,16 +481,16 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             </div>
 
             {/* To Token */}
-            {fromToken && toToken? 
-            <div className="h-20 bg-slate-800/50 border border-slate-600/30 rounded-lg p-4 mt-2">
-              <div className="mt-2 flex items-center gap-3">
-                <img src={toToken.icon} alt={toToken.symbol} className="w-8 h-8 rounded-full" />
-                <div>
-                  <div className="text-white font-medium">{(Number(amount) * fromToken.price / toToken.price).toFixed(5)} {toToken.symbol}</div>
+            {fromToken && toToken ?
+              <div className="h-20 bg-slate-800/50 border border-slate-600/30 rounded-lg p-4 mt-2">
+                <div className="mt-2 flex items-center gap-3">
+                  <img src={toToken.icon} alt={toToken.symbol} className="w-8 h-8 rounded-full" />
+                  <div>
+                    <div className="text-white font-medium">{(Number(amount) * fromToken.price / toToken.price).toFixed(5)} {toToken.symbol}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            : <Skeleton className="w-full h-20 rounded-lg mt-2" />
+              : <Skeleton className="w-full h-20 rounded-lg mt-2" />
             }
           </div>
 
@@ -514,7 +500,7 @@ export function StrategyJupiterModal({ isOpen, action, onClose, strategyData, de
             disabled={!amount || parseFloat(amount) <= 0 || isLoading}
             className="w-full h-14 py-6 text-xl font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200"
           >
-            {isLoading ? "Executing..." : 
+            {isLoading ? "Executing..." :
               action === "new" || action === "newYield" ? "Create and Execute" : "Execute Strategy"}
           </Button>
         </div>

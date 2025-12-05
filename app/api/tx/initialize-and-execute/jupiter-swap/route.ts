@@ -1,9 +1,8 @@
-import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
-import { v0TxToBase64 } from "@/lib/utils";
-import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiter-swap";
+import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
+import { swap } from "@/lib/client/jupiter";
 import { parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -81,19 +80,15 @@ export async function POST(req: NextRequest) {
       !PublicKey.isOnCurve(vault),
       depositMintTokenProgram,
     );
-    const executeSwapResult = await swap(
-      depositMint,
-      destinationMint,
+    const executeSwapResult = await swap({
+      inputMint: depositMint,
+      outputMint: destinationMint,
       amount,
       slippageBps,
-      false,
-      true,
-      new PublicKey(vault),
-      mirrorfiClient.program.provider.connection,
-    );
-    const remainingAccounts = extractRemainingAccountsForSwap(
-      executeSwapResult.swapInstruction,
-    ).remainingAccounts;
+      exactOutRoute: false,
+      onlyDirectRoutes: true,
+      userPublicKey: vault,
+    });
 
     const ixs = [
       await mirrorfiClient.program.methods
@@ -120,14 +115,14 @@ export async function POST(req: NextRequest) {
           tokenProgram: destinationMintTokenProgram,
           vaultSourceTokenAccount: vaultDepositMintTokenAccount,
         })
-        .remainingAccounts(remainingAccounts)
+        .remainingAccounts(executeSwapResult.remainingAccounts)
         .instruction()
     ];
 
     const tx = await buildTx(ixs, new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
     return NextResponse.json({
-      tx: v0TxToBase64(tx),
+      tx,
     });
   } catch (err) {
     console.error(err);

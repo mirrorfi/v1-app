@@ -7,10 +7,9 @@ import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey, Keypair } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync } from "@solana/spl-token"
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/client/solana';
 import { getVaultBalance, ParsedVaultBalanceData, parseVaultBalanceData} from "@/lib/api";
 import { parseVault, ParsedVault } from '@/types/accounts';
-import { getConnection } from "@/lib/solana"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 import { getVaultStrategies } from "@/lib/api/accounts";
@@ -21,7 +20,6 @@ export default function VaultPage() {
   const isMobile = useIsMobile()
   const { address: vault } = useParams<{ address: string }>();
 
-  const connection = getConnection();
   const { publicKey } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,10 +63,12 @@ export default function VaultPage() {
       lastProfitLockTs: vaultBalanceData.lastProfitLockTs,
       totalShares: vaultBalanceData.totalShares,
       unclaimedManagerFee: vaultBalanceData.unclaimedManagerFee,
-      performanceFeeBps: vaultBalanceData.performanceFeeBps,
+      managerFeeBps: vaultBalanceData.performanceFeeBps,
       status: vaultBalanceData.status,
       nextStrategyId: vaultBalanceData.nextStrategyId,
       publicKey: vaultKey.toBase58(),
+      assetPerShare: vaultBalanceData.assetPerShare,
+      highWaterMark: vaultBalanceData.highWaterMark,
     }
     setVaultData(vaultData);
     setDepositData(depositData);

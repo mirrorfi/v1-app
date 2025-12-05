@@ -2,8 +2,9 @@ import { GetProgramAccountsFilter } from '@solana/web3.js';
 import { NextRequest, NextResponse } from 'next/server';
 import { DISCRIMINATOR_SIZE } from '@/lib/constants';
 import { BN } from '@coral-xyz/anchor';
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/server/solana';
 import { parseStrategy } from '@/types/accounts';
+import { BNtoBase64 } from '@/lib/utils';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -21,6 +22,7 @@ export async function GET(req: NextRequest) {
           memcmp: {
             offset: DISCRIMINATOR_SIZE,
             bytes: vault,
+            encoding: "base58",
           },
         });
       }
@@ -29,7 +31,8 @@ export async function GET(req: NextRequest) {
         filters.push({
           memcmp: {
             offset: DISCRIMINATOR_SIZE + 32 + 8,
-            bytes: new BN(id).toArrayLike(Buffer, 'le', 1).toString('base64'),
+            bytes: BNtoBase64(new BN(id), 1),
+            encoding: "base64",
           },
         });
       }
@@ -54,7 +57,7 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          strategy: await mirrorfiClient.fetchProgramAccount(pdas[0], "strategy", parseStrategy),
+          strategies: [await mirrorfiClient.fetchProgramAccount(pdas[0], "strategy", parseStrategy)],
         },
         {
           status: 200,

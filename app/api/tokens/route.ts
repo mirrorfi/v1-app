@@ -1,4 +1,4 @@
-import { getTokenInfos } from "@/lib/api/jupiter";
+import { getJupiterTokenInfos } from "@/lib/server/jupiter";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const mints = ids.split(',');
 
     return NextResponse.json({
-      tokenInfos: getTokenInfos(mints),
+      tokenInfos: await getJupiterTokenInfos(mints),
     })
   } catch (err) {
     console.error(err);

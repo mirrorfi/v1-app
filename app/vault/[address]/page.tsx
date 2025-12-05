@@ -7,19 +7,18 @@ import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey } from "@solana/web3.js"
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token"
-import { mirrorfiClient } from '@/lib/solana-server';
-import { getPrices, getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
+import { mirrorfiClient } from '@/lib/client/solana';
+import { getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
-import { getConnection } from "@/lib/solana"
-import { useWallet } from "@solana/wallet-adapter-react"
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
   const {address: vault } = useParams<{ address: string }>();
 
-  const connection = getConnection();
   const { publicKey } = useWallet();
+  const { connection } = useConnection();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(false);
@@ -58,7 +57,7 @@ export default function VaultPage() {
     if(!vaultData.publicKey){ throw new Error("Invalid vault data: missing publicKey"); }
     if(!vaultData.depositMint){ throw new Error("Invalid vault data: missing depositMint"); }
     // Fetch Vault Depositor Account
-    const vaultDepositorPda = mirrorfiClient.getVaultDepositorPda(new PublicKey(vaultData.publicKey), user);
+    const vaultDepositorPda = mirrorfiClient.getVaultDepositorPda(user, new PublicKey(vaultData.publicKey));
     const vaultDepositor = await mirrorfiClient.fetchProgramAccount(vaultDepositorPda.toBase58(), "vaultDepositor", parseVaultDepositor);
     const userShares = vaultDepositor ? vaultDepositor.shares : "0";
     // Calculate Share Price
@@ -101,10 +100,12 @@ export default function VaultPage() {
       lastProfitLockTs: vaultBalanceData.lastProfitLockTs,
       totalShares: vaultBalanceData.totalShares,
       unclaimedManagerFee: vaultBalanceData.unclaimedManagerFee,
-      performanceFeeBps: vaultBalanceData.performanceFeeBps,
+      managerFeeBps: vaultBalanceData.managerFeeBps,
       status: vaultBalanceData.status,
       nextStrategyId: vaultBalanceData.nextStrategyId,
       publicKey: vaultKey.toBase58(),
+      assetPerShare: vaultBalanceData.assetPerShare,
+      highWaterMark: vaultBalanceData.highWaterMark,
     }
     setVaultData(vaultData);
     setDepositData(depositData);
@@ -153,7 +154,7 @@ export default function VaultPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
-      <GridStyleBackground />
+      {!isMobile && <GridStyleBackground />}
       <Navbar />
       
       {/* Conditional rendering based on screen size */}

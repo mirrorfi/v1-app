@@ -1,4 +1,4 @@
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/server/solana';
 import { parseConfig } from '@/types/accounts';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -8,7 +8,7 @@ export  async function GET(req: NextRequest) {
   try {
     return NextResponse.json(
       {
-        config: await mirrorfiClient.fetchProgramAccount(configPda.toBase58(), "config", parseConfig),
+        config: await mirrorfiClient.fetchProgramAccount(configPda, "config", parseConfig),
       },
       {
         status: 200,

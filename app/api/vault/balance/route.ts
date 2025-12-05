@@ -1,6 +1,6 @@
-import { getTokenInfos } from "@/lib/api/jupiter";
+import { getJupiterTokenInfos } from "@/lib/server/jupiter";
 import { DISCRIMINATOR_SIZE } from "@/lib/constants";
-import { mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
+import { mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
         const depositMint = new PublicKey(vault.depositMint);
         const depositMintIndex = depositMint.toBase58();
-        const tokenInfo = (await getTokenInfos([depositMintIndex]))[depositMintIndex];
+        const tokenInfo = (await getJupiterTokenInfos([depositMintIndex]))[depositMintIndex];
         const tokenProgram = new PublicKey(tokenInfo.tokenProgram);
         const vaultAta = getAssociatedTokenAddressSync(
           depositMint,
@@ -48,9 +48,9 @@ export async function GET(req: NextRequest) {
 
         const strategiesWithNav = await Promise.all(
           strategies.map(async (strategy) => {
-            if (strategy.strategyType.jupiterSwap) {
+            if ("jupiterSwap" in strategy.strategyType) {
               const index = strategy.strategyType.jupiterSwap.targetMint;
-              const tokenInfo = (await getTokenInfos([index]))[index];
+              const tokenInfo = (await getJupiterTokenInfos([index]))[index];
               const tokenProgram = new PublicKey(tokenInfo.tokenProgram);
               const ata = getAssociatedTokenAddressSync(
                 new PublicKey(index),

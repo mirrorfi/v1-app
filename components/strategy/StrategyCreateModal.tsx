@@ -32,12 +32,28 @@ const STRATEGY_OPTIONS: StrategyOption[] = [
     active: true
   },
   {
-    id: "jupiterYieldToken", 
+    id: "jupiterYieldToken",
     name: "Yield Tokens",
     platform: "Jupiter",
     description: "Yield farming with tokens",
     icon: "https://static1.tokenterminal.com//jupiter/logo.png?logo_hash=6745b324c298242676b7eab38db2c28901075b4f",
     active: true
+  },
+  {
+    id: "meteora-damm",
+    name: "LP",
+    platform: "Meteora DAMM V2",
+    description: "Alternative DLMM strategy",
+    icon: "https://docs.meteora.ag/images/logo/meteora.png",
+    active: true
+  },
+  {
+    id: "meteora-dlmm",
+    name: "LP",
+    platform: "Meteora DLMM",
+    description: "Dynamic liquidity market making",
+    icon: "https://docs.meteora.ag/images/logo/meteora.png",
+    active: false
   },
   {
     id: "borrow-lend-kamino",
@@ -53,22 +69,6 @@ const STRATEGY_OPTIONS: StrategyOption[] = [
     platform: "Jupiter Lend",
     description: "Jupiter lending protocols",
     icon: "https://static1.tokenterminal.com//jupiter/logo.png?logo_hash=6745b324c298242676b7eab38db2c28901075b4f",
-    active: false
-  },
-  {
-    id: "meteora-dlmm",
-    name: "LP",
-    platform: "Meteora DLMM",
-    description: "Dynamic liquidity market making",
-    icon: "https://docs.meteora.ag/images/logo/meteora.png",
-    active: false
-  },
-  {
-    id: "meteora-damm",
-    name: "LP",
-    platform: "Meteora DAMM V2",
-    description: "Alternative DLMM strategy",
-    icon: "https://docs.meteora.ag/images/logo/meteora.png",
     active: false
   },
   {
@@ -89,33 +89,31 @@ const STRATEGY_OPTIONS: StrategyOption[] = [
   }
 ];
 
-function StrategyOptionCard({ 
-  option, 
-  isSelected, 
-  onClick 
-}: { 
-  option: StrategyOption; 
-  isSelected: boolean; 
-  onClick: () => void; 
+function StrategyOptionCard({
+  option,
+  isSelected,
+  onClick
+}: {
+  option: StrategyOption;
+  isSelected: boolean;
+  onClick: () => void;
 }) {
   const isInactive = !option.active;
-  
+
   return (
-    <Card 
-      className={`relative transition-all duration-200 overflow-hidden ${
-        isInactive 
-          ? 'bg-slate-900/50 border-slate-700/30 opacity-60 cursor-not-allowed' 
-          : `cursor-pointer hover:scale-102 ${
-              isSelected 
-                ? 'bg-blue-600/20 border-blue-500/50 shadow-lg shadow-blue-500/20' 
-                : 'bg-slate-800/50 border-slate-600/30 hover:bg-slate-700/50'
-            }`
-      }`}
+    <Card
+      className={`relative transition-all duration-200 overflow-hidden ${isInactive
+          ? 'bg-slate-900/50 border-slate-700/30 opacity-60 cursor-not-allowed'
+          : `cursor-pointer hover:scale-102 ${isSelected
+            ? 'bg-blue-600/20 border-blue-500/50 shadow-lg shadow-blue-500/20'
+            : 'bg-slate-800/50 border-slate-600/30 hover:bg-slate-700/50'
+          }`
+        }`}
       onClick={isInactive ? undefined : onClick}
     >
       {/* Background token image on the right */}
       <div className="absolute right-0 top-0 w-40 h-full opacity-50 overflow-hidden">
-        <div 
+        <div
           className="w-40 h-40 bg-contain bg-no-repeat bg-center transform translate-x-2 -translate-y-3 rounded-full"
           style={{
             backgroundImage: `url(${option.icon})`,
@@ -165,26 +163,18 @@ export function StrategyCreateModal({ isOpen, onClose, onCreateStrategy }: Strat
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl bg-slate-900/95 border-slate-700/50 backdrop-blur-sm flex flex-col max-h-[85vh] sm:max-h-[90vh]">
+      <DialogContent className="max-w-2xl pb-0 pl-4.5 pr-2.5 bg-slate-900/95 border-slate-700/50 backdrop-blur-sm flex flex-col min-h-screen sm:min-h-[80vh] sm:max-h-[85vh] z-[200] md:mt-10 w-full">
         {/* Fixed Header */}
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold text-white">
               Create Strategy
             </DialogTitle>
-            {/*<Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50"
-            >
-              <X className="h-4 w-4" />
-            </Button>*/}
           </div>
         </DialogHeader>
 
         {/* Scrollable Content Area */}
-        <div className="h-[600px] flex-1 overflow-y-auto pt-2 sm:pt-4 pb-0">
+        <div className="h-[600px] flex-1 overflow-y-auto pt-2 sm:pt-4 pb-0 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {STRATEGY_OPTIONS.map((option) => (
               <StrategyOptionCard
@@ -198,15 +188,14 @@ export function StrategyCreateModal({ isOpen, onClose, onCreateStrategy }: Strat
         </div>
 
         {/* Sticky Footer with Create Button */}
-        <div className="sticky bottom-0 flex-shrink-0 bg-slate-900/95 backdrop-blur-sm border-t border-slate-700/50 pt-4 pb-2 mt-4">
+        <div className="sticky bottom-0 flex-shrink-0 bg-slate-900/95 backdrop-blur-sm border-t border-slate-700/50 pt-4 pb-4 mt-4">
           <Button
             onClick={handleCreateStrategy}
             disabled={!selectedStrategy}
-            className={`w-full h-12 sm:h-15 py-3 sm:py-4 text-lg sm:text-xl font-semibold rounded-xl transition-all duration-200 ${
-              selectedStrategy
+            className={`w-full h-12 sm:h-15 py-3 sm:py-4 text-lg sm:text-xl font-semibold rounded-xl transition-all duration-200 ${selectedStrategy
                 ? 'bg-blue-600 hover:bg-blue-800 text-white shadow-lg shadow-blue-500/20'
                 : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             Create
           </Button>
