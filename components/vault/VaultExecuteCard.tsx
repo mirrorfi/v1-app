@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { ArrowUpRight } from "lucide-react"
 import { logActivity, LogActivityParams } from '@/lib/utils/activity-logger';
 
-export function VaultDashboardExecuteCard({ vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance }: { vault: string, vaultData: any, depositData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number }) {
+export function VaultExecuteCard({ vault, vaultData, depositData, positionBalance, sharePrice, handleReload, tokenPrice, tokenBalance }: { vault: string, vaultData: any, depositData: any, positionBalance: number, sharePrice: number, handleReload: () => void, tokenPrice: number, tokenBalance: number }) {
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeAction, setActiveAction] = useState<"deposit" | "withdraw">("deposit")
@@ -43,7 +43,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
       console.log("User Maximum Withdraw Amount (USDC):", amount);
     }
 
-    const computed = amount * percent
+    const computed = Math.floor(amount * percent * 10**depositData.tokenInfo.decimals) / 10**depositData.tokenInfo.decimals;
     setAmount(computed.toString())
   }
 
@@ -73,7 +73,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
       // Fetch Transaction Details from API
       if (activeAction === "deposit") {
         res = await getDepositVaultTx({
-          amount: (Number.parseFloat(amount) * 10 ** depositData.tokenInfo.decimals).toString(),
+          amount: Math.floor(Number.parseFloat(amount) * 10 ** depositData.tokenInfo.decimals).toString(),
           depositor: publicKey.toString(),
           vault,
         })
@@ -149,58 +149,65 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
           </div>
         </div>
       )}
-      <Card className={`bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-lg shadow-lg ${/*hover:bg-blue-900/30*/""} transition-all duration-200`}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-white text-lg">{vaultData ? vaultData.name : "Loading..."}</CardTitle>
-            {/*<div className="text-lg text-green-400 font-medium">APY: {apy}%</div>*/}
-          </div>
-          <div className="mb-2 text-xs text-gray-400">
-            Created By: {vaultData ? formatAddress(vaultData.authority.toString()) : "Loading..."}
-          </div>
-          <div className="text-sm text-gray-300 leading-relaxed">
-            {vaultData ? vaultData.description : "Loading..."}
-          </div>
-        </CardHeader>
+      <Card className="bg-[#101018] border border-[#16161f] rounded-xl py-0">
+        {/* Deposit/Withdraw Toggle - Top Section */}
+        <div className="flex w-full">
+          <button
+            onClick={() => setActiveAction("deposit")}
+            className={`flex-1 py-4 text-xl font-semibold transition-all relative ${
+              activeAction === "deposit"
+                ? "text-white bg-[#101018] border-b-2 border-blue-500"
+                : "text-gray-500 bg-[#05050a] border-b-2 border-[#16161f]"
+            }`}
+          >
+            Deposit
+          </button>
+          <button
+            onClick={() => setActiveAction("withdraw")}
+            className={`flex-1 py-4 text-xl font-semibold transition-all relative ${
+              activeAction === "withdraw"
+                ? "text-white bg-[#101018] border-b-2 border-blue-500"
+                : "text-gray-500 bg-[#05050a] border-b-2 border-[#16161f]"
+            }`}
+          >
+            Withdraw
+          </button>
+        </div>
 
         <CardContent className="space-y-4 pb-6">
           {/*<div className="inline-flex items-center px-2 py-1 bg-blue-600/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
             {/*Lending
           </div>*/}
 
-          <div className="space-y-3 mt-6">
-            {/* Deposit/Withdraw Toggle */}
-            <div className="flex rounded-md overflow-hidden">
-              <Button
-                onClick={() => setActiveAction("deposit")}
-                className={`flex-1 py-2 text-sm font-medium ${activeAction === "deposit"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
-              >
-                Deposit
-              </Button>
-              <Button
-                onClick={() => setActiveAction("withdraw")}
-                className={`flex-1 py-2 text-sm font-medium ${activeAction === "withdraw"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-[#1A202C] text-gray-400 hover:bg-[#2D3748] hover:text-gray-300"}`}
-              >
-                Withdraw
-              </Button>
+          {/* Max Deposit Label */}
+          {vaultData && false && <div className="mt-3 bg-amber-500/20 border-2 border-amber-500/50 rounded-lg p-3">
+            <div className="text-amber-300 font-semibold text-sm">
+              ⚠️ Max Deposit: {Number(vaultData.depositCap) / 10 ** depositData.tokenInfo.decimals} {depositData?.tokenInfo.symbol || ""}
             </div>
-
-            <div className="bg-[#0F1218] rounded-lg border border-[#2D3748]/50 p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Image src={depositData ? depositData.tokenInfo.icon : `/PNG/usdc-logo.png`} alt="Deposit Mint Logo" width={25} height={25} />
-                  <span className="text-white font-medium">{depositData ? depositData.tokenInfo.symbol : ""}</span>
+            <div className="text-amber-200/50 text-xs mt-1 font-normal">
+              This app is currently in beta
+            </div>
+          </div>}
+          <div className="space-y-5">
+            <div className="bg-[#0d0d14] rounded-lg border border-[#16161f] p-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <img src={depositData ? depositData.tokenInfo.icon : `/PNG/usdc-logo.png`} alt="Deposit Mint Logo" className="w-8 h-8 rounded-full" />
+                  <div>
+                    <div className="text-white font-medium">{depositData ? depositData.tokenInfo.symbol : ""}</div>
+                    <div className="text-slate-400 text-sm">
+                      Balance: {activeAction === "deposit" 
+                        ? formatNumber(tokenBalance, 2)
+                        : formatNumber(positionBalance * sharePrice, 2)}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(0.25)}
-                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 text-xs bg-[#1a1a2e] border-[#16161f] text-gray-300 hover:bg-[#2a2a3e] hover:text-white"
                   >
                     25%
                   </Button>
@@ -208,7 +215,7 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(0.5)}
-                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 text-xs bg-[#1a1a2e] border-[#16161f] text-gray-300 hover:bg-[#2a2a3e] hover:text-white"
                   >
                     50%
                   </Button>
@@ -216,40 +223,29 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
                     size="sm"
                     variant="outline"
                     onClick={() => handlePercent(1)}
-                    className="h-6 px-1.5 text-xs bg-[#2D3748] border-[#4A5568] text-gray-300 hover:bg-[#4A5568] hover:text-white"
+                    className="h-6 px-1.5 text-xs bg-[#1a1a2e] border-[#16161f] text-gray-300 hover:bg-[#2a2a3e] hover:text-white"
                   >
                     100%
                   </Button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-3 relative z-10">
+              <div className="flex items-center justify-between relative">
                 <input
                   type="text"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  placeholder={`${depositData ? depositData.tokenInfo.symbol : ""}`}
-                  className="bg-transparent text-white text-lg font-medium outline-none flex-1 placeholder-gray-500 cursor-text relative z-20"
-                  style={{ pointerEvents: 'auto' }}
+                  placeholder="0.0"
+                  className="bg-transparent text-white text-lg font-medium outline-none flex-1 relative z-10 pointer-events-auto"
                 />
-                <span className="text-gray-400 text-sm pointer-events-none">${formatNumber(Number(usdValue), 2)}</span>
+                <span className="text-gray-400 text-sm ml-2">${formatNumber(Number(usdValue), 2)}</span>
               </div>
-
-              {/* Max Deposit Label */}
-              {vaultData && <div className="mt-3 bg-amber-500/20 border-2 border-amber-500/50 rounded-lg p-3">
-                <div className="text-amber-300 font-semibold text-sm">
-                  ⚠️ Max Deposit: {Number(vaultData.depositCap) / 10 ** depositData.tokenInfo.decimals} {depositData?.tokenInfo.symbol || ""}
-                </div>
-                <div className="text-amber-200/50 text-xs mt-1 font-normal">
-                  This app is currently in beta
-                </div>
-              </div>}
             </div>
 
             <Button
               onClick={handleConfirm}
               disabled={!amount || Number.parseFloat(amount) <= 0 || isLoading}
-              className="w-full text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700"
+              className="w-full text-white font-semibold text-xl py-6 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700"
             >
               {isLoading ? "Processing..." : activeAction === "deposit" ? "Deposit" : "Withdraw"}
             </Button>
@@ -262,13 +258,15 @@ export function VaultDashboardExecuteCard({ vault, vaultData, depositData, posit
 
 export function VaultDashboardExecuteCardSkeleton() {
   return <>
-    <Card className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 border-slate-700/50 backdrop-blur-sm rounded-xl shadow-2xl p-6">
-      <Skeleton className="h-38 w-full" />
-      <Skeleton className="h-28 w-full" />
-      <div className="grid grid-cols-2 gap-4">
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
+    <Card className="bg-[#101018] border border-[#16161f] rounded-xl py-0">
+      <div className="flex w-full border-b border-[#16161f]">
+        <Skeleton className="h-14 flex-1" />
+        <Skeleton className="h-14 flex-1" />
       </div>
+      <CardContent className="space-y-4 pb-6">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </CardContent>
     </Card>
   </>
 }

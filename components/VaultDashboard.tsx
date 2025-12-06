@@ -8,13 +8,12 @@ import { useEffect, useState } from "react"
 import { getVaultBalance } from "@/lib/api/vault"
 import { ArrowLeft, AlertCircle, RefreshCw, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Skeleton } from "./ui/skeleton"
-import { mirrorfiClient } from '@/lib/client/solana';
-import { getPrices } from "@/lib/api/metadata"
-import { parseVault } from '@/types/accounts';
 
-import { VaultDashboardExecuteCard, VaultDashboardExecuteCardSkeleton } from "@/components/VaultDashboardExecuteCard"
-import { VaultDashboardChart } from "@/components/VaultDashboardChart";
+import { VaultExecuteCard} from "@/components/vault/VaultExecuteCard"
+import { VaultData } from "@/components/vault/VaultData"
+import { VaultChart } from "@/components/vault/VaultChart";
+import { VaultBalances } from "@/components/vault/VaultBalances"
+import { VaultAllocation } from "@/components/vault/VaultAllocation"
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
@@ -43,23 +42,12 @@ const strategy = {
 }
 
 export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: StrategyDashboardProps) {
-  const [activeTab, setActiveTab] = useState("vault-stats")
-  const tabs = [
-    { id: "vault-stats", label: "Vault Stats" },
-    { id: "your-position", label: "Your Position" },
-    //{ id: "overview", label: "Overview" },
-  ]
-
   const { publicKey } = useWallet();
   const router = useRouter();
   const [vaultBalances, setVaultBalances] = useState<any>(null);
 
   // Check if current user has managing authority
   const hasManagingAuthority = publicKey && vaultData && publicKey.toString() === vaultData.authority;
-
-  const onTabChange = (tabName: string) => {
-    setActiveTab(tabName)
-  }
 
   const handleBackClick = () => {
     router.push('/');
@@ -71,16 +59,25 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
 
   return (
     <div className="w-full max-w-7xl mx-auto p-8 md:p-6">
-      {/* Back Button */}
-      <div className="mb-4">
+      {/* Header with Back Button and Vault Info */}
+      <div className="mb-6 flex items-center gap-4">
         <Button
           variant="ghost"
           onClick={handleBackClick}
           className="text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 h-auto"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
+          <ArrowLeft className="h-5 w-5" />
         </Button>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-white">
+            {vaultData?.name || depositData?.tokenInfo?.symbol + " Vault" || "Vault Dashboard"}
+          </h1>
+          {vaultData?.description && (
+            <p className="text-sm text-slate-400 mt-1">
+              {vaultData.description}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Error Display */}
@@ -120,58 +117,23 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
 
       {/* Main Dashboard Content - Only show if no error */}
       {!error && (
-        <>
-      {/* Navigation Tabs with Management Authority - Mobile responsive */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <div className="flex flex-wrap gap-2 overflow-x-auto">
-          {tabs.map((tab) => (
-            <Button
-              key={tab.id}
-              variant={activeTab === tab.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => onTabChange?.(tab.id)}
-              className={`whitespace-nowrap text-xs md:text-sm ${
-                activeTab === tab.id
-                  ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
-                  : "bg-transparent border-blue-700/50 text-blue-300 hover:bg-blue-800/30 hover:text-white"
-              }`}
-            >
-              {tab.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-
+      <>
       <div className="space-y-4">
         {/* Mobile: Stack all content vertically */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
           {/* Main Content */}
-          {activeTab == "vault-stats" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardFlow vaultData={vaultData} depositData={depositData} strategyData={strategiesData} />
-              {/*<VaultDashboardChart vaultAddress={vault} />*/}
-              <VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} />
-            </div>
-          )}
-          {activeTab == "your-position" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              <VaultDashboardPNLCard 
-                positionBalance={positionBalance} 
-                tokenPrice={tokenPrice}
-                isLoading={isLoading}
-              />
-              {/*<VaultDashboardUserPosition vaultDepositor={vaultDepositorInfo} positionBalance={positionBalance} tokenPrice={tokenPrice}/> */}
-            </div>
-          )}
-          {activeTab == "overview" && (
-            <div className="xl:col-span-2 space-y-4 order-2 xl:order-1">
-              {/*<VaultDashboardBalances vaultBalances={vaultBalances} isLoading={isLoading} />*/}
-            </div>
-          )}
-
+          <div className="xl:col-span-3 space-y-4 order-2 xl:order-1">
+            {/*<VaultDashboardFlow vaultData={vaultData} depositData={depositData} strategyData={strategiesData} />*/}
+            <VaultChart vaultAddress={vault} />
+            <VaultData depositData={depositData} vaultData={vaultData}/>
+            <VaultBalances  depositData={depositData} vaultData={vaultData} strategiesData={strategiesData}/>
+            {/*<VaultDashboardBalances depositData={depositData} strategiesData={strategiesData} isLoading={isLoading} />*/}
+          </div>
+          
           {/* Execute Card - Show first on mobile */}
-          <div className="xl:col-span-1 order-1 xl:order-2">
-            {vaultData ? <VaultDashboardExecuteCard 
+          <div className="xl:col-span-2 space-y-4 order-1 xl:order-1">
+            {/*Deposit/Withdraw Section*/}
+            {vaultData && depositData && <VaultExecuteCard 
               vault={vault} 
               vaultData={vaultData} 
               depositData={depositData}
@@ -180,7 +142,20 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
               handleReload={handleReload} 
               tokenPrice={tokenPrice} 
               tokenBalance={tokenBalance} 
-            />: <VaultDashboardExecuteCardSkeleton />}
+            />}
+            {/*Show User Position*/}
+            <VaultDashboardPNLCard 
+              positionBalance={positionBalance} 
+              tokenPrice={sharePrice}
+              isLoading={isLoading}
+              depositData={depositData}
+            />
+            {/*Asset Allocation*/}
+            {/*<VaultAllocation
+              depositData={depositData}
+              strategiesData={strategiesData}
+              isLoading={isLoading}
+            />*/}
           </div>
         </div>
       </div>

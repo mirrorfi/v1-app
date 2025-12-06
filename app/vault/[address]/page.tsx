@@ -154,7 +154,7 @@ export default function VaultPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
-      <GridStyleBackground />
+      {!isMobile && <GridStyleBackground />}
       <Navbar />
       
       {/* Conditional rendering based on screen size */}
