@@ -72,12 +72,12 @@ export interface UserPosition {
 }
 
 export interface UserStats {
-    title: string;
-    value: string;
-    subValue?: string;
-    icon: any;
-    color: string;
-    isPositive?: boolean;
+  title: string;
+  value: string;
+  subValue?: string;
+  icon: any;
+  color: string;
+  isPositive?: boolean;
 }
 
 interface PortfolioStats {
@@ -306,17 +306,16 @@ export default function ProfilePage() {
       console.log("Payload data:", payload[0]);
       console.log("Full payload:", payload);
       const vaultAddress = payload[0].payload.vault;
-      const truncatedVault = vaultAddress.length > 20 
-        ? `${vaultAddress.slice(0, 8)}...${vaultAddress.slice(-8)}`
-        : vaultAddress;
+      const truncatedVault =
+        vaultAddress.length > 20
+          ? `${vaultAddress.slice(0, 8)}...${vaultAddress.slice(-8)}`
+          : vaultAddress;
       return (
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-lg">
           <p className="text-sm text-slate-300 font-medium">
             {payload[0].name}
           </p>
-          <p className="text-xs text-slate-400 mb-2">
-            {truncatedVault}
-          </p>
+          <p className="text-xs text-slate-400 mb-2">{truncatedVault}</p>
           <p className="text-lg text-white font-bold">
             ${payload[0].value.toFixed(2)}
           </p>
@@ -328,6 +327,101 @@ export default function ProfilePage() {
     }
     return null;
   };
+
+  // THIS IS FOR ARCHIVING INCASE WE NEED IT AGAIN
+  function portfolioOverview() {
+    {
+      /* Portfolio Overview Cards */
+    }
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-12">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-full">
+              <StatCard
+                title="Total Value"
+                value={`$${portfolioStats.totalValue.toFixed(2)}`}
+                icon={DollarSign}
+                color="blue"
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Total value of all your positions</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-full">
+              <StatCard
+                title="24h P&L"
+                value={`$${portfolioStats.totalPnL.toFixed(2)}`}
+                subValue={`${
+                  portfolioStats.pnlPercentage >= 0 ? "+" : ""
+                }${portfolioStats.pnlPercentage.toFixed(2)}%`}
+                icon={
+                  portfolioStats.pnlPercentage >= 0 ? TrendingUp : TrendingDown
+                }
+                color={portfolioStats.pnlPercentage >= 0 ? "green" : "red"}
+                isPositive={portfolioStats.pnlPercentage >= 0}
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Profit/Loss over the last 24 hours</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-full">
+              <StatCard
+                title="Active Positions"
+                value={portfolioStats.positionsCount.toString()}
+                icon={Activity}
+                color="purple"
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Number of vaults you're invested in</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              className="h-full"
+              href={`/vault/${portfolioStats.bestPerformer?.vault}`}
+            >
+              <StatCard
+                title="Best Performer"
+                value={portfolioStats.bestPerformer?.name.slice(0, 12) || "N/A"}
+                subValue={
+                  portfolioStats.bestPerformer
+                    ? `+${portfolioStats.bestPerformer.change.toFixed(2)}%`
+                    : ""
+                }
+                icon={ArrowUpRight}
+                color="green"
+              />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{"Your top performing vault"}</p>
+            <p className="text-xs text-slate-200">Click to view vault</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>;
+  }
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-black">
@@ -362,12 +456,12 @@ export default function ProfilePage() {
         ) : isLoading ? (
           <PositionCardSkeleton />
         ) : userPositions.length === 0 ? (
-            <>
+          <>
             <div className="mb-8">
               <ProfileCard />
             </div>
             <EmtpyPosition />
-            </>
+          </>
         ) : (
           <>
             {/* Profile Card */}
@@ -375,108 +469,116 @@ export default function ProfilePage() {
               <ProfileCard />
             </div>
 
-            {/* Portfolio Overview Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-12">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="h-full">
-                      <StatCard
-                        title="Total Value"
-                        value={`$${portfolioStats.totalValue.toFixed(2)}`}
-                        icon={DollarSign}
-                        color="blue"
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Total value of all your positions</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="h-full">
-                      <StatCard
-                        title="24h P&L"
-                        value={`$${portfolioStats.totalPnL.toFixed(2)}`}
-                        subValue={`${
-                          portfolioStats.pnlPercentage >= 0 ? "+" : ""
-                        }${portfolioStats.pnlPercentage.toFixed(2)}%`}
-                        icon={
-                          portfolioStats.pnlPercentage >= 0
-                            ? TrendingUp
-                            : TrendingDown
-                        }
-                        color={
-                          portfolioStats.pnlPercentage >= 0 ? "green" : "red"
-                        }
-                        isPositive={portfolioStats.pnlPercentage >= 0}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Profit/Loss over the last 24 hours</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="h-full">
-                      <StatCard
-                        title="Active Positions"
-                        value={portfolioStats.positionsCount.toString()}
-                        icon={Activity}
-                        color="purple"
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Number of vaults you're invested in</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link className="h-full"
-                    href = {`/vault/${portfolioStats.bestPerformer?.vault}`}
-                    >
-                      <StatCard
-                        title="Best Performer"
-                        value={
-                          portfolioStats.bestPerformer?.name.slice(0, 12) ||
-                          "N/A"
-                        }
-                        subValue={
-                          portfolioStats.bestPerformer
-                            ? `+${portfolioStats.bestPerformer.change.toFixed(
-                                2
-                              )}%`
-                            : ""
-                        }
-                        icon={ArrowUpRight}
-                        color="green"
-                      />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{"Your top performing vault"}</p>
-                    <p className="text-xs text-slate-200">
-                      Click to view vault
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Asset Allocation Chart */}
+              <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/10 border-purple-700/30 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden">
+                <CardContent className="p-6 lg:p-8">
+                  <div className="flex items-start justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                        <TrendingUp className="h-5 w-5 text-purple-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">
+                        Asset Allocation
+                      </h3>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
+                        Portfolio Value
+                      </p>
+                      <p className="text-2xl font-bold text-white tracking-tight">
+                        $
+                        {portfolioStats.totalValue.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-center">
+                    <ResponsiveContainer
+                      width="100%"
+                      height={isMobile ? 180 : 220}
+                    >
+                      <RechartsPieChart>
+                        <Pie
+                          data={allocationData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={isMobile ? 50 : 65}
+                          outerRadius={isMobile ? 75 : 95}
+                          paddingAngle={3}
+                          dataKey="value"
+                          onClick={(data) => {
+                            if (data && data.vault) {
+                              router.push(`/vault/${data.vault}`);
+                            }
+                          }}
+                          style={{ cursor: "pointer" }}
+                          strokeWidth={2}
+                          stroke="rgb(88, 28, 135, 0.3)"
+                        >
+                          {allocationData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.color}
+                              className="transition-opacity hover:opacity-80"
+                            />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip content={<PieChartToolTip />} />
+                        {!isMobile && (
+                          <Legend
+                            verticalAlign="middle"
+                            align="right"
+                            layout="vertical"
+                            iconType="circle"
+                            iconSize={8}
+                            wrapperStyle={{
+                              paddingLeft: "32px",
+                            }}
+                            formatter={(value, entry: any) => (
+                              <span className="text-sm text-slate-300 font-medium ml-2">
+                                {value.slice(0, 20)}
+                                <span className="text-slate-400 ml-2">
+                                  {entry.payload.percentage}%
+                                </span>
+                              </span>
+                            )}
+                          />
+                        )}
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {isMobile && allocationData.length > 0 && (
+                    <div className="mt-6 space-y-3 pt-6 border-t border-purple-700/20">
+                      {allocationData.map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-2.5 w-2.5 rounded-full"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span className="text-sm font-medium text-white">
+                              {item.name}
+                            </span>
+                          </div>
+                          <span className="text-sm text-slate-400">
+                            {item.percentage}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* Performance Chart */}
               <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-700/30 backdrop-blur-sm rounded-xl shadow-lg">
                 <CardContent className="p-6">
@@ -549,58 +651,6 @@ export default function ProfilePage() {
                         fill="url(#colorValue)"
                       />
                     </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Asset Allocation Chart */}
-              <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/10 border-purple-700/30 backdrop-blur-sm rounded-xl shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                      <PieChart className="h-5 w-5 text-purple-400" />
-                      Asset Allocation
-                    </h3>
-                  </div>
-                  <ResponsiveContainer
-                    width="100%"
-                    height={isMobile ? 200 : 250}
-                  >
-                    <RechartsPieChart>
-                      <Pie
-                        data={allocationData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={isMobile ? 40 : 60}
-                        outerRadius={isMobile ? 70 : 90}
-                        paddingAngle={2}
-                        dataKey="value"
-                        onClick={(data) => {
-                          if (data && data.vault) {
-                            router.push(`/vault/${data.vault}`);
-                          }
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {allocationData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip content={<PieChartToolTip />} />
-                      {!isMobile && (
-                        <Legend
-                          verticalAlign="middle"
-                          align="right"
-                          layout="vertical"
-                          iconType="circle"
-                          formatter={(value, entry: any) => (
-                            <span className="text-xs text-slate-300">
-                              {value.slice(0, 15)} ({entry.payload.percentage}%)
-                            </span>
-                          )}
-                        />
-                      )}
-                    </RechartsPieChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
