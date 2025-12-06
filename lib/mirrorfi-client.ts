@@ -13,6 +13,12 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
 
   configPda = this.getConfigPda();
   treasuryPda = this.getTreasuryPda();
+  meteoraDammV2EventAuthority = new PublicKey(
+    "3rmHSu74h1ZcmAisVcWerTCiRDQbUrBKmcwptYGjHfet",
+  );
+  meteoraDammV2PoolAuthority = new PublicKey(
+    "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+  );
 
   getConfigPda() {
     return PublicKey.findProgramAddressSync(
@@ -214,7 +220,6 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     liquidityDelta,
     tokenAAmountThreshold,
     tokenBAmountThreshold,
-    eventAuthority,
     pool,
     poolTokenAAccount,
     poolTokenBAccount,
@@ -233,7 +238,6 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     liquidityDelta: BigIntString;
     tokenAAmountThreshold: BigIntString;
     tokenBAmountThreshold: BigIntString;
-    eventAuthority: Address;
     pool: Address;
     poolTokenAAccount: Address;
     poolTokenBAccount: Address;
@@ -257,7 +261,7 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
       })
       .accounts({
         config: this.configPda,
-        eventAuthority,
+        eventAuthority: this.meteoraDammV2EventAuthority,
         pool,
         poolTokenAAccount,
         poolTokenBAccount,
@@ -334,11 +338,9 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     liquidityDelta,
     tokenAAmountThreshold,
     tokenBAmountThreshold,
-    eventAuthority,
     pool,
     poolTokenAAccount,
     poolTokenBAccount,
-    poolAuthority,
     position,
     positionNftAccount,
     strategy,
@@ -355,11 +357,9 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     liquidityDelta: BigIntString;
     tokenAAmountThreshold: BigIntString;
     tokenBAmountThreshold: BigIntString;
-    eventAuthority: Address;
     pool: Address;
     poolTokenAAccount: Address;
     poolTokenBAccount: Address;
-    poolAuthority: Address;
     position: Address;
     positionNftAccount: Address;
     strategy: Address;
@@ -381,11 +381,11 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
       )
       .accounts({
         config: this.configPda,
-        eventAuthority,
+        eventAuthority: this.meteoraDammV2EventAuthority,
         pool,
         poolTokenAAccount,
         poolTokenBAccount,
-        poolAuthority,
+        poolAuthority: this.meteoraDammV2PoolAuthority,
         position,
         positionNftAccount,
         strategy,
@@ -425,18 +425,14 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
   }
 
   async initializeStrategyMeteoraDammV2Ix({
-    eventAuthority,
     pool,
-    poolAuthority,
     position,
     positionNftAccount,
     positionNftMint,
     vault,
     authority,
   }: {
-    eventAuthority: Address;
     pool: Address;
-    poolAuthority: Address;
     position: Address;
     positionNftAccount: Address;
     positionNftMint: Address;
@@ -446,9 +442,9 @@ export class MirrorFiClient extends ProgramClient<Mirrorfi> {
     return this.program.methods
       .initializeStrategyMeteoraDammV2()
       .accounts({
-        eventAuthority,
+        eventAuthority: this.meteoraDammV2EventAuthority,
         pool,
-        poolAuthority,
+        poolAuthority: this.meteoraDammV2PoolAuthority,
         position,
         positionNftAccount,
         positionNftMint,
