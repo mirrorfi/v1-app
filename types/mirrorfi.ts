@@ -1339,7 +1339,8 @@ export type Mirrorfi = {
           "name": "positionNftAccount"
         },
         {
-          "name": "positionNftMint"
+          "name": "positionNftMint",
+          "signer": true
         },
         {
           "name": "systemProgram",

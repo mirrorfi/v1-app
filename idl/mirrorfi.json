@@ -1333,7 +1333,8 @@
           "name": "position_nft_account"
         },
         {
-          "name": "position_nft_mint"
+          "name": "position_nft_mint",
+          "signer": true
         },
         {
           "name": "system_program",
