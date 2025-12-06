@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
       amount, 
       amountInUsd, 
       txHash,
-      metadata 
+      metadata,
+      decimals 
     } = body;
     
     // Validate required fields
@@ -82,6 +83,7 @@ export async function POST(req: NextRequest) {
       txHash,
       timestamp: new Date(),
       metadata,
+      decimals
     });
     
     return NextResponse.json({ 
