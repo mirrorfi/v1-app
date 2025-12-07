@@ -105,7 +105,7 @@ export function VaultBalances({ depositData, vaultData, strategiesData = [], isL
         <div className="flex-1 px-6">
           <span className="text-xs font-semibold text-gray-400">Deposited Capital</span>
         </div>
-        <div className="flex-1 px-6 text-center">
+        <div className="flex-1 px-6">
           <div className="text-xs font-semibold text-gray-400 whitespace-nowrap">Unrealized Profit</div>
         </div>
         <div className="flex-1 px-6 text-center">
@@ -134,6 +134,7 @@ export function VaultBalances({ depositData, vaultData, strategiesData = [], isL
               capitalSymbol="USDC"
               pnl={0.00}
               positionValue={depositData.balance * depositData.tokenInfo.usdPrice}
+              isDeposit={true}
             />
           )}
           
@@ -179,9 +180,10 @@ interface PositionRowProps {
   capitalSymbol: string;
   pnl: number;
   positionValue: number;
+  isDeposit?: boolean;
 }
 
-function PositionRow({ icon, name, capitalValue, capitalAmount, capitalSymbol, pnl, positionValue }: PositionRowProps) {
+function PositionRow({ icon, name, capitalValue, capitalAmount, capitalSymbol, pnl, positionValue, isDeposit=false }: PositionRowProps) {
   const formatValue = (value: number) => value.toFixed(2);
   const isProfit = pnl >= 0;
   const pnlPercent = capitalValue > 0 ? (pnl / capitalValue) * 100 : 0;
@@ -201,26 +203,30 @@ function PositionRow({ icon, name, capitalValue, capitalAmount, capitalSymbol, p
         <div className="text-slate-400 text-xs">{formatValue(capitalAmount)} {capitalSymbol}</div>
       </div>
       <div className="flex-1 px-6">
-        <div className="flex items-center justify-center gap-1.5">
-          {isProfit ? (
-            <TrendingUp className="h-3.5 w-3.5 text-[#10b981]" />
-          ) : (
-            <TrendingDown className="h-3.5 w-3.5 text-[#ef4444]" />
-          )}
-          <span
-            className={`text-sm font-medium tabular-nums ${
-              isProfit ? "text-[#10b981]" : "text-[#ef4444]"
-            }`}
-          >
-            {isProfit ? "+" : ""}${Math.abs(pnl).toFixed(2)}
-          </span>
-          <span
-            className={`text-xs tabular-nums ${isProfit ? "text-[#10b981]/70" : "text-[#ef4444]/70"}`}
-          >
-            ({isProfit ? "+" : ""}
-            {pnlPercent.toFixed(2)}%)
-          </span>
-        </div>
+        {isDeposit ? 
+          <span className="text-sm font-bold text-[#ffffff] tabular-nums mr-2">-</span>
+          :(
+          <div className="flex items-center justify-start gap-1.5">
+            {isProfit ? (
+              <TrendingUp className="h-3.5 w-3.5 text-[#10b981]" />
+            ) : (
+              <TrendingDown className="h-3.5 w-3.5 text-[#ef4444]" />
+            )}
+            <span
+              className={`text-sm font-medium tabular-nums ${
+                isProfit ? "text-[#10b981]" : "text-[#ef4444]"
+              }`}
+            >
+              {isProfit ? "+" : ""}${Math.abs(pnl).toFixed(2)}
+            </span>
+            <span
+              className={`text-xs tabular-nums ${isProfit ? "text-[#10b981]/70" : "text-[#ef4444]/70"}`}
+            >
+              ({isProfit ? "+" : ""}
+              {pnlPercent.toFixed(2)}%)
+            </span>
+          </div>
+        )}
       </div>
       <div className="flex-1 px-6 text-center">
         <span className="text-sm font-bold text-[#ffffff] tabular-nums">${formatValue(positionValue)}</span>
