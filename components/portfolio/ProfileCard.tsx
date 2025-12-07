@@ -303,7 +303,7 @@ export function ProfileCard() {
 
 
   return (
-    <Card className="bg-linear-to-br from-slate-800/50 to-slate-900/50 border-slate-600/30 backdrop-blur-sm rounded-xl shadow-lg hover:border-slate-500/50 transition-all">
+    <Card className="bg-[#101018] border-slate-700/40 backdrop-blur-sm rounded-xl shadow-xl hover:border-slate-600/60 transition-all">
       <CardContent className="p-6">
         {isEditing ? (
           // Edit Mode
@@ -314,7 +314,7 @@ export function ProfileCard() {
             <div className="space-y-2">
               <label className="text-sm text-slate-400 block">Profile Picture</label>
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-600 bg-slate-700 shrink-0">
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-700/60 bg-slate-800/50 shrink-0">
                   <img
                     src={editImage || displayPfp}
                     alt="Profile Preview"
@@ -338,7 +338,7 @@ export function ProfileCard() {
                     variant="outline"
                     size="sm"
                     disabled={isUploadingImage || isSaving}
-                    className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="w-full border-slate-700/60 text-slate-300 hover:bg-slate-800/70 hover:border-slate-600"
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     {isUploadingImage ? "Uploading..." : "Upload Image"}
@@ -372,7 +372,7 @@ export function ProfileCard() {
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Enter your display name"
                 disabled={isSaving}
-                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                className="bg-slate-800/50 border-slate-700/60 text-white placeholder:text-slate-500 focus:border-slate-600"
                 autoComplete="off"
               />
               <p className="text-xs text-slate-500">This will override your X profile name if connected</p>
@@ -386,7 +386,7 @@ export function ProfileCard() {
                 variant="outline"
                 size="sm"
                 disabled={isSaving}
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                className="border-slate-700/60 text-slate-300 hover:bg-slate-800/70 hover:border-slate-600"
               >
                 <XClose className="h-4 w-4 mr-1" />
                 Cancel
@@ -407,7 +407,7 @@ export function ProfileCard() {
           <div className="flex items-center gap-6">
             {/* Profile Picture */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-600 bg-slate-700">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-700/60 bg-slate-800/50">
                 <img
                   src={displayPfp}
                   alt="Profile"
@@ -505,7 +505,7 @@ export function ProfileCard() {
                       variant="outline"
                       size="sm"
                       disabled={!publicKey}
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                      className="border-slate-700/60 text-slate-300 hover:bg-slate-800/70 hover:border-slate-600"
                     >
                       <Edit2 className="h-4 w-4 mr-1" />
                       Edit

@@ -11,7 +11,7 @@ export function PositionCardSkeleton() {
                         {/* Profile Picture Skeleton */}
                         <Skeleton className="w-20 h-20 rounded-full shrink-0" />
                         
-                        {/* User Info Skeleton */}
+                        User Info Skeleton
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
                                 <Skeleton className="h-6 w-32" />
@@ -31,7 +31,7 @@ export function PositionCardSkeleton() {
             </Card>
 
             {/* Stats Skeleton */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
                     <Card key={i} className="bg-slate-800/30 border-slate-600/20 rounded-xl">
                         <CardContent className="p-4 md:p-6">
@@ -41,7 +41,7 @@ export function PositionCardSkeleton() {
                         </CardContent>
                     </Card>
                 ))}
-            </div>
+            </div> */}
 
             {/* Charts Skeleton */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
