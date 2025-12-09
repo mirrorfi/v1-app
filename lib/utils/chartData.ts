@@ -39,7 +39,6 @@ export const transformHistoricalData = (
   return sortedData.map((dataPoint, index) => {
     const timestamp = new Date(dataPoint.timestamp);
   
-    
     let value: number;
     
     switch (dataType) {
