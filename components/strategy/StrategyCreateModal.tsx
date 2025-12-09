@@ -45,7 +45,7 @@ const STRATEGY_OPTIONS: StrategyOption[] = [
     platform: "Meteora DAMM V2",
     description: "Alternative DLMM strategy",
     icon: "https://docs.meteora.ag/images/logo/meteora.png",
-    active: true
+    active: false
   },
   {
     id: "meteora-dlmm",
