@@ -3,12 +3,14 @@
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, AlertCircle, RefreshCw, ArrowUpRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useState } from "react";
 
 // Mobile-optimized components
 import { MobileVaultPNL } from "@/components/vault/MobileVaultPNL"
 import { MobileVaultAllocation } from "@/components/vault/MobileVaultAllocation"
 import { MobileVaultChart } from "@/components/vault/MobileVaultChart"
 import { MobileVaultData } from "@/components/vault/MobileVaultData"
+import { MobileVaultExecuteCard } from "@/components/vault/MobileVaultExecuteCard"
 import { MobileVaultBalances } from "@/components/vault/MobileVaultBalances"
 import { useWallet } from "@solana/wallet-adapter-react"
 
@@ -29,6 +31,7 @@ interface MobileVaultDashboardProps {
 export function MobileVaultDashboard({ vault, vaultData, positionBalance, sharePrice, tokenBalance, tokenPrice, isLoading, error, handleReload, depositData, strategiesData }: MobileVaultDashboardProps) {
   const { publicKey } = useWallet();
   const router = useRouter();
+  const [isDepositing, setIsDepositing] = useState(false);
 
   const handleBackClick = () => {
     router.push('/');
@@ -40,8 +43,11 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, shareP
   }
 
   const handleDeposit = () => {
-    // Scroll to execute card or open deposit modal
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsDepositing(true);
+  }
+
+  const handleCloseExecuteCard = () => {
+    setIsDepositing(false);
   }
 
   return (
@@ -140,12 +146,28 @@ export function MobileVaultDashboard({ vault, vaultData, positionBalance, shareP
         </div>
       )}
 
+      {/* Mobile Execute Card: Auto Set to Deposit when opened */}
+      {isDepositing && vaultData && depositData && 
+        <MobileVaultExecuteCard 
+          vault={vault}
+          vaultData={vaultData} 
+          depositData={depositData} 
+          positionBalance={positionBalance}
+          sharePrice={sharePrice}
+          handleReload={handleReload}
+          tokenBalance={tokenBalance}
+          tokenPrice={tokenPrice}
+          initialMode="deposit"
+          onClose={handleCloseExecuteCard}
+        />
+      }
+
       {/* Sticky Deposit Button */}
-      {!error && vaultData && depositData && (
+      {!error && vaultData && depositData && !isDepositing && (
         <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent p-4 backdrop-blur-sm z-50">
           <Button 
             onClick={handleDeposit}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg transition-colors shadow-lg"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg py-7 rounded-lg transition-colors shadow-lg"
           >
             Deposit
           </Button>

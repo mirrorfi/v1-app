@@ -13,7 +13,7 @@ interface PNLCardProps {
   depositData?: any
 }
 
-export function VaultDashboardPNLCard({positionBalance, tokenPrice, isLoading = false, depositData }: PNLCardProps) {
+export function VaultPNLCard({positionBalance, tokenPrice, isLoading = false, depositData }: PNLCardProps) {
   const [currentValue, setCurrentValue] = useState(0)
   const [tokenAmount, setTokenAmount] = useState(0)
 

@@ -1,8 +1,5 @@
 "use client"
 import { useState, useEffect } from "react"
-import { VaultDashboard } from "@/components/VaultDashboard"
-import { MobileVaultDashboard } from "@/components/MobileVaultDashboard"
-import { Navbar } from "@/components/Navbar"
 import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { PublicKey } from "@solana/web3.js"
@@ -11,7 +8,10 @@ import { mirrorfiClient } from '@/lib/client/solana';
 import { getVaultBalance, parseVaultBalanceData, ParsedVaultBalanceData } from "@/lib/api";
 import { parseVault, parseVaultDepositor, ParsedVault, ParsedVaultDepositor } from '@/types/accounts';
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
+import { Navbar } from "@/components/Navbar"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
+import { VaultDashboard } from "@/components/vault/Dashboard"
+import { MobileVaultDashboard } from "@/components/vault/DashboardMobile"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()

@@ -9,15 +9,15 @@ import { getVaultBalance } from "@/lib/api/vault"
 import { ArrowLeft, AlertCircle, RefreshCw, Settings } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import { VaultExecuteCard} from "@/components/vault/VaultExecuteCard"
-import { VaultData } from "@/components/vault/VaultData"
+import { VaultExecuteCard} from "@/components/vault/VaultExecuteCard";
+import { VaultData } from "@/components/vault/VaultData";
 import { VaultChart } from "@/components/vault/VaultChart";
-import { VaultBalances } from "@/components/vault/VaultBalances"
-import { VaultAllocation } from "@/components/vault/VaultAllocation"
+import { VaultBalances } from "@/components/vault/VaultBalances";
+import { VaultAllocation } from "@/components/vault/VaultAllocation";
+import { VaultPNLCard } from "@/components/vault/VaultPNLCard";
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
 import { VaultDashboardUserPosition } from "@/components/VaultDashboardUserPosition"
-import { VaultDashboardPNLCard } from "@/components/VaultDashboardPNLCard"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
 
@@ -144,7 +144,7 @@ export function VaultDashboard({ vault, vaultData, positionBalance, sharePrice, 
               tokenBalance={tokenBalance} 
             />}
             {/*Show User Position*/}
-            <VaultDashboardPNLCard 
+            <VaultPNLCard 
               positionBalance={positionBalance} 
               tokenPrice={sharePrice}
               isLoading={isLoading}

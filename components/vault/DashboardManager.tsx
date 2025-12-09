@@ -1,16 +1,11 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { useEffect, useState } from "react"
 import { ArrowLeft, AlertCircle, RefreshCw, ArrowUpRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Skeleton } from "./ui/skeleton"
 import { VaultDashboardFlow } from "@/components/VaultDashboardFlow";
 import { VaultDashboardBalances } from "@/components/VaultDashboardBalances"
-import { useWallet } from "@solana/wallet-adapter-react"
 
 import { VaultData } from "@/components/vault/VaultData";
 import { VaultChart } from "@/components/vault/VaultChart";

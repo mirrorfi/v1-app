@@ -1,20 +1,15 @@
 "use client"
 import { useState, useEffect } from "react"
-import { VaultDashboard } from "@/components/VaultDashboard"
-import { MobileVaultDashboard } from "@/components/MobileVaultDashboard"
 import { Navbar } from "@/components/Navbar"
 import { useParams } from "next/navigation"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
-import { PublicKey, Keypair } from "@solana/web3.js"
-import { getAssociatedTokenAddressSync } from "@solana/spl-token"
-import { mirrorfiClient } from '@/lib/client/solana';
+import { PublicKey } from "@solana/web3.js"
 import { getVaultBalance, ParsedVaultBalanceData, parseVaultBalanceData} from "@/lib/api";
-import { parseVault, ParsedVault } from '@/types/accounts';
+import { ParsedVault } from '@/types/accounts';
 import { useWallet } from "@solana/wallet-adapter-react"
-import { TOKEN_INFO } from "@/lib/utils/tokens"
-import { getVaultStrategies } from "@/lib/api/accounts";
-import { VaultManagerDashboard } from "@/components/VaultManagerDashboard"
+import { VaultManagerDashboard } from "@/components/vault/DashboardManager";
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
+import { MobileVaultManagerDashboard } from "@/components/vault/DashboardManagerMobile"
 
 export default function VaultPage() {
   const isMobile = useIsMobile()
@@ -113,14 +108,14 @@ export default function VaultPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
-      <GridStyleBackground />
+      {!isMobile && <GridStyleBackground />}
       {/* Only show Navbar on desktop */}
       {!isMobile && <Navbar />}
 
       {/* Conditional rendering based on screen size */}
       {isMobile ? (
         <div className="w-full h-full">
-          <VaultManagerDashboard
+          <MobileVaultManagerDashboard
             vault={vault}
             vaultData={vaultData}
             isLoading={isLoading}
