@@ -1,4 +1,4 @@
-import { mirrorfiClient } from '@/lib/solana-server';
+import { mirrorfiClient } from '@/lib/server/solana';
 import { parseUser } from '@/types/accounts';
 import { NextRequest, NextResponse } from 'next/server';
 import { GetProgramAccountsFilter } from '@solana/web3.js';
@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
           memcmp: {
             offset: DISCRIMINATOR_SIZE,
             bytes: authority,
+            encoding: 'base58',
           },
         });
       }
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          user: await mirrorfiClient.fetchProgramAccount(pdas[0], 'user', parseUser),
+          users: [await mirrorfiClient.fetchProgramAccount(pdas[0], 'user', parseUser)],
         },
         {
           status: 200,

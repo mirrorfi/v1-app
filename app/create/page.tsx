@@ -10,27 +10,25 @@ import { Navbar } from "@/components/Navbar"
 import { useIsMobile } from "@/lib/hooks/useIsMobile"
 import { ChevronDown } from "lucide-react"
 import { getInitializeVaultTx } from "@/lib/api/transaction"
-import { useWallet } from "@solana/wallet-adapter-react"
+import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { useNotification } from "@/contexts/NotificationContext"
 import { TOKEN_INFO } from "@/lib/utils/tokens"
-import { getConnection } from "@/lib/solana"
-import { mirrorfiClient } from "@/lib/solana-server"
+import { mirrorfiClient } from "@/lib/client/solana"
 import { BN } from "@coral-xyz/anchor"
 import { useRouter } from "next/navigation";
 import { createVault } from "@/lib/utils/vault-manager"
 
-const connection = getConnection();
 const tokenOptions = [
-    { 
-        symbol: 'USDC', 
-        name: 'USD Coin', 
+    {
+        symbol: 'USDC',
+        name: 'USD Coin',
         mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         icon: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
         decimals: 6
     },
-    { 
-        symbol: 'SOL', 
-        name: 'Solana', 
+    {
+        symbol: 'SOL',
+        name: 'Solana',
         mint: 'So11111111111111111111111111111111111111112',
         icon: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
         decimals: 9
@@ -40,11 +38,12 @@ const tokenOptions = [
 export default function CreatePage() {
     const isMobile = useIsMobile()
     const router = useRouter();
-    const {showNotification} = useNotification();
-    const {publicKey, signTransaction} = useWallet();
+    const { showNotification } = useNotification();
+    const { publicKey, sendTransaction } = useWallet();
+    const { connection } = useConnection();
     const dropdownRef = useRef<HTMLDivElement>(null)
     const [isLoading, setIsLoading] = useState(false)
-    
+
     // Form state
     const [formData, setFormData] = useState({
         name: '',
@@ -53,20 +52,20 @@ export default function CreatePage() {
         commissionRate: '',
         maxDeposit: ''
     })
-    
+
     const [isTokenDropdownOpen, setIsTokenDropdownOpen] = useState(false)
-    
+
     const commissionRates = ['1%', '2%', '5%', '10%']
-    
+
     const handleInputChange = (field: string, value: string) => {
         if (field === 'description' && value.length > 64) return
         setFormData(prev => ({ ...prev, [field]: value }))
     }
-    
+
     const handleCommissionSelect = (rate: string) => {
         setFormData(prev => ({ ...prev, commissionRate: rate }))
     }
-    
+
     const handleTokenSelect = (token: string) => {
         setFormData(prev => ({ ...prev, capitalToken: token }))
         setIsTokenDropdownOpen(false)
@@ -75,8 +74,8 @@ export default function CreatePage() {
     const createAllowed = formData.name && formData.description && formData.commissionRate && formData.maxDeposit
     const handleCreate = async () => {
         setIsLoading(true);
-        try{
-            if (!publicKey || !signTransaction) {
+        try {
+            if (!publicKey || !sendTransaction) {
                 showNotification({
                     title: `Wallet Not Connected!`,
                     message: `Please connect your wallet to continue.`,
@@ -100,7 +99,7 @@ export default function CreatePage() {
                 });
                 return;
             }
-            const {pythOracle, tokenDecimals, tokenProgram} = TOKEN_INFO[tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint];
+            const { pythOracle, tokenDecimals, tokenProgram } = TOKEN_INFO[tokenOptions.find(token => token.symbol === formData.capitalToken)!.mint];
             if (!pythOracle || !tokenDecimals || !tokenProgram) {
                 showNotification({
                     title: `Token Information Missing!`,
@@ -124,18 +123,10 @@ export default function CreatePage() {
                 authority: publicKey.toString(),
             });
             const versionedTx = res;
-            const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+            const { blockhash } = await connection.getLatestBlockhash();
             versionedTx.message.recentBlockhash = blockhash;
-            const signedTx = await signTransaction(versionedTx);
-            const txid = await connection.sendRawTransaction(signedTx.serialize());
-            await connection.confirmTransaction(
-            {
-                signature: txid,
-                blockhash: blockhash,
-                lastValidBlockHeight: lastValidBlockHeight,
-                },
-                "confirmed"
-            );
+            const txid = await sendTransaction(versionedTx, connection);
+            await connection.confirmTransaction(txid);
             console.log("Transaction ID:", txid);
 
             showNotification({
@@ -161,21 +152,21 @@ export default function CreatePage() {
         }
         setIsLoading(false);
     }
-    
+
     const selectedToken = tokenOptions.find(token => token.symbol === formData.capitalToken)
-    
+
     return (
         <main className="relative min-h-screen w-full overflow-hidden bg-background">
             <GridStyleBackground />
             <Navbar />
-            
+
             <div className="relative z-20 flex flex-col items-center justify-center">
                 {/* Create Vault Form Card */}
                 <Card className="w-full max-w-md bg-slate-800/50 border-slate-600/30 rounded-xl backdrop-blur-sm">
                     <CardContent className="p-8">
                         <div className="space-y-6">
                             <h1 className="text-2xl font-bold text-white text-center">Create MirrorFi Vault</h1>
-                            
+
                             {/* Vault Name */}
                             <div className="space-y-2">
                                 <label className="text-slate-400 text-sm font-medium">Vault Name</label>
@@ -205,7 +196,7 @@ export default function CreatePage() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Select Capital Token */}
                             <div className="space-y-2">
                                 <label className="text-slate-400 text-sm font-medium">Select Capital Token:</label>
@@ -216,16 +207,16 @@ export default function CreatePage() {
                                         onClick={() => setIsTokenDropdownOpen(!isTokenDropdownOpen)}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <img 
-                                                src={selectedToken?.icon} 
-                                                alt={selectedToken?.symbol} 
-                                                className="w-6 h-6 rounded-full" 
+                                            <img
+                                                src={selectedToken?.icon}
+                                                alt={selectedToken?.symbol}
+                                                className="w-6 h-6 rounded-full"
                                             />
                                             <span>{selectedToken?.symbol}</span>
                                         </div>
                                         <ChevronDown className="h-4 w-4" />
                                     </Button>
-                                    
+
                                     {isTokenDropdownOpen && (
                                         <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600/30 rounded-lg shadow-lg z-50">
                                             {tokenOptions.map((token) => (
@@ -245,7 +236,7 @@ export default function CreatePage() {
                                     )}
                                 </div>
                             </div>
-                            
+
                             {/* Commission Rate */}
                             <div className="space-y-3">
                                 <label className="text-slate-400 text-sm font-medium">Commission Rate:</label>
@@ -264,18 +255,17 @@ export default function CreatePage() {
                                             placeholder="Custom %"
                                         />
                                     </div>
-                                    
+
                                     {/* Quick Select Buttons */}
                                     {commissionRates.map((rate) => (
                                         <Button
                                             key={rate}
                                             variant="outline"
                                             size="sm"
-                                            className={`px-4 ${
-                                                formData.commissionRate === rate
+                                            className={`px-4 ${formData.commissionRate === rate
                                                     ? 'bg-blue-600 border-blue-500 text-white'
                                                     : 'bg-slate-700/50 border-slate-600/30 text-slate-300 hover:bg-slate-600/50'
-                                            }`}
+                                                }`}
                                             onClick={() => handleCommissionSelect(rate)}
                                         >
                                             {rate}
@@ -283,7 +273,7 @@ export default function CreatePage() {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             {/* Max User Deposit Cap */}
                             <div className="space-y-2">
                                 <label className="text-slate-400 text-sm font-medium">Max Deposit per User Cap:</label>
@@ -304,7 +294,7 @@ export default function CreatePage() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Create Button */}
                             <Button
                                 onClick={handleCreate}

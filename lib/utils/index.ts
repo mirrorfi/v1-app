@@ -1,6 +1,7 @@
 import { VersionedTransaction } from "@solana/web3.js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { BN } from "@coral-xyz/anchor";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,10 +25,7 @@ export function stringToByteArray(str: string, length: number): number[] {
 }
 
 export function v0TxToBase64(tx: VersionedTransaction): string {
-  return Buffer.from(tx.serialize({
-    requireAllSignatures: false,
-    verifySignatures: false,
-  })).toString("base64");
+  return Buffer.from(tx.serialize()).toString("base64");
 }
 
 export function base64ToV0Tx(base64: string): VersionedTransaction {
@@ -36,30 +34,38 @@ export function base64ToV0Tx(base64: string): VersionedTransaction {
 }
 
 export async function wrappedFetch(url: string, method: string = 'GET', body: any = null) {
-  let res;
-  if (method === 'GET') {
-    res = await fetch(url, {
-      method,
-      body: body
-    });
-  }
-  else if (method === 'POST') {
-    res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-  }
-  else {
-    throw new Error(`Unsupported HTTP method: ${method}`);
-  }
-  const data = await res.json();
+  try {
+    let res;
+    
+    if (method === 'GET') {
+      res = await fetch(url, {
+        method,
+        body: body
+      });
+    } else if (method === 'POST') {
+      res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+    } else {
+      throw new Error(`Unsupported HTTP method: ${method}`);
+    }
 
-  if (!res.ok) {
-    throw new Error(data.error);
-  }
+    const data = await res.json();
 
-  return data;
+    if (!res.ok) {
+      throw new Error(data.error);
+    }
+
+    return data;
+  } catch (err) {
+    throw new Error(`Fetch error: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+export function BNtoBase64(bn: BN, bytes: 1 | 2 | 4 | 8 | 16): string {
+  return bn.toArrayLike(Buffer, "le", bytes).toString("base64");
 }

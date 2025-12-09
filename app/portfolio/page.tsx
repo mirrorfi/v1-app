@@ -55,6 +55,7 @@ import { PositionCard } from "@/components/portfolio/PositionCard";
 import { PositionCardSkeleton } from "@/components/portfolio/PositionCardSkeleton";
 import { EmtpyPosition } from "@/components/portfolio/EmptyPosition";
 import { StatCard } from "@/components/portfolio/StatCard";
+import { ProfileCard } from "@/components/portfolio/ProfileCard";
 import Link from "next/link";
 
 export interface UserPosition {
@@ -361,9 +362,19 @@ export default function ProfilePage() {
         ) : isLoading ? (
           <PositionCardSkeleton />
         ) : userPositions.length === 0 ? (
-          <EmtpyPosition />
+            <>
+            <div className="mb-8">
+              <ProfileCard />
+            </div>
+            <EmtpyPosition />
+            </>
         ) : (
           <>
+            {/* Profile Card */}
+            <div className="mb-8">
+              <ProfileCard />
+            </div>
+
             {/* Portfolio Overview Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-12">
               <TooltipProvider>

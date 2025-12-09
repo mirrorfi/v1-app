@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { VaultCard, VaultCardData } from "@/components/VaultCard";
-import { getConnection } from "@/lib/solana"
 import { GridStyleBackground } from "@/components/ui/GridStyleBackground"
 import { StrategyFlow } from '@/components/StrategyFlow';
 import { getAllVaultBalances } from '@/lib/api';
@@ -16,8 +15,6 @@ import { AccessCodeGate } from '@/components/AccessCodeGate';
 import { TermsOfService } from '@/components/TermsOfService';
 import { useWallet } from "@solana/wallet-adapter-react";
 import { registerUser } from '@/lib/utils/activity-logger';
-
-const connection = getConnection();
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
