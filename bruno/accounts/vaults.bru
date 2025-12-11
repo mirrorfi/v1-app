@@ -1,0 +1,22 @@
+meta {
+  name: vaults
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/api/accounts/vaults
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pda: 
+  ~id: 
+  ~authority: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,9 +1,7 @@
-import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/solana-server";
-import { v0TxToBase64 } from "@/lib/utils";
-import { extractRemainingAccountsForSwap, swap } from "@/lib/utils/jupiter-swap";
+import { buildTx, mirrorfiClient, SERVER_CONNECTION } from "@/lib/server/solana";
+import { swap } from "@/lib/client/jupiter";
 import { parseStrategy, parseVault } from "@/types/accounts";
 import { BN } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
@@ -66,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     const strategyType = strategyAcc.strategyType;
 
-    if (!strategyType.jupiterSwap) {
+    if (!('jupiterSwap' in strategyType)) {
       return NextResponse.json(
         { error: 'Strategy is not a JupiterSwap strategy.' },
         { status: 400 }
@@ -103,19 +101,15 @@ export async function POST(req: NextRequest) {
       amount = (await SERVER_CONNECTION.getTokenAccountBalance(vaultTargetMintTokenAccount)).value.amount;
     }
 
-    const executeSwapResult = await swap(
-      targetMint,
-      depositMint,
+    const executeSwapResult = await swap({
+      inputMint: targetMint,
+      outputMint: depositMint,
       amount,
       slippageBps,
-      false,
-      true,
-      new PublicKey(vault),
-      mirrorfiClient.program.provider.connection,
-    );
-    const remainingAccounts = extractRemainingAccountsForSwap(
-      executeSwapResult.swapInstruction,
-    ).remainingAccounts;
+      exactOutRoute: false,
+      onlyDirectRoutes: true,
+      userPublicKey: vault,
+    });
     const treasuryPda = mirrorfiClient.treasuryPda;
     const treasuryTokenAccount = getAssociatedTokenAddressSync(
       depositMint,
@@ -143,7 +137,7 @@ export async function POST(req: NextRequest) {
         vaultDestinationTokenAccount: vaultDepositMintTokenAccount,
         treasuryTokenAccount,
       })
-      .remainingAccounts(remainingAccounts)
+      .remainingAccounts(executeSwapResult.remainingAccounts)
       .instruction();
     let ixs = [exitIx];
     
@@ -159,7 +153,7 @@ export async function POST(req: NextRequest) {
     const tx = await buildTx(ixs, new PublicKey(authority), executeSwapResult.addressLookupTableAccounts);
 
     return NextResponse.json({
-      tx: v0TxToBase64(tx),
+      tx,
     });
   } catch (err) {
     console.error(err);
