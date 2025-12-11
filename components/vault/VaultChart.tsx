@@ -331,6 +331,12 @@ export function VaultChart({ vaultAddress }: VaultChartProps) {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: "#64748b", fontSize: 12 }} 
+                  interval={Math.floor(data.length / 7)}
+                  tickFormatter={(timestamp) => {
+                    return selectedTimeframe === "24H"
+                      ? timestamp
+                      : new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric'});
+                  }}
                 />
                 <YAxis
                   axisLine={false}
