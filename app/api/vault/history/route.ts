@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
-import { connectToDatabase } from "@/lib/database";
-import { VaultData5Minute, VaultDataHourly, IVaultData } from "@/lib/database/models/vaultData";
+import { connectToNeon } from "@/lib/neon";
+import type { 
+  VaultData5Minute, 
+  VaultDataHourly, 
+  ChartDataPoint, 
+  VaultHistoryResponse 
+} from "./types";
 
 // ============================================
 // Types
@@ -8,18 +13,9 @@ import { VaultData5Minute, VaultDataHourly, IVaultData } from "@/lib/database/mo
 
 interface TimeConfig {
   range: number;
-  model: typeof VaultData5Minute | typeof VaultDataHourly;
+  table: "vault_data_5_minute" | "vault_data_hourly";
   needsAggregation: boolean;
-  unit?: string;
-  binSize?: number;
-}
-
-interface ChartDataPoint {
-  timestamp: Date;
-  tokenNav: number;     // Vault valuation in USDC
-  usdNav: number;       // Vault valuation in USD
-  userDeposits: number; // User deposits adjusted by decimals
-  dataPointsInBucket?: number;
+  binSize?: string; // e.g., "3 hours" for TimescaleDB time_bucket
 }
 
 // ============================================
@@ -41,33 +37,32 @@ export async function GET(req: NextRequest) {
   const timeframe = searchParams.get("timeframe") || "7D";
 
   try {
-    await connectToDatabase();
-    
     const now = new Date();
+
+    const sql = await connectToNeon();
     
-    // Define time ranges and which model to use
+    // Define time ranges and which table to use
     const timeConfig: Record<string, TimeConfig> = {
       "24H": { 
         range: 24 * 60 * 60 * 1000,      // 24 hours
-        model: VaultData5Minute,
+        table: "vault_data_5_minute",
         needsAggregation: false           // Full resolution from 5-minute data
       },
       "7D": { 
         range: 7 * 24 * 60 * 60 * 1000,   // 7 days
-        model: VaultData5Minute,
+        table: "vault_data_5_minute",
         needsAggregation: false           // Return all data (TTL is 7 days anyway)
       },
       "30D": { 
         range: 30 * 24 * 60 * 60 * 1000,  // 30 days
-        model: VaultDataHourly,
+        table: "vault_data_hourly",
         needsAggregation: false           // Hourly data, no need to aggregate
       },
       "90D": { 
         range: 90 * 24 * 60 * 60 * 1000,  // 90 days
-        model: VaultDataHourly,
+        table: "vault_data_hourly",
         needsAggregation: true,           // Aggregate to 3-hour intervals
-        unit: "hour",
-        binSize: 3
+        binSize: "3 hours"
       },
     };
 
@@ -86,113 +81,90 @@ export async function GET(req: NextRequest) {
 
     // Simple query without aggregation
     if (!config.needsAggregation) {
-      const historicalData = await config.model
-        .find({
-          "metadata.vaultAddr": vault,
-          timestamp: {
-            $gte: startTime,
-            $lte: now,
-          },
-        })
-        .sort({ timestamp: 1 })
-        .lean<IVaultData[]>();
-
-      // Transform data from indexer schema to API output format
-      chartData = historicalData.map((doc) => ({
-        timestamp: doc.timestamp,
-        tokenNav: doc.data?.tokenNav || 0,
-        usdNav: doc.data?.usdNav || 0,
-        userDeposits: doc.data?.userDeposits || 0,
-      }));
+      if (config.table === "vault_data_5_minute") {
+        const result = await sql`
+          SELECT timestamp, vault_addr, token_nav, usd_nav, user_deposits
+          FROM vault_data_5_minute
+          WHERE vault_addr = ${vault}
+            AND timestamp >= ${startTime.toISOString()}
+            AND timestamp <= ${now.toISOString()}
+          ORDER BY timestamp ASC
+        `;
+        
+        chartData = result.map((row: any) => ({
+          timestamp: new Date(row.timestamp),
+          tokenNav: Number(row.token_nav) || 0,
+          usdNav: Number(row.usd_nav) || 0,
+          userDeposits: Number(row.user_deposits) || 0,
+        }));
+      } else {
+        // For hourly data, use the close values from OHLC
+        const result = await sql`
+          SELECT 
+            timestamp, 
+            vault_addr, 
+            token_nav_close, 
+            usd_nav_close, 
+            user_deposits_close
+          FROM vault_data_hourly
+          WHERE vault_addr = ${vault}
+            AND timestamp >= ${startTime.toISOString()}
+            AND timestamp <= ${now.toISOString()}
+          ORDER BY timestamp ASC
+        `;
+        
+        chartData = result.map((row: any) => ({
+          timestamp: new Date(row.timestamp),
+          tokenNav: Number(row.token_nav_close) || 0,
+          usdNav: Number(row.usd_nav_close) || 0,
+          userDeposits: Number(row.user_deposits_close) || 0,
+        }));
+      }
     } else {
-      // Aggregation for 90D (3-hour intervals)
-      const aggregatedData = await config.model.aggregate([
-        // Stage 1: Filter by vault and time range
-        {
-          $match: {
-            "metadata.vaultAddr": vault,
-            timestamp: {
-              $gte: startTime,
-              $lte: now,
-            },
-          },
-        },
-        
-        // Stage 2: Sort by timestamp
-        {
-          $sort: { timestamp: 1 },
-        },
-        
-        // Stage 3: Group by time intervals
-        {
-          $group: {
-            _id: {
-              interval: {
-                $dateTrunc: {
-                  date: "$timestamp",
-                  unit: config.unit!,
-                  binSize: config.binSize!,
-                },
-              },
-              vaultAddr: "$metadata.vaultAddr",
-            },
-            // Use LAST value in each interval (most recent snapshot)
-            timestamp: { $last: "$timestamp" },
-            tokenNav: { $last: "$data.tokenNav" },
-            usdNav: { $last: "$data.usdNav" },
-            userDeposits: { $last: "$data.userDeposits" },
-            
-            // Count how many data points are in this bucket
-            count: { $sum: 1 },
-          },
-        },
-        
-        // Stage 4: Sort by interval
-        {
-          $sort: { "_id.interval": 1 },
-        },
-        
-        // Stage 5: Project and calculate derived values
-        {
-          $project: {
-            _id: 0,
-            timestamp: "$timestamp",
-            tokenNav: { $ifNull: ["$tokenNav", 0] },
-            usdNav: { $ifNull: ["$usdNav", 0] },
-            userDeposits: { $ifNull: ["$userDeposits", 0] },
-            dataPointsInBucket: "$count",
-          },
-        },
-      ]);
+      // Aggregation for 90D (3-hour intervals using TimescaleDB time_bucket)
+      const result = await sql`
+        SELECT 
+          time_bucket(${config.binSize}, timestamp) AS bucket,
+          MAX(timestamp) AS timestamp,
+          MAX(token_nav_close) AS token_nav,
+          MAX(usd_nav_close) AS usd_nav,
+          MAX(user_deposits_close) AS user_deposits,
+          COUNT(*) AS data_points_in_bucket
+        FROM vault_data_hourly
+        WHERE vault_addr = ${vault}
+          AND timestamp >= ${startTime.toISOString()}
+          AND timestamp <= ${now.toISOString()}
+        GROUP BY bucket
+        ORDER BY bucket ASC
+      `;
 
       // Transform aggregated data to API output format
-      chartData = aggregatedData.map((doc: any) => ({
-        timestamp: doc.timestamp,
-        tokenNav: doc.tokenNav || 0,
-        usdNav: doc.usdNav || 0,
-        userDeposits: doc.userDeposits || 0,
-        dataPointsInBucket: doc.dataPointsInBucket,
+      chartData = result.map((row: any) => ({
+        timestamp: new Date(row.timestamp),
+        tokenNav: Number(row.token_nav) || 0,
+        usdNav: Number(row.usd_nav) || 0,
+        userDeposits: Number(row.user_deposits) || 0,
+        dataPointsInBucket: Number(row.data_points_in_bucket),
       }));
     }
 
-    const collectionName = config.model.collection.name;
-
-    return Response.json({
+    const response: VaultHistoryResponse = {
       vaultAddress: vault,
       timeframe,
-      collection: collectionName,
-      resolution: config.needsAggregation ? `${config.binSize}-${config.unit}` : "native",
+      table: config.table,
+      resolution: config.needsAggregation && config.binSize ? config.binSize : "native",
       dataPoints: chartData.length,
       data: chartData,
-    });
+    };
+
+    return Response.json(response);
 
   } catch (err) {
-    console.error(err);
+    console.error("[Vault History API Error]", err);
 
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : "Failed to fetch historical data." }), 
       { status: 500 }
     );
   }
-  // No need to close connection - mongoose handles connection pooling
 }
